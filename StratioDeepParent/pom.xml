@@ -5,23 +5,23 @@
 	<artifactId>StratioDeepParent</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>pom</packaging>
-	
+
 	<properties>
 		<!-- Cassandra -->
 		<cassandra.version>1.2.11</cassandra.version>
-		
+
 		<!-- Spark version -->
 		<spark.version>0.8.0-incubating</spark.version>
-		
+
 		<java.version>1.7</java.version>
 	</properties>
-	
+
 	<scm>
 		<connection>scm:git:ssh://bitbucket.org/stratio/stratiodeep.git</connection>
-    	<developerConnection>scm:git:ssh://bitbucket.org/stratio/stratiodeep.git</developerConnection>
-    	<url>https://bitbucket.org/stratio/stratiodeep</url>
+		<developerConnection>scm:git:ssh://bitbucket.org/stratio/stratiodeep.git</developerConnection>
+		<url>https://bitbucket.org/stratio/stratiodeep</url>
 	</scm>
-	
+
 	<build>
 		<pluginManagement>
 			<plugins>
@@ -42,18 +42,20 @@
 					<configuration>
 						<autoVersionSubmodules>true</autoVersionSubmodules>
 						<preparationGoals>clean verify install</preparationGoals>
+						<pushChanges>false</pushChanges>
 					</configuration>
 				</plugin>
+
 			</plugins>
 		</pluginManagement>
 	</build>
-	
+
 	<modules>
 		<module>../StratioDeepCommons</module>
 		<module>../StratioDeep</module>
 		<module>../StratioTestEntity</module>
 	</modules>
-	
+
 	<profiles>
 		<profile>
 			<id>release</id>
