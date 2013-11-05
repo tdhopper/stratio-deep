@@ -51,6 +51,7 @@
 	<modules>
 		<module>../StratioDeepCommons</module>
 		<module>../StratioDeep</module>
+		<module>../StratioTestEntity</module>
 	</modules>
 	
 	<profiles>

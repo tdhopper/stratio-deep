@@ -4,7 +4,6 @@
 **/test-output/*
 **/target/*
 **/.settings/*
-StratioTest*
 *.jar
 RemoteSystemTempFiles/*
 Servers/*
