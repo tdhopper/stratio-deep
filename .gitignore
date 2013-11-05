@@ -9,3 +9,4 @@ StratioTest*
 RemoteSystemTempFiles/*
 Servers/*
 .metadata
+**/release.properties
