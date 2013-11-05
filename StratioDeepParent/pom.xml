@@ -1,8 +1,9 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.stratio.deep</groupId>
 	<artifactId>StratioDeepParent</artifactId>
-	<version>0.0.1</version>
+	<version>0.0.1-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	
 	<properties>
@@ -19,8 +20,7 @@
 		<connection>scm:git:ssh://git@bitbucket.org/stratio/stratiodeep.git</connection>
     	<developerConnection>scm:git:ssh://git@bitbucket.org/stratio/stratiodeep.git</developerConnection>
     	<url>https://bitbucket.org/stratio/stratiodeep</url>
-	  <tag>StratioDeepParent-0.0.1</tag>
-  </scm>
+	</scm>
 	
 	<build>
 		<pluginManagement>
