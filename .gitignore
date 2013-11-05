@@ -1,0 +1,11 @@
+**/.classpath
+**/.project
+**/.springBeans
+**/test-output/*
+**/target/*
+**/.settings/*
+StratioTest*
+*.jar
+RemoteSystemTempFiles/*
+Servers/*
+.metadata

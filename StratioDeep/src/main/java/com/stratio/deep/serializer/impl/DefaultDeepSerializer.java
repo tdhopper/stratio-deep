@@ -1,0 +1,74 @@
+package com.stratio.deep.serializer.impl;
+import static com.stratio.deep.util.CassandraRDDUtils.*;
+
+import java.io.Serializable;
+import java.lang.reflect.Field;
+import java.nio.ByteBuffer;
+import java.util.Map.Entry;
+
+import org.apache.cassandra.db.marshal.AbstractType;
+import org.apache.cassandra.db.marshal.TypeParser;
+import org.apache.cassandra.exceptions.ConfigurationException;
+import org.apache.cassandra.exceptions.SyntaxException;
+
+import com.stratio.deep.annotations.DeepField;
+import com.stratio.deep.entity.DeepByteBuffer;
+import com.stratio.deep.entity.IDeepType;
+import com.stratio.deep.entity.impl.DeepByteBufferImpl;
+import com.stratio.deep.exception.DeepGenericException;
+import com.stratio.deep.exception.DeepIllegalAccessException;
+import com.stratio.deep.serializer.IDeepSerializer;
+
+/**
+ * Default {@link IDeepSerializer} implementation.
+ * 
+ * @author Luca Rosellini <luca@strat.io>
+ *
+ * @param <T>
+ */
+public class DefaultDeepSerializer<T extends IDeepType> implements IDeepSerializer<T> {
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.stratio.deep.serializer.IDeepSerializer#serialize(java.util.Map.Entry, java.lang.Class)
+	 */
+	@Override
+	public DeepByteBuffer<?> serialize(Entry<String, ByteBuffer> entry, Class<T> clazz) {
+		if (entry == null){
+			throw new DeepIllegalAccessException("entry cannot be null");
+		}
+		
+		if (entry.getValue() == null){
+			return null;
+		}
+		
+		Field f = deepField(entry.getKey(), clazz);
+		
+		if (f == null){
+			return null;
+		}
+		
+		DeepField annotation = f.getAnnotation(DeepField.class);
+		Class<? extends AbstractType<?>> type = annotation.validationClass();
+		
+		AbstractType<?> typeInstance = null;
+		try {
+			typeInstance = TypeParser.parse(type.getName());
+		} catch (SyntaxException | ConfigurationException e) {
+			throw new DeepGenericException(e);
+		}
+		
+		Serializable obj = (Serializable) typeInstance.compose(entry.getValue());
+		
+		return DeepByteBufferImpl.create(f.getName(), f.getDeclaringClass(), obj);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.stratio.deep.serializer.IDeepSerializer#deserialize(byte[])
+	 */
+	@Override
+	public Object deserialize(DeepByteBuffer<?> byteBuffer) {
+		return byteBuffer.getObject();
+	}
+}
