@@ -26,6 +26,8 @@
 		<junit.version>4.11</junit.version>
 		
 		<proguard.version>4.10</proguard.version>
+		
+		<datastax.driver.version>2.0.0-rc1</datastax.driver.version>
 	</properties>
 
 	<dependencies>
@@ -84,7 +86,7 @@
 		<dependency>
 			<groupId>com.datastax.cassandra</groupId>
 			<artifactId>cassandra-driver-core</artifactId>
-			<version>1.0.4</version>
+			<version>${datastax.driver.version}</version>
 		</dependency>
 
 	</dependencies>
@@ -100,7 +102,8 @@
 					<target>${java.version}</target>
 				</configuration>
 			</plugin>
-			 
+			
+			<!-- 
 			<plugin>
 				<groupId>com.github.wvengen</groupId>
 				<artifactId>proguard-maven-plugin</artifactId>
@@ -135,7 +138,7 @@
 					</dependency>
 				</dependencies>
 			</plugin>
-			 
+			  -->  
 		</plugins>
 	</build>
 </project>

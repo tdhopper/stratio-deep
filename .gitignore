@@ -9,3 +9,5 @@ RemoteSystemTempFiles/*
 Servers/*
 .metadata
 **/release.properties
+jars/*
+*.releaseBackup

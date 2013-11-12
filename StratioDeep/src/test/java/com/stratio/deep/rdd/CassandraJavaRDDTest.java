@@ -66,7 +66,7 @@ public final class CassandraJavaRDDTest extends AbstractDeepSparkContextTest{
 	
 	@Test(dependsOnMethods = "testCassandraRDDInstantiation")
 	public void testCollect() throws CharacterCodingException {
-		logger.info("testCompute()");
+		logger.info("testCollect()");
 		long count = rdd.count();
 		assertEquals(count, testDataSize);
 		

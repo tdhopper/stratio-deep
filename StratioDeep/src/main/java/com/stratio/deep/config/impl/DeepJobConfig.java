@@ -1,5 +1,4 @@
 package com.stratio.deep.config.impl;
-
 import java.io.IOException;
 import java.lang.annotation.AnnotationTypeMismatchException;
 
@@ -30,6 +29,9 @@ import com.stratio.deep.util.Constants;
  * 
  */
 public final class DeepJobConfig<T extends IDeepType> implements IDeepJobConfig<T> {
+	
+	private static final long serialVersionUID = 4490719746563473495L;
+
 	public DeepJobConfig(Class<T> entityClass) {
 		super();
 		this.entityClass = entityClass;
@@ -46,6 +48,7 @@ public final class DeepJobConfig<T extends IDeepType> implements IDeepJobConfig<
 	private String username;
 	private String password;
 	private String defaultFilter;
+	private Integer thriftFramedTransportSizeMB = 256;
 	
 	private transient IPartitioner<?> partitioner = new Murmur3Partitioner();
 	private transient IDeepSerializer<T> serializer = new DefaultDeepSerializer<T>();
@@ -54,7 +57,7 @@ public final class DeepJobConfig<T extends IDeepType> implements IDeepJobConfig<
 
 	private transient Job hadoopJob;
 
-	private Configuration configuration;
+	private transient Configuration configuration;
 
 	private void checkInitialized() {
 		if (configuration == null) {
@@ -103,7 +106,6 @@ public final class DeepJobConfig<T extends IDeepType> implements IDeepJobConfig<
 		}
 		
 		initialize();
-
 		
 		return configuration;
 	}
@@ -203,6 +205,13 @@ public final class DeepJobConfig<T extends IDeepType> implements IDeepJobConfig<
 	@Override
 	public IDeepJobConfig<T> partitioner(IPartitioner<?> partitioner){
 		this.partitioner = partitioner;
+		
+		return this;
+	}
+	
+	@Override
+	public IDeepJobConfig<T> framedTransportSize(Integer thriftFramedTransportSizeMB){
+		this.thriftFramedTransportSizeMB = thriftFramedTransportSizeMB;
 		
 		return this;
 	}
@@ -320,13 +329,17 @@ public final class DeepJobConfig<T extends IDeepType> implements IDeepJobConfig<
 			ConfigHelper.setOutputPartitioner(c, partitioner.getClass()
 					.getCanonicalName());
 			
-			/* TODO: make this a little bit more configurable, maybe externalize it in a config file */
-			ConfigHelper.setThriftFramedTransportSizeInMb(c, 256);
+			ConfigHelper.setThriftFramedTransportSizeInMb(c, thriftFramedTransportSizeMB);
 
 			configuration = c;
 		} catch (IOException e) {
 			throw new DeepIOException(e);
 		}
 		return this;
+	}
+
+	@Override
+	public Integer getThriftFramedTransportSizeMB() {
+		return thriftFramedTransportSizeMB;
 	}
 }

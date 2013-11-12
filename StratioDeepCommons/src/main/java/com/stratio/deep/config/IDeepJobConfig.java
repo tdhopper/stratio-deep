@@ -1,5 +1,7 @@
 package com.stratio.deep.config;
 
+import java.io.Serializable;
+
 import org.apache.cassandra.dht.IPartitioner;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.mapreduce.Job;
@@ -7,7 +9,7 @@ import org.apache.hadoop.mapreduce.Job;
 import com.stratio.deep.entity.IDeepType;
 import com.stratio.deep.serializer.IDeepSerializer;
 
-public interface IDeepJobConfig<T extends IDeepType> {
+public interface IDeepJobConfig<T extends IDeepType> extends Serializable {
 
 	/**
 	 * Validates if any of the mandatory fields have been configured or not.
@@ -55,12 +57,36 @@ public interface IDeepJobConfig<T extends IDeepType> {
 	 */
 	public abstract IDeepJobConfig<T> columnFamily(String columnFamily);
 
+	/**
+	 * Sets the username to use to login to Cassandra.
+	 * 
+	 * @param username
+	 * @return
+	 */
 	public abstract IDeepJobConfig<T> username(String username);
 
+	/**
+	 * Sets the password to use to login to Cassandra.
+	 * 
+	 * @param username
+	 * @return
+	 */
 	public abstract IDeepJobConfig<T> password(String password);
 
+	/**
+	 * Sets the default "where" filter to use to access ColumnFamily's data.
+	 * 
+	 * @param username
+	 * @return
+	 */
 	public abstract IDeepJobConfig<T> defaultFilter(String defaultFilter);
 
+	/**
+	 * 
+	 * 
+	 * @param serializer
+	 * @return
+	 */
 	public abstract IDeepJobConfig<T> serializer(IDeepSerializer<T> serializer);
 
 	public abstract IDeepJobConfig<T> partitioner(IPartitioner<?> partitioner);
@@ -84,5 +110,9 @@ public interface IDeepJobConfig<T extends IDeepType> {
 	public abstract Job getHadoopJob();
 
 	public abstract IDeepSerializer<T> getSerializer();
+
+	public abstract IDeepJobConfig<T> framedTransportSize(Integer thriftFramedTransportSizeMB);
+
+	public abstract Integer getThriftFramedTransportSizeMB();
 
 }

@@ -1,10 +1,14 @@
 package com.stratio.deep.config;
 
-import com.stratio.deep.config.IDeepJobConfig;
+import java.io.Serializable;
+
 import com.stratio.deep.config.impl.DeepJobConfig;
 import com.stratio.deep.entity.IDeepType;
 
-public class DeepJobConfigFactory {
+public class DeepJobConfigFactory implements Serializable {
+	
+	private static final long serialVersionUID = -4559130919203819088L;
+
 	/**
 	 * Factory method.
 	 * 
