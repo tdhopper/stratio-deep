@@ -82,14 +82,22 @@ public interface IDeepJobConfig<T extends IDeepType> extends Serializable {
 	public abstract IDeepJobConfig<T> defaultFilter(String defaultFilter);
 
 	/**
+	 * Defines a projection over the CF columns.
+	 * 
+	 * @param columns
+	 * @return
+	 */
+	public abstract IDeepJobConfig<T> inputColumns(String... columns);
+	
+	/**
 	 * 
 	 * 
 	 * @param serializer
 	 * @return
 	 */
-	public abstract IDeepJobConfig<T> serializer(IDeepSerializer<T> serializer);
+	public abstract IDeepJobConfig<T> serializer(String serializerClassName);
 
-	public abstract IDeepJobConfig<T> partitioner(IPartitioner<?> partitioner);
+	public abstract <P extends IPartitioner<?>> IDeepJobConfig<T> partitioner(String partitionerClassName);
 
 	public abstract String getDefaultFilter();
 
@@ -114,5 +122,7 @@ public interface IDeepJobConfig<T extends IDeepType> extends Serializable {
 	public abstract IDeepJobConfig<T> framedTransportSize(Integer thriftFramedTransportSizeMB);
 
 	public abstract Integer getThriftFramedTransportSizeMB();
+
+	
 
 }

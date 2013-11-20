@@ -3,20 +3,22 @@ import java.io.IOException;
 import java.lang.annotation.AnnotationTypeMismatchException;
 
 import org.apache.cassandra.dht.IPartitioner;
-import org.apache.cassandra.dht.Murmur3Partitioner;
 import org.apache.cassandra.hadoop.ConfigHelper;
+import org.apache.cassandra.hadoop.cql3.CqlConfigHelper;
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.mapreduce.Job;
+import org.apache.log4j.Logger;
 
 import com.stratio.deep.annotations.DeepEntity;
 import com.stratio.deep.config.DeepJobConfigFactory;
 import com.stratio.deep.config.IDeepJobConfig;
 import com.stratio.deep.entity.IDeepType;
+import com.stratio.deep.exception.DeepGenericException;
 import com.stratio.deep.exception.DeepIOException;
 import com.stratio.deep.exception.DeepIllegalAccessException;
 import com.stratio.deep.serializer.IDeepSerializer;
-import com.stratio.deep.serializer.impl.DefaultDeepSerializer;
 import com.stratio.deep.util.Constants;
 
 /**
@@ -29,6 +31,8 @@ import com.stratio.deep.util.Constants;
  * 
  */
 public final class DeepJobConfig<T extends IDeepType> implements IDeepJobConfig<T> {
+	
+	private transient Logger logger = Logger.getLogger(getClass());
 	
 	private static final long serialVersionUID = 4490719746563473495L;
 
@@ -48,10 +52,13 @@ public final class DeepJobConfig<T extends IDeepType> implements IDeepJobConfig<
 	private String username;
 	private String password;
 	private String defaultFilter;
+	private String[] inputColumns;
+	
 	private Integer thriftFramedTransportSizeMB = 256;
 	
-	private transient IPartitioner<?> partitioner = new Murmur3Partitioner();
-	private transient IDeepSerializer<T> serializer = new DefaultDeepSerializer<T>();
+	private String partitionerClassName = "org.apache.cassandra.dht.Murmur3Partitioner";
+	private String serializerClassName = "com.stratio.deep.serializer.impl.DefaultDeepSerializer";
+	
 
 	private Class<T> entityClass;
 
@@ -61,8 +68,7 @@ public final class DeepJobConfig<T extends IDeepType> implements IDeepJobConfig<
 
 	private void checkInitialized() {
 		if (configuration == null) {
-			throw new DeepIllegalAccessException(
-					"DeepJobConfig has not been initialized!");
+			throw new DeepIllegalAccessException("DeepJobConfig has not been initialized!");
 		}
 	}
 
@@ -130,6 +136,18 @@ public final class DeepJobConfig<T extends IDeepType> implements IDeepJobConfig<
 		return this;
 	}
 
+	/*
+	 * (non-Jvadoc)
+	 * @see com.stratio.deep.config.IDeepJobConfig#inputColumns(java.lang.String[])
+	 */
+	@Override
+	public IDeepJobConfig<T> inputColumns(String... columns) {
+		this.inputColumns = columns;
+
+		return this;
+	}
+
+	
 	/* (non-Javadoc)
 	 * @see com.stratio.deep.config.IDeepJobConfig#keyspace(java.lang.String)
 	 */
@@ -193,8 +211,8 @@ public final class DeepJobConfig<T extends IDeepType> implements IDeepJobConfig<
 	 * @see com.stratio.deep.config.IDeepJobConfig#serializer(com.stratio.deep.serializer.IDeepSerializer)
 	 */
 	@Override
-	public IDeepJobConfig<T> serializer(IDeepSerializer<T> serializer){
-		this.serializer = serializer;
+	public IDeepJobConfig<T> serializer(String serializerClassName){
+		this.serializerClassName = serializerClassName;
 		
 		return this;
 	}
@@ -203,9 +221,8 @@ public final class DeepJobConfig<T extends IDeepType> implements IDeepJobConfig<
 	 * @see com.stratio.deep.config.IDeepJobConfig#partitioner(org.apache.cassandra.dht.IPartitioner)
 	 */
 	@Override
-	public IDeepJobConfig<T> partitioner(IPartitioner<?> partitioner){
-		this.partitioner = partitioner;
-		
+	public <P extends IPartitioner<?>> IDeepJobConfig<T> partitioner(String partitionerClassName){
+		this.partitionerClassName = partitionerClassName;
 		return this;
 	}
 	
@@ -301,9 +318,18 @@ public final class DeepJobConfig<T extends IDeepType> implements IDeepJobConfig<
 	/* (non-Javadoc)
 	 * @see com.stratio.deep.config.IDeepJobConfig#getSerializer()
 	 */
+	@SuppressWarnings("unchecked")
 	@Override
 	public IDeepSerializer<T> getSerializer() {
-		return serializer;
+		
+		try {
+			return (IDeepSerializer<T>) Class.forName(serializerClassName).newInstance();
+		} catch (InstantiationException | IllegalAccessException
+				| ClassNotFoundException e) {
+			logger.error(e.getMessage(),e);
+			
+			throw new DeepGenericException(e);
+		}
 	}
 
 	@Override
@@ -320,14 +346,20 @@ public final class DeepJobConfig<T extends IDeepType> implements IDeepJobConfig<
 			ConfigHelper.setInputColumnFamily(c, keyspace, columnFamily, false);
 			ConfigHelper.setInputInitialAddress(c, host);
 			ConfigHelper.setInputRpcPort(c, String.valueOf(port));
-			ConfigHelper.setInputPartitioner(c, partitioner.getClass()
-					.getCanonicalName());
-
+			ConfigHelper.setInputPartitioner(c, partitionerClassName);
+			
+			if (StringUtils.isNotEmpty(defaultFilter)){
+				CqlConfigHelper.setInputWhereClauses(c, defaultFilter);
+			}
+			
+			if (!ArrayUtils.isEmpty(inputColumns)){
+				CqlConfigHelper.setInputColumns(c, StringUtils.join(inputColumns, ","));
+			}
+			
 			ConfigHelper.setOutputColumnFamily(c, keyspace, columnFamily);
 			ConfigHelper.setOutputInitialAddress(c, host);
 			ConfigHelper.setOutputRpcPort(c, String.valueOf(port));
-			ConfigHelper.setOutputPartitioner(c, partitioner.getClass()
-					.getCanonicalName());
+			ConfigHelper.setOutputPartitioner(c, partitionerClassName);
 			
 			ConfigHelper.setThriftFramedTransportSizeInMb(c, thriftFramedTransportSizeMB);
 

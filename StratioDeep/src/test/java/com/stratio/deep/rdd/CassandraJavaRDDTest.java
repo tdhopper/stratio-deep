@@ -8,7 +8,6 @@ import java.nio.charset.CharacterCodingException;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.cassandra.dht.Murmur3Partitioner;
 import org.apache.cassandra.exceptions.ConfigurationException;
 import org.apache.log4j.Logger;
 import org.apache.spark.api.java.JavaPairRDD;
@@ -27,7 +26,6 @@ import com.stratio.deep.context.AbstractDeepSparkContextTest;
 import com.stratio.deep.embedded.CassandraServer;
 import com.stratio.deep.entity.StrippedTestEntity;
 import com.stratio.deep.entity.TestEntity;
-import com.stratio.deep.serializer.impl.DefaultDeepSerializer;
 import com.stratio.deep.util.Constants;
 
 public final class CassandraJavaRDDTest extends AbstractDeepSparkContextTest{
@@ -44,8 +42,8 @@ public final class CassandraJavaRDDTest extends AbstractDeepSparkContextTest{
 				.port(CassandraServer.CASSANDRA_THRIFT_PORT)
 				.keyspace(KEYSPACE_NAME)
 				.columnFamily(COLUMN_FAMILY)
-				.partitioner(new Murmur3Partitioner())
-				.serializer(new DefaultDeepSerializer<TestEntity>())
+				.partitioner("org.apache.cassandra.dht.Murmur3Partitioner")
+				.serializer("com.stratio.deep.serializer.impl.DefaultDeepSerializer")
 				.username("")
 				.password("");
 

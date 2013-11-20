@@ -50,6 +50,7 @@ import com.stratio.deep.serializer.IDeepSerializer;
  * 
  */
 public final class CassandraRDD<T extends IDeepType> extends RDD<T> {
+	//private transient Logger logger = 	;
 
 	private static final String STRATIO_DEEP_JOB_PREFIX = "stratio-deep-job-";
 	private static final String STRATIO_DEEP_TASK_PREFIX = "stratio-deep-task-";
@@ -95,6 +96,8 @@ public final class CassandraRDD<T extends IDeepType> extends RDD<T> {
 
 		final DeepCqlPagingInputFormat inputFormat = new DeepCqlPagingInputFormat();
 		DeepPartition deepPartition = (DeepPartition) split;
+		
+		log().debug("Executing compute for split: "+ deepPartition);
 
 		final DeepCqlPagingRecordReader recordReader = initRecordReader(ctx, inputFormat, deepPartition);
 
@@ -161,8 +164,9 @@ public final class CassandraRDD<T extends IDeepType> extends RDD<T> {
 	 */
 	private DeepCqlPagingRecordReader initRecordReader(
 			TaskContext ctx, final DeepCqlPagingInputFormat inputFormat,
-			DeepPartition dp) {
+			final DeepPartition dp) {
 		try {
+			
 			TaskAttemptID attemptId = new TaskAttemptID(STRATIO_DEEP_TASK_PREFIX
 					+ System.currentTimeMillis(), id(), true, dp.index(), 0);
 
@@ -171,10 +175,12 @@ public final class CassandraRDD<T extends IDeepType> extends RDD<T> {
 			
 			final DeepCqlPagingRecordReader recordReader = (DeepCqlPagingRecordReader) inputFormat
 					.createRecordReader(dp.splitWrapper().value(), taskCtx);
+			
+			log().debug("Initializing recordReader for split: "+ dp);
 			recordReader.initialize(dp.splitWrapper().value(), taskCtx);
 
 			ctx.addOnCompleteCallback(new OnComputedRDDCallback<BoxedUnit>(
-					recordReader));
+					recordReader, dp));
 
 			return recordReader;
 		} catch (IOException | InterruptedException e) {
@@ -209,6 +215,8 @@ public final class CassandraRDD<T extends IDeepType> extends RDD<T> {
 		for (int i = 0; i < underlyingInputSplits.size(); i++) {
 			InputSplit split = underlyingInputSplits.get(i);
 			partitions[i] = new DeepPartition(id(), i, (Writable) split);
+			
+			log().debug("Detected partition: "+partitions[i]);
 		}
 		return partitions;
 	}
@@ -224,7 +232,8 @@ public final class CassandraRDD<T extends IDeepType> extends RDD<T> {
 		DeepPartition p = (DeepPartition) split;
 
 		String[] locations = p.splitWrapper().value().getLocations();
-
+		log().debug("getPreferredLocations: " + p);
+		
 		return asScalaBuffer(Arrays.asList(locations));
 
 	}
@@ -239,16 +248,20 @@ public final class CassandraRDD<T extends IDeepType> extends RDD<T> {
 	 */
 	class OnComputedRDDCallback<R> extends AbstractFunction0<R> {
 		private final RecordReader<Map<String, ByteBuffer>, Map<String, ByteBuffer>> recordReader;
-
+		private final DeepPartition deepPartition;
+		
 		public OnComputedRDDCallback(
-				RecordReader<Map<String, ByteBuffer>, Map<String, ByteBuffer>> recordReader) {
+				RecordReader<Map<String, ByteBuffer>, Map<String, ByteBuffer>> recordReader, DeepPartition dp) {
 			super();
 			this.recordReader = recordReader;
+			this.deepPartition = dp;
 		}
 
 		@Override
 		public R apply() {
 			try {
+				log().debug("Closing context for partition " + deepPartition);
+				
 				recordReader.close();
 			} catch (IOException e) {
 				throw new DeepIOException(e);
