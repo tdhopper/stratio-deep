@@ -18,7 +18,6 @@ import org.apache.cassandra.io.util.FileUtils;
 import org.apache.cassandra.service.CassandraDaemon;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-import org.apache.thrift.transport.TTransportException;
 
 import com.datastax.driver.core.Cluster;
 import com.datastax.driver.core.Session;
@@ -57,7 +56,7 @@ public class CassandraServer {
 	 * @throws IOException
 	 * @throws InterruptedException
 	 */
-	public void start() throws TTransportException, IOException,
+	public void start() throws IOException,
 			InterruptedException, ConfigurationException {
 
 		File dir = Files.createTempDir();

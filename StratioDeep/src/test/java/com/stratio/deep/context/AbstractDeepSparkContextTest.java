@@ -13,7 +13,6 @@ import java.util.ArrayList;
 import org.apache.cassandra.exceptions.ConfigurationException;
 import org.apache.log4j.Logger;
 import org.apache.spark.rdd.RDD;
-import org.apache.thrift.transport.TTransportException;
 import org.testng.annotations.AfterSuite;
 import org.testng.annotations.BeforeSuite;
 
@@ -97,7 +96,7 @@ public abstract class AbstractDeepSparkContextTest {
 	}
 
 	@BeforeSuite
-	protected void initContextAndServer() throws ConfigurationException, TTransportException, IOException, InterruptedException{
+	protected void initContextAndServer() throws ConfigurationException, IOException, InterruptedException{
 		context = new DeepSparkContext("local[4]", "deepSparkContextTest");
 		
 		String createKeyspace = "CREATE KEYSPACE "

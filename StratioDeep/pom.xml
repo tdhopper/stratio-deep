@@ -1,7 +1,8 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>StratioDeep</artifactId>
-	
+
 	<parent>
 		<groupId>com.stratio.deep</groupId>
 		<artifactId>StratioDeepParent</artifactId>
@@ -24,9 +25,9 @@
 
 		<!-- Test -->
 		<junit.version>4.11</junit.version>
-		
+
 		<proguard.version>4.10</proguard.version>
-		
+
 		<datastax.driver.version>2.0.0-rc1</datastax.driver.version>
 	</properties>
 
@@ -36,7 +37,7 @@
 			<artifactId>StratioDeepCommons</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		
+
 		<!-- Logging with SLF4J & LogBack -->
 		<dependency>
 			<groupId>log4j</groupId>
@@ -81,8 +82,12 @@
 			<groupId>org.apache.cassandra</groupId>
 			<artifactId>cassandra-all</artifactId>
 			<version>${cassandra.version}</version>
-
 		</dependency>
+<!-- 		<dependency> -->
+<!-- 			<groupId>org.apache.cassandra</groupId> -->
+<!-- 			<artifactId>cassandra-thrift</artifactId> -->
+<!-- 			<version>${cassandra.version}</version> -->
+<!-- 		</dependency> -->
 		<dependency>
 			<groupId>com.datastax.cassandra</groupId>
 			<artifactId>cassandra-driver-core</artifactId>
@@ -102,43 +107,18 @@
 					<target>${java.version}</target>
 				</configuration>
 			</plugin>
-			
-			<!-- 
-			<plugin>
-				<groupId>com.github.wvengen</groupId>
-				<artifactId>proguard-maven-plugin</artifactId>
-				<version>2.0.6</version>
-				<executions>
-					<execution>
-						<phase>package</phase>
-						<goals>
-							<goal>proguard</goal>
-						</goals>
-					</execution>
-				</executions>
-				<configuration>
-					<proguardVersion>${proguard.version}</proguardVersion>
-					<obfuscate>true</obfuscate>
-					<options>
-						<option>-keepattributes Signature</option>
-						<option>-allowaccessmodification</option>
-						<option>-keep public class com.stratio.deep.context.DeepSparkContext { *; }</option>
-						<option>-keep public class com.stratio.deep.config.DeepJobConfigFactory { *; }</option>
-					</options>
-					<libs>
-						<lib>${java.home}/lib/rt.jar</lib>
-					</libs>
-				</configuration>
-				<dependencies>
-					<dependency>
-						<groupId>net.sf.proguard</groupId>
-						<artifactId>proguard-base</artifactId>
-						<version>${proguard.version}</version>
-						<scope>runtime</scope>
-					</dependency>
-				</dependencies>
-			</plugin>
-			  -->  
+
+			<!-- <plugin> <groupId>com.github.wvengen</groupId> <artifactId>proguard-maven-plugin</artifactId> 
+				<version>2.0.6</version> <executions> <execution> <phase>package</phase> 
+				<goals> <goal>proguard</goal> </goals> </execution> </executions> <configuration> 
+				<proguardVersion>${proguard.version}</proguardVersion> <obfuscate>true</obfuscate> 
+				<options> <option>-keepattributes Signature</option> <option>-allowaccessmodification</option> 
+				<option>-keep public class com.stratio.deep.context.DeepSparkContext { *; 
+				}</option> <option>-keep public class com.stratio.deep.config.DeepJobConfigFactory 
+				{ *; }</option> </options> <libs> <lib>${java.home}/lib/rt.jar</lib> </libs> 
+				</configuration> <dependencies> <dependency> <groupId>net.sf.proguard</groupId> 
+				<artifactId>proguard-base</artifactId> <version>${proguard.version}</version> 
+				<scope>runtime</scope> </dependency> </dependencies> </plugin> -->
 		</plugins>
 	</build>
 </project>

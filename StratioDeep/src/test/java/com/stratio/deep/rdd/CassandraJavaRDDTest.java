@@ -15,7 +15,6 @@ import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.function.Function;
 import org.apache.spark.api.java.function.Function2;
 import org.apache.spark.api.java.function.PairFunction;
-import org.apache.thrift.transport.TTransportException;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -35,7 +34,7 @@ public final class CassandraJavaRDDTest extends AbstractDeepSparkContextTest{
 	
 	@BeforeClass
 	protected void initServerAndRDD() throws IOException, URISyntaxException,
-			ConfigurationException, TTransportException, InterruptedException {
+			ConfigurationException, InterruptedException {
 		
 		rddConfig = DeepJobConfigFactory.create(TestEntity.class)
 				.host(Constants.DEFAULT_CASSANDRA_HOST)

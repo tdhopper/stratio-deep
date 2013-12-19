@@ -17,19 +17,18 @@ import com.stratio.deep.entity.IDeepType;
  * @param <T>
  */
 public final class CassandraJavaRDD<T extends IDeepType> extends JavaRDD<T> {
-	private static final int FIRST_FIELD = 0;
-	private static final long serialVersionUID = -3208994171892747470L;
+    private static final int FIRST_FIELD = 0;
+    private static final long serialVersionUID = -3208994171892747470L;
 
-	/**
-	 * Default constructor. Constructs a new Java-friendly Cassandra RDD
-	 * 
-	 * @param rdd
-	 */
-	@SuppressWarnings({ "unchecked" })
-	public CassandraJavaRDD(CassandraRDD<T> rdd) {
-		super(rdd, MODULE$.fromClass(	(Class<T>) 
-										(	(java.lang.reflect.TypeVariable<?>)
-												( (ParameterizedType) CassandraJavaRDD.class.getGenericSuperclass() )
-														.getActualTypeArguments()[FIRST_FIELD]).getGenericDeclaration()) );
-	}	
+    /**
+     * Default constructor. Constructs a new Java-friendly Cassandra RDD
+     * 
+     * @param rdd
+     */
+    @SuppressWarnings({ "unchecked" })
+    public CassandraJavaRDD(CassandraRDD<T> rdd) {
+	super(rdd, MODULE$
+		.fromClass((Class<T>) ((java.lang.reflect.TypeVariable<?>) ((ParameterizedType) CassandraJavaRDD.class
+			.getGenericSuperclass()).getActualTypeArguments()[FIRST_FIELD]).getGenericDeclaration()));
+    }
 }

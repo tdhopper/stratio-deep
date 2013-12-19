@@ -10,7 +10,6 @@ import org.apache.cassandra.exceptions.ConfigurationException;
 import org.apache.log4j.Logger;
 import org.apache.spark.Partition;
 import org.apache.spark.rdd.RDD;
-import org.apache.thrift.transport.TTransportException;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -29,7 +28,7 @@ public class CassandraRDDTest extends AbstractDeepSparkContextTest {
 
 	@BeforeClass
 	protected void initServerAndRDD() throws IOException, URISyntaxException,
-			ConfigurationException, TTransportException, InterruptedException {
+			ConfigurationException, InterruptedException {
 		rddConfig = DeepJobConfigFactory.create(TestEntity.class)
 				.host(Constants.DEFAULT_CASSANDRA_HOST)
 				.port(CassandraServer.CASSANDRA_THRIFT_PORT)
