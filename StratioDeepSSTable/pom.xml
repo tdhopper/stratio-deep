@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>com.stratio.deep</groupId>
 		<artifactId>StratioDeepParent</artifactId>
-		<version>0.0.4-SNAPSHOT</version>
+		<version>0.0.6-SNAPSHOT</version>
 		<relativePath>../StratioDeepParent</relativePath>
 	</parent>
 	<artifactId>StratioDeepSSTable</artifactId>
@@ -39,7 +39,7 @@
 		<!-- spark artifact -->
 		<dependency>
 			<groupId>org.apache.spark</groupId>
-			<artifactId>spark-core_2.9.3</artifactId>
+			<artifactId>spark-core_2.10</artifactId>
 			<version>${spark.version}</version>
 			<exclusions>
 				<exclusion>

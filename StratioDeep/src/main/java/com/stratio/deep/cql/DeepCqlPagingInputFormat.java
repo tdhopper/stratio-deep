@@ -1,4 +1,4 @@
-package com.stratio.deep.cql3;
+package com.stratio.deep.cql;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -21,7 +21,7 @@ import org.apache.hadoop.mapreduce.TaskAttemptContext;
 public class DeepCqlPagingInputFormat extends CqlPagingInputFormat {
 
     /**
-     * Returns a new instance of {@link DeepCqlPagingRecordReader}.
+     * Returns a new instance of {@link IterableCqlPagingRecordReader}.
      */
     @Override
     public RecordReader<Map<String, ByteBuffer>, Map<String, ByteBuffer>> createRecordReader(InputSplit arg0,

@@ -14,4 +14,5 @@ public @interface DeepField {
 
 	Class<? extends AbstractType<?>> validationClass() default UTF8Type.class;
 	String fieldName() default "";
+    boolean isKey() default false;
 }

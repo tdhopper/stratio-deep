@@ -97,6 +97,7 @@ public class DeepSSTablesReader {
 	    
 	})) {
 	    
+	    
 	    for (Path entry: dStream) {
 		Matcher matcher = DATA_FILE_PATTERN.matcher(entry.getFileName().toString());
 

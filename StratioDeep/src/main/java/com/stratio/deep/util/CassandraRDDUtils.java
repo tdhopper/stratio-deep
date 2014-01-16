@@ -1,8 +1,7 @@
 package com.stratio.deep.util;
 
 import java.io.Serializable;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.*;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -25,6 +24,7 @@ import com.stratio.deep.entity.DeepByteBuffer;
 import com.stratio.deep.entity.IDeepType;
 import com.stratio.deep.exception.DeepGenericException;
 import com.stratio.deep.serializer.IDeepSerializer;
+import scala.reflect.ClassTag;
 
 /**
  * Utility class providing useful methods to manipulate the conversion
@@ -90,7 +90,7 @@ public final class CassandraRDDUtils {
 	
 
 	/**
-	 * Utility method that filters out all the fields not annotated
+	 * Utility method that filters out all the fields _not_ annotated
 	 * with the {@link DeepField} annotation.
 	 * 
 	 * @param fields
@@ -106,6 +106,31 @@ public final class CassandraRDDUtils {
 		}
 		return filtered.toArray(new Field[0]);
 	}
+
+  /**
+   * Return a pair of Field[] whose left element is
+   * the array of keys fields.
+   * The right element contains the array of all other non-key fields.
+   *
+   * @param fields
+   * @return
+   */
+  public static Pair<Field[], Field[]> filterKeyFields(Field[] fields){
+    Field[] filtered = filterDeepFields(fields);
+    List<Field> keys = new ArrayList<>();
+    List<Field> others = new ArrayList<>();
+
+
+    for (Field field : filtered) {
+      if (field.getAnnotation(DeepField.class).isKey()){
+        keys.add(field);
+      } else {
+        others.add(field);
+      }
+    }
+
+    return Pair.create(keys.toArray(new Field[0]),others.toArray(new Field[0]));
+  }
 
 	/**
 	 * Returns a {@link Field} object corresponding to the
@@ -165,8 +190,8 @@ public final class CassandraRDDUtils {
 			Class<T> deepType,
 			IDeepSerializer<T> serializer){
 		
-		Map<String, DeepByteBuffer<?>> left = tuple._1;
-		Map<String, DeepByteBuffer<?>> right = tuple._2;
+		Map<String, DeepByteBuffer<?>> left = tuple._1();
+		Map<String, DeepByteBuffer<?>> right = tuple._2();
 		
 		T instance = newTypeInstance(deepType);
 		
@@ -229,4 +254,16 @@ public final class CassandraRDDUtils {
 		
 		return createTargetObject(createTupleFromByteBufferPair(pair, deepType, serializer), deepType, serializer);
 	}
+
+  public static <T extends IDeepType> Pair<Map<String, ByteBuffer>, Map<String, ByteBuffer>> deepType2pair(T e){
+
+    Pair<Field[], Field[]> fields = filterKeyFields(e.getClass().getDeclaredFields());
+
+    Field[] keyFields = fields.left;
+    Field[] otherFields = fields.right;
+
+
+    return null;
+
+  }
 }

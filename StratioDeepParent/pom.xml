@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.stratio.deep</groupId>
 	<artifactId>StratioDeepParent</artifactId>
-	<version>0.0.4-SNAPSHOT</version>
+	<version>0.0.6-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<properties>
@@ -11,7 +11,7 @@
 		<cassandra.version>2.1-SNAPSHOT</cassandra.version>
 
 		<!-- Spark version -->
-		<spark.version>0.8.0-incubating</spark.version>
+		<spark.version>0.9.0-incubating-SNAPSHOT</spark.version>
 
 		<java.version>1.7</java.version>
 	</properties>
@@ -20,8 +20,34 @@
 		<connection>scm:git:ssh://bitbucket.org/stratio/stratiodeep.git</connection>
 		<developerConnection>scm:git:ssh://bitbucket.org/stratio/stratiodeep.git</developerConnection>
 		<url>https://bitbucket.org/stratio/stratiodeep</url>
-		<tag>StratioDeepParent-0.0.2</tag>
 	</scm>
+
+    <distributionManagement>
+
+        <repository>
+            <id>stratio-releases</id>
+            <url>http://nexus.strat.io:8081/nexus/content/repositories/releases</url>
+        </repository>
+
+        <snapshotRepository>
+            <id>stratio-snapshots</id>
+            <url>http://nexus.strat.io:8081/nexus/content/repositories/snapshots</url>
+        </snapshotRepository>
+
+    </distributionManagement>
+
+    <repositories>
+        <repository>
+            <id>spark-snapshots</id>
+            <url>http://nexus.strat.io:8081/nexus/content/repositories/spark-snapshots</url>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+        </repository>
+    </repositories>
 
 	<build>
 		<pluginManagement>
@@ -54,7 +80,6 @@
 	<modules>
 		<module>../StratioDeepCommons</module>
 		<module>../StratioDeep</module>
-<!-- 		<module>../StratioDeepSSTable</module> -->
 		<module>../StratioTestEntity</module>
 	</modules>
 

@@ -33,7 +33,16 @@ public interface IDeepJobConfig<T extends IDeepType> extends Serializable {
 	 */
 	public abstract IDeepJobConfig<T> host(String hostname);
 
-	/**
+    /**
+     * Sets the name of the output keyspace. If not specified we assume
+     * it's the same as the input keyspace.
+     *
+     * @param outputKeyspace
+     * @return
+     */
+    public abstract IDeepJobConfig<T> outputKeyspace(String outputKeyspace);
+
+    /**
 	 * Sets Cassandra Keyspace. 
 	 * 
 	 * @param keyspace
@@ -88,7 +97,24 @@ public interface IDeepJobConfig<T extends IDeepType> extends Serializable {
 	 * @return
 	 */
 	public abstract IDeepJobConfig<T> inputColumns(String... columns);
-	
+
+    /**
+     * Sets the name of the output column family.
+     * This implementation assumes the CF already exists and column names
+     * match the names of the fields contained in the RDD that we want to write.
+     *
+     * @param outputColumnFamily
+     * @return
+     */
+    public abstract IDeepJobConfig<T> outputColumnFamily(String outputColumnFamily);
+
+    /**
+     * Generates the CQL insert query.
+     *
+     * @return
+     */
+    public abstract String generateOutputQuery();
+
 	/**
 	 * 
 	 * 
@@ -123,6 +149,8 @@ public interface IDeepJobConfig<T extends IDeepType> extends Serializable {
 
 	public abstract Integer getThriftFramedTransportSizeMB();
 
-	
+	public abstract String getOutputColumnFamily();
+
+    public abstract String getOutputKeyspace();
 
 }
