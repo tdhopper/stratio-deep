@@ -41,12 +41,30 @@
             <id>spark-snapshots</id>
             <url>http://nexus.strat.io:8081/nexus/content/repositories/spark-snapshots</url>
             <snapshots>
+                <updatePolicy>daily</updatePolicy>
                 <enabled>true</enabled>
             </snapshots>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
         </repository>
+
+        <repository>
+            <id>stratio-snapshots</id>
+            <url>http://nexus.strat.io:8081/nexus/content/repositories/snapshots</url>
+            <snapshots>
+                <updatePolicy>daily</updatePolicy>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+
+        <!--repository>
+            <id>stratio-releases</id>
+            <url>http://nexus.strat.io:8081/nexus/content/repositories/releases</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+        </repository-->
     </repositories>
 
 	<build>
