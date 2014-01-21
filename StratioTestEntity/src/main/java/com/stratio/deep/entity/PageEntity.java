@@ -11,7 +11,7 @@ public class PageEntity implements IDeepType {
 	
 	private static final long serialVersionUID = -9213306241759793383L;
 
-	@DeepField(fieldName="key", isKey = true)
+	@DeepField(fieldName="key", isPartOfPartitionKey = true)
 	private String id;
 	
 	@DeepField(fieldName="domainName")

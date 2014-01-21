@@ -6,6 +6,7 @@ import com.stratio.deep.entity.IDeepType;
 import com.stratio.deep.exception.DeepIOException;
 import com.stratio.deep.partition.impl.DeepPartition;
 import com.stratio.deep.serializer.IDeepSerializer;
+import com.stratio.deep.util.DeepType2TupleFunction;
 import org.apache.cassandra.hadoop.cql3.CqlPagingRecordReader;
 import org.apache.cassandra.hadoop.cql3.DeepCqlOutputFormat;
 import org.apache.cassandra.hadoop.cql3.IterableCqlPagingRecordReader;
@@ -20,7 +21,7 @@ import org.apache.spark.TaskContext;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.broadcast.Broadcast;
 import org.apache.spark.rdd.RDD;
-import scala.Function0;
+import scala.Function1;
 import scala.Tuple2;
 import scala.collection.Iterator;
 import scala.collection.Seq;
@@ -30,13 +31,8 @@ import scala.runtime.AbstractFunction0;
 import scala.runtime.BoxedUnit;
 
 import java.io.IOException;
-import java.lang.reflect.GenericDeclaration;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.TypeVariable;
 import java.nio.ByteBuffer;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static com.stratio.deep.util.CassandraRDDUtils.pair2DeepType;
 import static scala.collection.JavaConversions.asScalaBuffer;
@@ -59,17 +55,25 @@ public final class CassandraRDD<T extends IDeepType> extends RDD<T> {
   private static final long serialVersionUID = -3208994171892747470L;
 
   /*
-   * An Hadoop Job Id is needed by the underlying cassandra's API.
-   *
-   * We make it transient in order to prevent this to be sent through the wire
-   * to slaves.
-   */
+     * An Hadoop Job Id is needed by the underlying cassandra's API.
+     *
+
+     * We make it transient in order to prevent this to be sent through the wire
+     * to slaves.
+     */
   private final transient JobID hadoopJobId;
 
   /*
    * RDD configuration. This config is broadcasted to all the Sparks machines.
    */
   protected final Broadcast<IDeepJobConfig<T>> config;
+
+  public CassandraRDD(RDD<T> oneParent, IDeepJobConfig<T> config) {
+    super(oneParent, ClassTag$.MODULE$.<T>apply(config.getEntityClass()));
+    long timestamp = System.currentTimeMillis();
+    hadoopJobId = new JobID(STRATIO_DEEP_JOB_PREFIX + timestamp, id());
+    this.config = oneParent.context().broadcast(config);
+  }
 
   /**
    * Constructs a new CassandraRDD taking a Spark context and a configuration
@@ -245,41 +249,69 @@ public final class CassandraRDD<T extends IDeepType> extends RDD<T> {
     return asScalaBuffer(Arrays.asList(locations));
   }
 
+  /**
+   * Persists the given RDD to the underlying Cassandra datastore, using configuration
+   * options provided by <i>writeConfig</i>.
+   *
+   * @param rdd
+   * @param writeConfig
+   * @param <W>
+   */
+  public static <W extends IDeepType> void saveToCassandra(RDD<W> rdd, IDeepJobConfig<W> writeConfig) {
 
-  public <W extends IDeepType> void saveToCassandra(Function0<CassandraRDD<W>> map, IDeepJobConfig<W> writeConfig) {
+    /* build the key map */
+    Function1<W, Tuple2<Map<String, ByteBuffer>, List<ByteBuffer>>> mapFunc =
+        new DeepType2TupleFunction<W>();
 
+    Tuple2<Map<String, ByteBuffer>, List<ByteBuffer>> tuple = new Tuple2<>(null,null);
 
-  }
+    RDD<Tuple2<Map<String, ByteBuffer>, List<ByteBuffer>>> mappedRDD = rdd.map(
+        mapFunc,
+        ClassTag$.MODULE$.<Tuple2<Map<String, ByteBuffer>, List<ByteBuffer>>>apply(tuple.getClass()));
 
-  public static void saveToCassandra(RDD<Tuple2<Map<String, ByteBuffer>, List<ByteBuffer>>> rdd, IDeepJobConfig<?> writeConfig) {
-    GenericDeclaration tupleGenericDeclaration = ((TypeVariable<?>) ((ParameterizedType) rdd.getClass()
-        .getGenericSuperclass()).getActualTypeArguments()[0]).getGenericDeclaration();
-
-    Class<Tuple2<Map<String, ByteBuffer>, List<ByteBuffer>>> tupleClass =
-        (Class<Tuple2<Map<String, ByteBuffer>, List<ByteBuffer>>>) tupleGenericDeclaration;
-
-    GenericDeclaration keyGenericDeclaration = ((TypeVariable<?>) ((ParameterizedType) tupleClass
-        .getGenericSuperclass()).getActualTypeArguments()[0]).getGenericDeclaration();
-
-    Class<Map<String, ByteBuffer>> keyClass = (Class<Map<String, ByteBuffer>>) keyGenericDeclaration;
+    Map<String, ByteBuffer> dummyMap = new HashMap<String, ByteBuffer>();
+    List<ByteBuffer> dummyList = new ArrayList<ByteBuffer>();
 
     ClassTag<Map<String, ByteBuffer>> keyClassTag =
-        ClassTag$.MODULE$.<Map<String, ByteBuffer>>apply(keyClass);
-
-    GenericDeclaration valueGenericDeclaration = ((TypeVariable<?>) ((ParameterizedType) tupleClass
-        .getGenericSuperclass()).getActualTypeArguments()[1]).getGenericDeclaration();
-
-    Class<List<ByteBuffer>> valueClass = (Class<List<ByteBuffer>>) valueGenericDeclaration;
+        ClassTag$.MODULE$.<Map<String, ByteBuffer>>apply(dummyMap.getClass());
 
     ClassTag<List<ByteBuffer>> valueClassTag =
-        ClassTag$.MODULE$.<List<ByteBuffer>>apply(keyClass);
+        ClassTag$.MODULE$.<List<ByteBuffer>>apply(dummyList.getClass());
+
+    JavaPairRDD<Map<String, ByteBuffer>, List<ByteBuffer>> pairRDD =
+        new JavaPairRDD<>(mappedRDD, keyClassTag, valueClassTag);
+
+    pairRDD.saveAsNewAPIHadoopFile(
+        writeConfig.getOutputKeyspace(),
+        dummyMap.getClass(),
+        dummyList.getClass(),
+        DeepCqlOutputFormat.class,
+        writeConfig.getConfiguration());
+  }
+
+  /*
+  public static void saveToCassandra(RDD<Tuple2<Map<String, ByteBuffer>, List<ByteBuffer>>> rdd, IDeepJobConfig<?> writeConfig) {
+
+    Map<String, ByteBuffer> dummyMap = new HashMap<String, ByteBuffer>();
+    List<ByteBuffer> dummyList = new ArrayList<ByteBuffer>();
+
+    ClassTag<Map<String, ByteBuffer>> keyClassTag =
+        ClassTag$.MODULE$.<Map<String, ByteBuffer>>apply(dummyMap.getClass());
+
+    ClassTag<List<ByteBuffer>> valueClassTag =
+        ClassTag$.MODULE$.<List<ByteBuffer>>apply(dummyList.getClass());
 
     JavaPairRDD<Map<String, ByteBuffer>, List<ByteBuffer>> pairRDD =
         new JavaPairRDD<>(rdd, keyClassTag, valueClassTag);
 
-    pairRDD.saveAsNewAPIHadoopFile(writeConfig.getOutputKeyspace(), keyClass, valueClass,
-        DeepCqlOutputFormat.class, writeConfig.getConfiguration());
+    pairRDD.saveAsNewAPIHadoopFile(
+        writeConfig.getOutputKeyspace(),
+        dummyMap.getClass(),
+        dummyList.getClass(),
+        DeepCqlOutputFormat.class,
+        writeConfig.getConfiguration());
   }
+  */
 
   /**
    * Helper callback class called by Spark when the current RDD is computed

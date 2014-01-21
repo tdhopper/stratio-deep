@@ -4,11 +4,6 @@ import com.stratio.deep.entity.IDeepType;
 import org.apache.spark.api.java.JavaRDD;
 import scala.reflect.ClassTag;
 import scala.reflect.ClassTag$;
-import scala.reflect.api.TypeTags;
-
-import java.lang.reflect.GenericDeclaration;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.TypeVariable;
 
 /**
  * Commodity RDD implementation that should be used as a
@@ -18,7 +13,6 @@ import java.lang.reflect.TypeVariable;
  * @author Luca Rosellini <luca@strat.io>
  */
 public final class CassandraJavaRDD<W extends IDeepType> extends JavaRDD<W> {
-  private static final int FIRST_FIELD = 0;
   private static final long serialVersionUID = -3208994171892747470L;
 
   /**

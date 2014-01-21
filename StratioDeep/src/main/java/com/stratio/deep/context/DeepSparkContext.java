@@ -9,6 +9,7 @@ import com.stratio.deep.config.IDeepJobConfig;
 import com.stratio.deep.entity.IDeepType;
 import com.stratio.deep.rdd.CassandraJavaRDD;
 import com.stratio.deep.rdd.CassandraRDD;
+import org.apache.spark.rdd.RDD;
 
 /**
  * Entry point to the Cassandra-aware Spark context.
@@ -76,6 +77,16 @@ public class DeepSparkContext extends JavaSparkContext {
 	public DeepSparkContext(SparkContext sc) {
 		super(sc);
 	}
+
+  /**
+   * Builds a new CassandraRDD.
+   *
+   * @param config
+   * @return
+   */
+  public <T extends IDeepType> CassandraRDD<T> cassandraRDD(RDD<T> oneParent, IDeepJobConfig<T> config){
+    return new CassandraRDD<T>(oneParent,config);
+  }
 
 	/**
 	 * Builds a new CassandraRDD.

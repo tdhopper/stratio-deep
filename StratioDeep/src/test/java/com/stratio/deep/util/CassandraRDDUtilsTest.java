@@ -7,9 +7,11 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.ByteBuffer;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.cassandra.db.marshal.Int32Type;
+import org.apache.cassandra.db.marshal.LongType;
 import org.apache.cassandra.db.marshal.UTF8Type;
 import org.apache.cassandra.exceptions.ConfigurationException;
 import org.apache.cassandra.exceptions.SyntaxException;
@@ -89,4 +91,57 @@ public class CassandraRDDUtilsTest {
 		assertEquals(targetObject.getResponseCode(), new Integer(200));
 
 	}
+
+  @Test
+  public void testFilterKeyFields(){
+    Field[] fields = TestEntity.class.getDeclaredFields();
+
+    Pair<Field[], Field[]> keyFields = filterKeyFields(filterDeepFields(fields));
+
+    assertNotNull(keyFields);
+    assertNotNull(keyFields.left);
+    assertNotNull(keyFields.right);
+    assertTrue(keyFields.left.length == 1);
+    assertTrue(keyFields.right.length == 5);
+
+    assertTrue(keyFields.left[0].getName().equals("id"));
+  }
+
+  @Test
+  public void testCassandraMarshaller(){
+
+    Field[] fields = filterDeepFields(TestEntity.class.getDeclaredFields());
+
+    for (Field f : fields){
+      if (f.getName().equals("LongType")){
+        assertEquals(cassandraMarshaller(f).getClass(), LongType.class);
+      }
+
+      if (f.getName().equals("responseCode")){
+        assertEquals(cassandraMarshaller(f).getClass(), Int32Type.class);
+      }
+
+      if (f.getName().equals("id")){
+        assertEquals(cassandraMarshaller(f).getClass(), UTF8Type.class);
+      }
+    }
+  }
+
+  @Test
+  public void testDeepType2Pair(){
+
+    TestEntity te = new TestEntity();
+    te.setDomain("abcd");
+    te.setId("48297148932");
+    te.setResponseCode(312);
+
+    Tuple2<Map<String, ByteBuffer>, List<ByteBuffer>> pair =
+        deepType2tuple(te);
+
+    assertNotNull(pair);
+    assertNotNull(pair._1());
+    assertNotNull(pair._2());
+    assertEquals(pair._1().size(),1);
+    assertEquals(pair._2().size(),5);
+  }
 }

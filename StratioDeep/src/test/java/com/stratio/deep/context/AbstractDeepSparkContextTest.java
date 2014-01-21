@@ -35,7 +35,20 @@ public abstract class AbstractDeepSparkContextTest {
 	private static CassandraServer cassandraServer;
 	protected static final String KEYSPACE_NAME = "test_keyspace";
 	protected static final String COLUMN_FAMILY = "test_page";
-	protected static int testDataSize = 0;
+  protected static final String OUTPUT_KEYSPACE_NAME = "out_test_keyspace";
+  protected static final String OUTPUT_COLUMN_FAMILY = "out_test_page";
+
+  protected String createOutputCF = "CREATE TABLE " + OUTPUT_KEYSPACE_NAME+"."+OUTPUT_COLUMN_FAMILY + " (id text PRIMARY KEY, " +
+      "url text, " +
+      "domain_name text, " +
+      "response_code int, " +
+      "charset text," +
+      "response_time int," +
+      "download_time bigint," +
+      "first_download_time bigint," +
+      "title text ) ;";
+
+  protected static int testDataSize = 0;
 
 	private String buildTestDataInsertBatch() {
 		URL testData = Resources.getResource("testdata.csv");
@@ -98,14 +111,18 @@ public abstract class AbstractDeepSparkContextTest {
 	@BeforeSuite
 	protected void initContextAndServer() throws ConfigurationException, IOException, InterruptedException{
 		context = new DeepSparkContext("local[4]", "deepSparkContextTest");
-		
-		String createKeyspace = "CREATE KEYSPACE "
+
+    String createKeyspace = "CREATE KEYSPACE "
 				+ KEYSPACE_NAME
 				+ " WITH replication = {'class': 'SimpleStrategy', 'replication_factor' : 1 };";
-		
-		String useKeyspace = "USE " + KEYSPACE_NAME + ";";
-		
-		String createCF = "CREATE TABLE " + COLUMN_FAMILY + " (id text PRIMARY KEY, " +
+
+    String createOutputKeyspace = "CREATE KEYSPACE "
+        + OUTPUT_KEYSPACE_NAME
+        + " WITH replication = {'class': 'SimpleStrategy', 'replication_factor' : 1 };";
+
+    String useKeyspace = "USE " + KEYSPACE_NAME + ";";
+
+    String createCF = "CREATE TABLE " + COLUMN_FAMILY + " (id text PRIMARY KEY, " +
 				"url text, " +
 				"domain_name text, " +
 				"response_code int, " +
@@ -114,11 +131,14 @@ public abstract class AbstractDeepSparkContextTest {
 				"download_time bigint," +
 				"first_download_time bigint," +
 				"title text ) ;";
-		
+
+    String useOutputKeyspace = "USE " + OUTPUT_KEYSPACE_NAME + ";";
+
+
 		String initialDataset = buildTestDataInsertBatch();
 		
 		String[] startupCommands = new String[] {
-				createKeyspace, useKeyspace, createCF, initialDataset };
+				createKeyspace, createOutputKeyspace, useKeyspace, createCF, initialDataset, useOutputKeyspace, createOutputCF };
 		
 		cassandraServer = new CassandraServer();
 		cassandraServer.setStartupCommands(startupCommands);
@@ -128,7 +148,16 @@ public abstract class AbstractDeepSparkContextTest {
 		
 	}
 
-	
+  protected void executeCustomCQL(String... cqls){
+
+    Cluster cluster = Cluster.builder().withPort(CassandraServer.CASSANDRA_CQL_PORT)
+        .addContactPoint(Constants.DEFAULT_CASSANDRA_HOST).build();
+    Session session = cluster.connect();
+    for (String cql : cqls) {
+      session.execute(cql);
+    }
+    session.shutdown();
+  }
 
 	@AfterSuite
 	protected void disposeServerAndRdd() throws IOException {

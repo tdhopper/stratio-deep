@@ -47,17 +47,8 @@ public class DefaultDeepSerializer<T extends IDeepType> implements IDeepSerializ
 		if (f == null){
 			return null;
 		}
-		
-		DeepField annotation = f.getAnnotation(DeepField.class);
-		Class<? extends AbstractType<?>> type = annotation.validationClass();
-		
-		AbstractType<?> typeInstance = null;
-		try {
-			typeInstance = TypeParser.parse(type.getName());
-		} catch (SyntaxException | ConfigurationException e) {
-			throw new DeepGenericException(e);
-		}
-		
+
+		AbstractType<?> typeInstance = cassandraMarshaller(f);
 		Serializable obj = (Serializable) typeInstance.compose(entry.getValue());
 		
 		return DeepByteBufferImpl.create(f.getName(), f.getDeclaringClass(), obj);

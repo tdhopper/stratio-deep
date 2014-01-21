@@ -9,6 +9,11 @@ import org.apache.hadoop.mapreduce.Job;
 import com.stratio.deep.entity.IDeepType;
 import com.stratio.deep.serializer.IDeepSerializer;
 
+/**
+ * Defines the public methods that each Stratio Deep configuration object should implement.
+ *
+ * @param <T>
+ */
 public interface IDeepJobConfig<T extends IDeepType> extends Serializable {
 
 	/**
@@ -22,7 +27,12 @@ public interface IDeepJobConfig<T extends IDeepType> extends Serializable {
 	 * Validates and initializes this configuration object.
 	 */
 	public abstract Configuration getConfiguration();
-	
+
+  /**
+   * Initialized the current configuration object.
+   *
+   * @return
+   */
 	public abstract IDeepJobConfig<T> initialize();
 
 	/**
@@ -67,7 +77,7 @@ public interface IDeepJobConfig<T extends IDeepType> extends Serializable {
 	public abstract IDeepJobConfig<T> columnFamily(String columnFamily);
 
 	/**
-	 * Sets the username to use to login to Cassandra.
+	 * Sets the username to use to login to Cassandra. Leave empty if you do not need authentication.
 	 * 
 	 * @param username
 	 * @return
@@ -75,9 +85,9 @@ public interface IDeepJobConfig<T extends IDeepType> extends Serializable {
 	public abstract IDeepJobConfig<T> username(String username);
 
 	/**
-	 * Sets the password to use to login to Cassandra.
+	 * Sets the password to use to login to Cassandra. Leave empty if you do not need authentication.
 	 * 
-	 * @param username
+	 * @param password
 	 * @return
 	 */
 	public abstract IDeepJobConfig<T> password(String password);
@@ -85,7 +95,7 @@ public interface IDeepJobConfig<T extends IDeepType> extends Serializable {
 	/**
 	 * Sets the default "where" filter to use to access ColumnFamily's data.
 	 * 
-	 * @param username
+	 * @param defaultFilter
 	 * @return
 	 */
 	public abstract IDeepJobConfig<T> defaultFilter(String defaultFilter);
@@ -108,24 +118,35 @@ public interface IDeepJobConfig<T extends IDeepType> extends Serializable {
      */
     public abstract IDeepJobConfig<T> outputColumnFamily(String outputColumnFamily);
 
-    /**
-     * Generates the CQL insert query.
-     *
-     * @return
-     */
-    public abstract String generateOutputQuery();
-
 	/**
+	 * Let's the user specify an alternative serializer. The default one is
+   * com.stratio.deep.serializer.impl.DefaultDeepSerializer.
 	 * 
-	 * 
-	 * @param serializer
+	 * @param serializerClassName
 	 * @return
 	 */
 	public abstract IDeepJobConfig<T> serializer(String serializerClassName);
 
+  /**
+   * Let's the user specify an alternative partitioner class. The default partitioner is
+   * org.apache.cassandra.dht.Murmur3Partitioner.
+   *
+   * @param partitionerClassName
+   * @param <P>
+   * @return
+   */
 	public abstract <P extends IPartitioner<?>> IDeepJobConfig<T> partitioner(String partitionerClassName);
 
-	public abstract String getDefaultFilter();
+  /**
+   * Sets the default thrift frame size.
+   * @param thriftFramedTransportSizeMB
+   * @return
+   */
+  public abstract IDeepJobConfig<T> framedTransportSize(Integer thriftFramedTransportSizeMB);
+
+  /* Getters */
+
+  public abstract String getDefaultFilter();
 
 	public abstract String getKeyspace();
 
@@ -143,14 +164,17 @@ public interface IDeepJobConfig<T extends IDeepType> extends Serializable {
 
 	public abstract Job getHadoopJob();
 
-	public abstract IDeepSerializer<T> getSerializer();
+  public abstract String getPartitionerClassName();
 
-	public abstract IDeepJobConfig<T> framedTransportSize(Integer thriftFramedTransportSizeMB);
+  public abstract String getSerializerClassName();
 
-	public abstract Integer getThriftFramedTransportSizeMB();
+  public abstract IDeepSerializer<T> getSerializer();
+
+  public abstract String[] getInputColumns();
+
+  public abstract Integer getThriftFramedTransportSizeMB();
 
 	public abstract String getOutputColumnFamily();
 
-    public abstract String getOutputKeyspace();
-
+  public abstract String getOutputKeyspace();
 }
