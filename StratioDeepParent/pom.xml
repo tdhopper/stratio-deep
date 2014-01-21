@@ -17,8 +17,8 @@
 	</properties>
 
 	<scm>
-		<connection>scm:git:origin/stratiodeep.git</connection>
-		<developerConnection>scm:git:origin/stratiodeep.git</developerConnection>
+		<connection>scm:git:origin</connection>
+		<developerConnection>scm:git:origin</developerConnection>
 		<url>https://bitbucket.org/stratio/stratiodeep</url>
 	</scm>
 
