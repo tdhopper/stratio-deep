@@ -87,7 +87,7 @@
 					<configuration>
 						<autoVersionSubmodules>true</autoVersionSubmodules>
 						<preparationGoals>clean verify install</preparationGoals>
-						<pushChanges>false</pushChanges>
+						<pushChanges>true</pushChanges>
 					</configuration>
 				</plugin>
 

@@ -3,7 +3,7 @@
 
 echo " >>> STRATIO DEEP DEPLOYMENT <<< "
 
-if [ -z "$4" ]; then
+if [ -z "$2" ]; then
 echo "Usage: $0 -cv <cassandra version>"
   exit 0
 fi
@@ -33,8 +33,13 @@ git clone git@bitbucket.org:stratio/stratiodeep.git ../stratiodeep-clone
 cd ../stratiodeep-clone/StratioDeepParent/
 
 # Execute maven release (creating release number and jars)
-mvn release:prepare -B -DignoreSnapshots=true
-mvn release:perform
+echo "Executing release:prepare"
+mvn clean release:prepare -e -DignoreSnapshots=true -Darguments="-DskipTests"
+
+exit 0
+
+echo "Executing release:perform"
+mvn release:perform -e -DignoreSnapshots=true -Darguments="-DskipTests"
 
 cd ..
 
