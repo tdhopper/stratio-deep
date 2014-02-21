@@ -20,7 +20,7 @@ import static org.testng.Assert.*;
 /**
  * Created by luca on 05/02/14.
  */
-@Test(suiteName = "cassandraRddTests", groups = { "CassandraEntityRDDTest" })
+@Test//(suiteName = "cassandraRddTests", groups = { "CassandraEntityRDDTest" })
 public class CassandraEntityRDDTest extends CassandraGenericRDDTest<TestEntity> {
 
     private static class TestEntityAbstractSerializableFunction1 extends
@@ -122,6 +122,7 @@ public class CassandraEntityRDDTest extends CassandraGenericRDDTest<TestEntity> 
 			.cqlPort(CassandraServer.CASSANDRA_CQL_PORT).keyspace(KEYSPACE_NAME).columnFamily(COLUMN_FAMILY);
 
 	config.getConfiguration();
+	config.columnDefinitions();
 
 	return config;
     }
@@ -133,6 +134,7 @@ public class CassandraEntityRDDTest extends CassandraGenericRDDTest<TestEntity> 
 			.cqlPort(CassandraServer.CASSANDRA_CQL_PORT).keyspace(OUTPUT_KEYSPACE_NAME).columnFamily(OUTPUT_COLUMN_FAMILY);
 
 	writeConfig.getConfiguration();
+	writeConfig.columnDefinitions();
 	return writeConfig;
     }
 
