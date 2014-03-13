@@ -3,6 +3,8 @@ package com.stratio.deep.entity;
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.nio.ByteBuffer;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
@@ -10,7 +12,10 @@ import com.stratio.deep.exception.DeepGenericException;
 import com.stratio.deep.exception.DeepIllegalAccessException;
 import com.stratio.deep.exception.DeepNoSuchFieldException;
 import com.stratio.deep.utils.AnnotationUtils;
-import org.apache.cassandra.db.marshal.*;
+import org.apache.cassandra.db.marshal.AbstractType;
+import org.apache.cassandra.db.marshal.TimeUUIDType;
+import org.apache.cassandra.db.marshal.UTF8Type;
+import org.apache.cassandra.db.marshal.UUIDType;
 
 /**
  * Generic abstraction for cassandra's columns.
@@ -50,6 +55,8 @@ public final class Cell<T extends Serializable> implements Serializable {
      * The provided type must extends {@link org.apache.cassandra.db.marshal.AbstractType}
      */
     private String validator = "org.apache.cassandra.db.marshal.UTF8Type";
+
+    private static Map<String, Class<AbstractType<?>>> classMap = Collections.synchronizedMap(new HashMap<String, Class<AbstractType<?>>>());
 
     /**
      * Factory method, creates a new Cell.<br/>
@@ -148,7 +155,7 @@ public final class Cell<T extends Serializable> implements Serializable {
 	AbstractType<?> res = AnnotationUtils.MAP_JAVA_TYPE_TO_ABSTRACT_TYPE.get(obj.getClass());
 
 	if (res == null){
-	    throw new DeepGenericException("parameter class "+obj.getClass().getCanonicalName()+"does not have a Cassandra marshaller");
+	    throw new DeepGenericException("parameter class does not have a Cassandra marshaller");
 	}
 
 	if (obj instanceof UUID) {
@@ -174,8 +181,14 @@ public final class Cell<T extends Serializable> implements Serializable {
     @SuppressWarnings("unchecked")
     public static <T extends Serializable> AbstractType<T> marshaller(String valueAbstractType) {
 	try {
-	    Class<AbstractType<T>> clazz = (Class<AbstractType<T>>) Class.forName(valueAbstractType);
-	    Field f = clazz.getField("instance");
+      Class<AbstractType<?>> clazz = classMap.get(valueAbstractType);
+
+      if (clazz == null){
+          clazz = (Class<AbstractType<?>>) Class.forName(valueAbstractType);
+          classMap.put(valueAbstractType, clazz);
+      }
+
+      Field f = clazz.getField("instance");
 	    return (AbstractType<T>) f.get(null);
 
 	} catch (ClassNotFoundException e) {
