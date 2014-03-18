@@ -27,7 +27,7 @@ public final class CassandraEntityRDD<T extends IDeepType> extends CassandraRDD<
     private static final long serialVersionUID = -3208994171892747470L;
 
     public CassandraEntityRDD(SparkContext sc, IDeepJobConfig<T> config) {
-	super(sc, config);
+        super(sc, config);
     }
 
     /**
@@ -35,33 +35,39 @@ public final class CassandraEntityRDD<T extends IDeepType> extends CassandraRDD<
      */
     @Override
     protected T transformElement(Pair<Map<String, ByteBuffer>, Map<String, ByteBuffer>> elem) {
-	Map<String, Cell> columnDefinitions = config.value().columnDefinitions();
 
-	Class<T> entityClass = config.value().getEntityClass();
+        Map<String, Cell> columnDefinitions = config.value().columnDefinitions();
 
-	EntityDeepJobConfig<T> edjc = (EntityDeepJobConfig) config.value();
-	T instance = Utils.newTypeInstance(entityClass);
+        Class<T> entityClass = config.value().getEntityClass();
 
-	for (Map.Entry<String, ByteBuffer> entry : elem.left.entrySet()) {
-	    Cell metadata = columnDefinitions.get(entry.getKey());
-	    AbstractType<?> marshaller = metadata.marshaller();
-	    edjc.setInstancePropertyFromDbName(instance, entry.getKey(), marshaller.compose(entry.getValue()));
-	}
+        EntityDeepJobConfig<T> edjc = (EntityDeepJobConfig) config.value();
+        T instance = Utils.newTypeInstance(entityClass);
 
-	for (Map.Entry<String, ByteBuffer> entry : elem.right.entrySet()) {
-	    if (entry.getValue() == null) {
-		continue;
-	    }
+        for (Map.Entry<String, ByteBuffer> entry : elem.left.entrySet()) {
+            Cell metadata = columnDefinitions.get(entry.getKey());
 
-	    Cell metadata = columnDefinitions.get(entry.getKey());
-	    AbstractType<?> marshaller = metadata.marshaller();
-	    try {
-		edjc.setInstancePropertyFromDbName(instance, entry.getKey(), marshaller.compose(entry.getValue()));
-	    } catch (DeepNoSuchFieldException e) {
-		log().debug(e.getMessage());
-	    }
-	}
+            if (metadata == null) {
+                throw new DeepNoSuchFieldException("Cannot find metadata for property: " + entry.getKey());
+            }
 
-	return instance;
+            AbstractType<?> marshaller = metadata.marshaller();
+            edjc.setInstancePropertyFromDbName(instance, entry.getKey(), marshaller.compose(entry.getValue()));
+        }
+
+        for (Map.Entry<String, ByteBuffer> entry : elem.right.entrySet()) {
+            if (entry.getValue() == null) {
+                continue;
+            }
+
+            Cell metadata = columnDefinitions.get(entry.getKey());
+            AbstractType<?> marshaller = metadata.marshaller();
+            try {
+                edjc.setInstancePropertyFromDbName(instance, entry.getKey(), marshaller.compose(entry.getValue()));
+            } catch (DeepNoSuchFieldException e) {
+                log().debug(e.getMessage());
+            }
+        }
+
+        return instance;
     }
 }

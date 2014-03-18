@@ -38,18 +38,18 @@ public final class EntityDeepJobConfig<T extends IDeepType> extends GenericDeepJ
      */
     @Override
     public IDeepJobConfig<T> initialize() {
-	super.initialize();
+        super.initialize();
 
-	Field[] deepFields = AnnotationUtils.filterDeepFields(entityClass.getDeclaredFields());
+        Field[] deepFields = AnnotationUtils.filterDeepFields(entityClass.getDeclaredFields());
 
-	for (Field f : deepFields) {
-	    String dbName = AnnotationUtils.deepFieldName(f);
-	    String beanFieldName = f.getName();
+        for (Field f : deepFields) {
+            String dbName = AnnotationUtils.deepFieldName(f);
+            String beanFieldName = f.getName();
 
-	    //String dbName = f.getAnnotation(DeepField.class).fieldName();
+            //String dbName = f.getAnnotation(DeepField.class).fieldName();
 
 	    /*
-	    Method setter;
+      Method setter;
 
 	    try {
 		setter = entityClass.getMethod("set" + beanFieldName.substring(0, 1).toUpperCase() +
@@ -59,15 +59,15 @@ public final class EntityDeepJobConfig<T extends IDeepType> extends GenericDeepJ
 	    }
 	    */
 
-	    mapDBNameToEntityName.put(dbName, beanFieldName);
-	}
+            mapDBNameToEntityName.put(dbName, beanFieldName);
+        }
 
-	return this;
+        return this;
     }
 
     public EntityDeepJobConfig(Class<T> entityClass) {
-	super();
-	this.entityClass = entityClass;
+        super();
+        this.entityClass = entityClass;
     }
 
     /* (non-Javadoc)
@@ -75,8 +75,8 @@ public final class EntityDeepJobConfig<T extends IDeepType> extends GenericDeepJ
      */
     @Override
     public Class<T> getEntityClass() {
-	checkInitialized();
-	return entityClass;
+        checkInitialized();
+        return entityClass;
     }
 
     /* (non-Javadoc)
@@ -84,49 +84,53 @@ public final class EntityDeepJobConfig<T extends IDeepType> extends GenericDeepJ
        */
     @Override
     public void validate() {
-	super.validate();
+        super.validate();
 
-	if (entityClass == null) {
-	    throw new IllegalArgumentException("entity class cannot be null");
-	}
+        if (entityClass == null) {
+            throw new IllegalArgumentException("entity class cannot be null");
+        }
 
-	if (!entityClass.isAnnotationPresent(DeepEntity.class)) {
-	    throw new AnnotationTypeMismatchException(null, entityClass.getCanonicalName());
-	}
+        if (!entityClass.isAnnotationPresent(DeepEntity.class)) {
+            throw new AnnotationTypeMismatchException(null, entityClass.getCanonicalName());
+        }
     }
 
     public void setInstancePropertyFromDbName(T instance, String dbName, Object value) {
-	Method setter;
+        Method setter;
 
-	Map<String, Cell> cfs = columnDefinitions();
-       	Cell metadataCell = cfs.get(dbName);
+        Map<String, Cell> cfs = columnDefinitions();
+        Cell metadataCell = cfs.get(dbName);
 
-	String f = mapDBNameToEntityName.get(dbName);
+        if (metadataCell == null){
+            throw new DeepNoSuchFieldException("Cannot find metadataCell for property: " + dbName);
+        }
 
-	if (StringUtils.isEmpty(f)){
-	    // DB column is not mapped in the entity
+        String f = mapDBNameToEntityName.get(dbName);
 
-	    return;
-	}
+        if (StringUtils.isEmpty(f)) {
+            // DB column is not mapped in the entity
 
-	String setterName = "set" + f.substring(0, 1).toUpperCase() +
-			f.substring(1);
+            return;
+        }
 
-	try {
+        String setterName = "set" + f.substring(0, 1).toUpperCase() +
+            f.substring(1);
 
-	    setter = entityClass.getMethod(setterName, metadataCell.getValueType() );
-	} catch (NoSuchMethodException e) {
-	    throw new DeepIOException(e);
-	}
+        try {
 
-	if (setter == null) {
-	    throw new DeepNoSuchFieldException("Cannot find setter for property: " + dbName);
-	}
+            setter = entityClass.getMethod(setterName, metadataCell.getValueType());
+        } catch (NoSuchMethodException e) {
+            throw new DeepIOException(e);
+        }
 
-	try {
-	    setter.invoke(instance, value);
-	} catch (Exception e) {
-	    throw new DeepGenericException(e);
-	}
+        if (setter == null) {
+            throw new DeepNoSuchFieldException("Cannot find setter for property: " + dbName);
+        }
+
+        try {
+            setter.invoke(instance, value);
+        } catch (Exception e) {
+            throw new DeepGenericException(e);
+        }
     }
 }
