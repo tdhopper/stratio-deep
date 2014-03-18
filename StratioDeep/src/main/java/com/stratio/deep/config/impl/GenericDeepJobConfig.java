@@ -149,6 +149,9 @@ public abstract class GenericDeepJobConfig<T> implements IDeepJobConfig<T> {
                 columnDefinitionMap.put(key.getName(), metadata);
             }
         }
+
+        columnDefinitionMap = Collections.unmodifiableMap(columnDefinitionMap);
+
         return columnDefinitionMap;
     }
 
