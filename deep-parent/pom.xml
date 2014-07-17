@@ -264,6 +264,7 @@
         <module>../deep-commons</module>
         <module>../deep-cassandra</module>
         <module>../deep-mongodb</module>
+        <module>../deep-aerospike</module>
         <module>../deep-examples</module>
     </modules>
 
