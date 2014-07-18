@@ -30,14 +30,44 @@ Please, refer to the deep-example project README for further information on how 
 
 MongoDB integration
 ===================
-Support for MongoDB has been added in version 0.3.0 and is not yet considered feature complete. We actually only provide POJO interface, generic cell API will be added in the near future.
-We added a few working example for MongoDB in deep-examples subproject, take a look at com.stratio.deep.examples.java.ReadingEntityFromMongoDB and com.stratio.deep.examples.java.WritingEntityToMongoDB.
+
+Spark-MongoDB connector is based on Hadoop-mongoDB.
+
+Support for MongoDB has been added in version 0.3.0 and is not yet considered a complete feature.
+
+We provide two different interfaces:
+
+  * ORM API, you just have to annotate your POJOs with Deep annotations and magic will begin, you will be able to connect MongoDB with Spark using your own model entities.
+
+  * Generic cell API, you do not need to specify the collection's schema or add anything to your POJOs, each document will be transform to an object "Cells".
+
+We added a few working examples for MongoDB in deep-examples subproject, take a look at:
+
+Entities:
+
+  * com.stratio.deep.examples.java.ReadingEntityFromMongoDB
+  * com.stratio.deep.examples.java.WritingEntityToMongoDB
+  * com.stratio.deep.examples.java.GroupingEntityWithMongoDB
+
+Cells:
+
+  * com.stratio.deep.examples.java.ReadingCellFromMongoDB
+  * com.stratio.deep.examples.java.WritingCellToMongoDB
+  * com.stratio.deep.examples.java.GroupingCellWithMongoDB
+
+
+You can check out our first steps guide here:
+
+http://www.openstratio.org/tutorials/first-steps-with-stratio-deep-and-mongodb/
+
+
+We are working on further improvements!
 
 Requirements
 ============
 
   * Cassandra, we tested versions from 1.2.8 up to 2.0.8 (for Spark <=> Cassandra integration).
-  * MongoDB, we tested the integration with MongoDB versions 2.2, 2.4 y 2.6 (for Spark <=> MongoDB integration).
+  * MongoDB, we tested the integration with MongoDB versions 2.2, 2.4 y 2.6 using Standalone, Replica Set and Sharded Cluster (for Spark <=> MongoDB integration).
   * Spark 1.0.0
   * Apache Maven >= 3.0.4
   * Java 1.7
