@@ -16,8 +16,8 @@
 
 package com.stratio.deep.rdd
 
-import com.datastax.driver.core.{Cluster, ResultSet, Row, Session}
-import com.stratio.deep.config.{CassandraConfigFactory, ICassandraDeepJobConfig}
+import com.datastax.driver.core.{ Cluster, ResultSet, Row, Session }
+import com.stratio.deep.config.{ CassandraConfigFactory, ICassandraDeepJobConfig }
 import com.stratio.deep.context.AbstractDeepSparkContextTest
 import com.stratio.deep.embedded.CassandraServer
 import com.stratio.deep.testentity.DeepScalaPageEntity
@@ -25,7 +25,8 @@ import com.stratio.deep.utils.Constants
 import com.stratio.deep.utils.Utils
 import org.apache.spark.Partition
 import org.testng.Assert._
-import org.testng.annotations.{BeforeClass, Test}
+import org.testng.annotations.{ BeforeClass, Test }
+import com.stratio.deep.config.IDeepJobConfig
 
 /**
  * Created by luca on 20/03/14.
@@ -79,8 +80,7 @@ class ScalaCassandraEntityRDDTest extends AbstractDeepSparkContextTest {
     try {
       AbstractDeepSparkContextTest.executeCustomCQL("DROP TABLE " +
         Utils.quote(AbstractDeepSparkContextTest.OUTPUT_KEYSPACE_NAME) + "." + Utils.quote(OUTPUT_COLUMN_FAMILY))
-    }
-    catch {
+    } catch {
       case e: Exception =>
 
     };
@@ -89,31 +89,28 @@ class ScalaCassandraEntityRDDTest extends AbstractDeepSparkContextTest {
     checkSimpleTestData()
   }
 
-  private def initWriteConfig(): ICassandraDeepJobConfig[DeepScalaPageEntity] = {
+  private def initWriteConfig(): IDeepJobConfig[DeepScalaPageEntity] = {
 
     writeConfig =
       CassandraConfigFactory
         .createWriteConfig(classOf[DeepScalaPageEntity])
         .host(Constants.DEFAULT_CASSANDRA_HOST)
-        .rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT)
-        .cqlPort(CassandraServer.CASSANDRA_CQL_PORT)
-        .keyspace(AbstractDeepSparkContextTest.OUTPUT_KEYSPACE_NAME)
-        .columnFamily(OUTPUT_COLUMN_FAMILY)
-        .batchSize(2)
-        .createTableOnWrite(true)
+        .port(CassandraServer.CASSANDRA_THRIFT_PORT)
+        .catalog(AbstractDeepSparkContextTest.OUTPUT_KEYSPACE_NAME)
+        .table(OUTPUT_COLUMN_FAMILY)
+        .createTableOnWrite(true);
 
     writeConfig.initialize
   }
 
-  private def initReadConfig(): ICassandraDeepJobConfig[DeepScalaPageEntity] = {
+  private def initReadConfig(): IDeepJobConfig[DeepScalaPageEntity] = {
     rddConfig =
       CassandraConfigFactory
         .create(classOf[DeepScalaPageEntity])
         .host(Constants.DEFAULT_CASSANDRA_HOST)
-        .rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT)
-        .cqlPort(CassandraServer.CASSANDRA_CQL_PORT)
-        .keyspace(AbstractDeepSparkContextTest.KEYSPACE_NAME)
-        .columnFamily(AbstractDeepSparkContextTest.COLUMN_FAMILY)
+        .port(CassandraServer.CASSANDRA_THRIFT_PORT)
+        .catalog(AbstractDeepSparkContextTest.KEYSPACE_NAME)
+        .table(AbstractDeepSparkContextTest.COLUMN_FAMILY);
 
     rddConfig.initialize()
   }
@@ -133,7 +130,7 @@ class ScalaCassandraEntityRDDTest extends AbstractDeepSparkContextTest {
     assertEquals(rs.one.getLong(0), AbstractDeepSparkContextTest.entityTestDataSize)
     command = "select * from " +
       Utils.quote(AbstractDeepSparkContextTest.OUTPUT_KEYSPACE_NAME) + "." +
-        Utils.quote(AbstractDeepSparkContextTest.OUTPUT_COLUMN_FAMILY) + " WHERE \"id\" = 'e71aa3103bb4a63b9e7d3aa081c1dc5ddef85fa7';"
+      Utils.quote(AbstractDeepSparkContextTest.OUTPUT_COLUMN_FAMILY) + " WHERE \"id\" = 'e71aa3103bb4a63b9e7d3aa081c1dc5ddef85fa7';"
     rs = session.execute(command)
     val row: Row = rs.one
     assertEquals(row.getString("domain_name"), "11870.com")
