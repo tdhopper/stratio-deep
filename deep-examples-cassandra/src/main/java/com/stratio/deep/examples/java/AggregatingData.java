@@ -99,6 +99,8 @@ public final class AggregatingData {
         LOG.info("first: " + rdd.first());
 
 
+        
+
        // ExtractorServer.close();
         deepContext.stop();
     }
