@@ -71,7 +71,7 @@ public final class AggregatingData {
         String HOST         = "127.0.0.1";
 
 
-        ExtractorServer.initExtractorServer();
+        //ExtractorServer.initExtractorServer();
 
         // Creating the Deep Context where args are Spark Master and Job Name
         ContextProperties p = new ContextProperties(args);
@@ -99,7 +99,7 @@ public final class AggregatingData {
         LOG.info("first: " + rdd.first());
 
 
-        ExtractorServer.close();
+       // ExtractorServer.close();
         deepContext.stop();
     }
 
