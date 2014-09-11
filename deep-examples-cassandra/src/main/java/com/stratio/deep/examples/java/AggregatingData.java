@@ -64,7 +64,7 @@ public final class AggregatingData {
     public static void doMain(String[] args) {
         String job = "java:aggregatingData";
 
-        String KEYSPACENAME = "twitter";
+        String KEYSPACENAME = "test";
         String TABLENAME    = "tweets";
         String CQLPORT      = "9042";
         String RPCPORT      = "9160";

@@ -19,6 +19,7 @@ package com.stratio.deep.core.rdd;
 import static com.stratio.deep.commons.utils.Constants.SPARK_RDD_ID;
 
 import com.stratio.deep.commons.config.ExtractorConfig;
+import com.stratio.deep.commons.extractor.server.ExtractorServerFake;
 import com.stratio.deep.core.extractor.client.ExtractorClient;
 import com.stratio.deep.commons.exception.DeepExtractorinitializationException;
 import com.stratio.deep.commons.exception.DeepIOException;
@@ -113,8 +114,7 @@ public class DeepRDD<T> extends RDD<T> implements Serializable {
     private void initExtractorClient() {
         try {
             if (extractorClient == null) {
-                extractorClient = new ExtractorClient<>();
-                ((ExtractorClient) extractorClient).initialize();
+                extractorClient = new ExtractorServerFake<>();
             }
         } catch (DeepExtractorinitializationException e) {
             // TODO Auto-generated catch block

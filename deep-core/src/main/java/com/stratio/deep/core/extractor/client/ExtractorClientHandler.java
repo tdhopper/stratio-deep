@@ -1,5 +1,4 @@
-/*
- * Copyright 2012 The Netty Project
+/* Copyright 2012 The Netty Project
  *
  * The Netty Project licenses this file to you under the Apache License, version 2.0 (the
  * "License"); you may not use this file except in compliance with the License. You may obtain a
@@ -12,6 +11,7 @@
  * or implied. See the License for the specific language governing permissions and limitations under
  * the License.
  */
+
 package com.stratio.deep.core.extractor.client;
 
 
@@ -50,23 +50,23 @@ public class ExtractorClientHandler<T> extends SimpleChannelInboundHandler<Respo
         ctx.close();
     }
 
-    /*
-     * (non-Javadoc)
+     /* (non-Javadoc)
      *
      * @see
      * io.netty.channel.SimpleChannelInboundHandler#channelRead0(io.netty.channel.ChannelHandlerContext
-     * , java.lang.Object)
+     , java.lang.Object)
      */
+
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, Response msg) throws Exception {
         answer.add(msg);
     }
 
-    /*
-     * (non-Javadoc)
+    /* (non-Javadoc)
      *
      * @see com.stratio.deep.rdd.IDeepRDD#getPartitions(org.apache.spark.broadcast.Broadcast, int)
      */
+
     @Override
     public Partition[] getPartitions(ExtractorConfig<T> config) {
 
