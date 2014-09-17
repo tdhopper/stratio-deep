@@ -1,17 +1,15 @@
 /*
  * Copyright 2014, Stratio.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
+ * 
  * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * 
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
  */
 
 package com.stratio.deep.commons.config;
@@ -28,69 +26,70 @@ import java.util.Map;
  */
 public class ExtractorConfig<T> implements Serializable {
 
-    private Map<String, String> values = new HashMap<>();
+  private static final long serialVersionUID = 6711175817240765248L;
 
-    private Class extractorImplClass;
+  private Map<String, String> values = new HashMap<>();
 
-    private String extractorImplClassName;
+  private Class extractorImplClass;
 
-    private Class entityClass;
+  private String extractorImplClassName;
 
-    public ExtractorConfig (Class<T> t){
-        super();
-        entityClass = t;
-    }
+  private Class entityClass;
 
-    public ExtractorConfig(){
-        entityClass = Cells.class;
-    }
+  public ExtractorConfig(Class<T> t) {
+    super();
+    entityClass = t;
+  }
 
-    public Map<String, String> getValues() {
-        return values;
-    }
+  public ExtractorConfig() {
+    entityClass = Cells.class;
+  }
 
-    public void setValues(Map<String, String> values) {
-        this.values = values;
-    }
+  public Map<String, String> getValues() {
+    return values;
+  }
 
-    public Class getExtractorImplClass() {
-        return extractorImplClass;
-    }
+  public void setValues(Map<String, String> values) {
+    this.values = values;
+  }
 
-    public void setExtractorImplClass(Class extractorImplClass) {
-        this.extractorImplClass = extractorImplClass;
-    }
+  public Class getExtractorImplClass() {
+    return extractorImplClass;
+  }
 
-    public Class getEntityClass() {
-        return entityClass;
-    }
+  public void setExtractorImplClass(Class extractorImplClass) {
+    this.extractorImplClass = extractorImplClass;
+  }
 
-    public void setEntityClass(Class entityClass) {
-        this.entityClass = entityClass;
-    }
+  public Class getEntityClass() {
+    return entityClass;
+  }
 
-    public ExtractorConfig<T> putValue(String key, String value) {
-        values.put(key, value);
-        return this;
-    }
+  public void setEntityClass(Class entityClass) {
+    this.entityClass = entityClass;
+  }
 
-    public String getExtractorImplClassName() {
-        return extractorImplClassName;
-    }
+  public ExtractorConfig<T> putValue(String key, String value) {
+    values.put(key, value);
+    return this;
+  }
 
-    public void setExtractorImplClassName(String extractorImplClassName) {
-        this.extractorImplClassName = extractorImplClassName;
-    }
+  public String getExtractorImplClassName() {
+    return extractorImplClassName;
+  }
 
-    @Override
-    public String toString() {
-        final StringBuffer sb = new StringBuffer("ExtractorConfig{");
-        sb.append("values=").append(values);
-        sb.append(", extractorImplClass=").append(extractorImplClass);
-        sb.append(", extractorImplClassName='").append(extractorImplClassName).append('\'');
-        sb.append(", entityClass=").append(entityClass);
-        sb.append('}');
-        return sb.toString();
-    }
+  public void setExtractorImplClassName(String extractorImplClassName) {
+    this.extractorImplClassName = extractorImplClassName;
+  }
+
+  @Override
+  public String toString() {
+    final StringBuffer sb = new StringBuffer("ExtractorConfig{");
+    sb.append("values=").append(values);
+    sb.append(", extractorImplClass=").append(extractorImplClass);
+    sb.append(", extractorImplClassName='").append(extractorImplClassName).append('\'');
+    sb.append(", entityClass=").append(entityClass);
+    sb.append('}');
+    return sb.toString();
+  }
 }
-
