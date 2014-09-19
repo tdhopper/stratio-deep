@@ -16,23 +16,24 @@
 
 package com.stratio.deep.cassandra.context;
 
-import com.datastax.driver.core.Cluster;
-import com.datastax.driver.core.ResultSet;
-import com.datastax.driver.core.Row;
-import com.datastax.driver.core.Session;
-import com.google.common.io.Resources;
-import com.stratio.deep.cassandra.embedded.CassandraServer;
-import com.stratio.deep.core.context.DeepSparkContext;
-import com.stratio.deep.commons.utils.Constants;
-import org.apache.cassandra.exceptions.ConfigurationException;
-import org.apache.log4j.Logger;
-import org.testng.annotations.AfterSuite;
-import org.testng.annotations.BeforeSuite;
-
 import java.io.*;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+
+import com.google.common.io.Resources;
+
+import com.datastax.driver.core.Cluster;
+import com.datastax.driver.core.ResultSet;
+import com.datastax.driver.core.Row;
+import com.datastax.driver.core.Session;
+import com.stratio.deep.cassandra.embedded.CassandraServer;
+import com.stratio.deep.commons.utils.Constants;
+import com.stratio.deep.core.context.DeepSparkContext;
+import org.apache.cassandra.exceptions.ConfigurationException;
+import org.apache.log4j.Logger;
+import org.testng.annotations.AfterSuite;
+import org.testng.annotations.BeforeSuite;
 
 import static com.stratio.deep.commons.utils.Utils.quote;
 import static org.testng.Assert.assertEquals;
@@ -44,7 +45,7 @@ import static org.testng.Assert.assertNotNull;
 public abstract class AbstractDeepSparkContextTest {
 
     private Logger logger = Logger.getLogger(getClass());
-    public static DeepSparkContext context;
+    protected static DeepSparkContext context;
 
     private static CassandraServer cassandraServer;
     public static final String KEYSPACE_NAME = "Test_Keyspace";
@@ -96,7 +97,7 @@ public abstract class AbstractDeepSparkContextTest {
         URL cql3TestData = Resources.getResource("cql3_test_data.csv");
 
         String batch = "BEGIN BATCH \n";
-        List<String> inserts = new ArrayList<>();
+        java.util.List<String> inserts = new ArrayList<>();
 
         try (BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(
                 new File(testData.toURI()))))) {
@@ -216,30 +217,32 @@ public abstract class AbstractDeepSparkContextTest {
 
     @BeforeSuite
     protected void initContextAndServer() throws ConfigurationException, IOException, InterruptedException {
-        logger.info("instantiating context");
-        context = new DeepSparkContext("local", "deepSparkContextTest");
+        if (context==null && cassandraServer==null) {
 
-        String createKeyspace = "CREATE KEYSPACE " + quote(KEYSPACE_NAME)
-                + " WITH replication = {'class': 'SimpleStrategy', 'replication_factor' : 1 };";
+            logger.info("instantiating context");
+            context = new DeepSparkContext("local", "deepSparkContextTest");
 
-        String createOutputKeyspace = "CREATE KEYSPACE " + OUTPUT_KEYSPACE_NAME
-                + " WITH replication = {'class': 'SimpleStrategy', 'replication_factor' : 1 };";
+            String createKeyspace = "CREATE KEYSPACE " + quote(KEYSPACE_NAME)
+                    + " WITH replication = {'class': 'SimpleStrategy', 'replication_factor' : 1 };";
 
-        String useKeyspace = "USE " + quote(KEYSPACE_NAME) + ";";
+            String createOutputKeyspace = "CREATE KEYSPACE " + OUTPUT_KEYSPACE_NAME
+                    + " WITH replication = {'class': 'SimpleStrategy', 'replication_factor' : 1 };";
 
-        String useOutputKeyspace = "USE " + OUTPUT_KEYSPACE_NAME + ";";
+            String useKeyspace = "USE " + quote(KEYSPACE_NAME) + ";";
 
-        String initialDataset = buildTestDataInsertBatch();
+            String useOutputKeyspace = "USE " + OUTPUT_KEYSPACE_NAME + ";";
 
-        String[] startupCommands = new String[]{createKeyspace, createOutputKeyspace, useKeyspace, createCF,
-                createCFIndex, /*createLuceneIndex,*/
-                createCql3CF, createCql3CFIndex, createCql3CollectionsCF, initialDataset, useOutputKeyspace};
+            String initialDataset = buildTestDataInsertBatch();
 
-        cassandraServer = new CassandraServer();
-        cassandraServer.setStartupCommands(startupCommands);
-        cassandraServer.start();
+            String[] startupCommands = new String[]{createKeyspace, createOutputKeyspace, useKeyspace, createCF,
+                    createCFIndex, /*createLuceneIndex,*/
+                    createCql3CF, createCql3CFIndex, createCql3CollectionsCF, initialDataset, useOutputKeyspace};
 
-        checkTestData();
+            cassandraServer = new CassandraServer();
+            cassandraServer.setStartupCommands(startupCommands);
+            cassandraServer.start();
+           checkTestData();
+        }
     }
 
     protected DeepSparkContext getContext() {

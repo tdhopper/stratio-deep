@@ -14,10 +14,15 @@
  * limitations under the License.
  */
 
-package com.stratio.deep.cassandra.extractor;
+package com.stratio.deep.cassandra.rdd;
 
-import com.stratio.deep.commons.config.ExtractorConfig;
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.nio.charset.CharacterCodingException;
+
+import com.stratio.deep.cassandra.config.ICassandraDeepJobConfig;
 import com.stratio.deep.cassandra.context.AbstractDeepSparkContextTest;
+import com.stratio.deep.commons.config.ExtractorConfig;
 import org.apache.cassandra.exceptions.ConfigurationException;
 import org.apache.log4j.Logger;
 import org.apache.spark.Partition;
@@ -26,11 +31,8 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 import scala.collection.Seq;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.nio.charset.CharacterCodingException;
-
 import static com.stratio.deep.commons.utils.Utils.quote;
+import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
 
 /**
@@ -101,7 +103,7 @@ public abstract class CassandraRDDTest<W> extends AbstractDeepSparkContextTest {
         Partition[] partitions = getRDD().partitions();
 
         assertNotNull(partitions);
-        //assertEquals(partitions.length, getReadConfig().getBisectFactor() * (8 + 1));
+//        assertEquals(partitions.length, getReadConfig().getBisectFactor() * (8 + 1));
     }
 
     @Test(dependsOnMethods = "testGetPartitions")
@@ -129,7 +131,7 @@ public abstract class CassandraRDDTest<W> extends AbstractDeepSparkContextTest {
     public abstract void testSimpleSaveToCassandra();
 
     protected static void truncateCf(String keyspace, String cf) {
-        AbstractDeepSparkContextTest.executeCustomCQL("TRUNCATE  " + quote(keyspace) + "." + cf);
+        executeCustomCQL("TRUNCATE  " + quote(keyspace) + "." + cf);
     }
 
     @Test(dependsOnMethods = "testSaveToCassandra")

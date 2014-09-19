@@ -14,7 +14,14 @@
  * limitations under the License.
  */
 
-package com.stratio.deep.cassandra.extractor;
+package com.stratio.deep.cassandra.rdd;
+
+import java.io.*;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.util.*;
+
+import com.google.common.io.Resources;
 
 import com.datastax.driver.core.Cluster;
 import com.datastax.driver.core.ResultSet;
@@ -23,10 +30,14 @@ import com.datastax.driver.core.Session;
 import com.datastax.driver.core.querybuilder.Batch;
 import com.datastax.driver.core.querybuilder.Insert;
 import com.datastax.driver.core.querybuilder.QueryBuilder;
-import com.google.common.io.Resources;
-import com.stratio.deep.cassandra.context.AbstractDeepSparkContextTest;
-import com.stratio.deep.commons.config.ExtractorConfig;
+import com.stratio.deep.cassandra.config.CassandraConfigFactory;
+import com.stratio.deep.cassandra.config.ICassandraDeepJobConfig;
 import com.stratio.deep.cassandra.embedded.CassandraServer;
+import com.stratio.deep.cassandra.extractor.CassandraCellExtractor;
+import com.stratio.deep.cassandra.extractor.CassandraEntityExtractor;
+import com.stratio.deep.commons.config.ExtractorConfig;
+import com.stratio.deep.commons.entity.Cells;
+import com.stratio.deep.commons.exception.DeepIOException;
 import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
 import com.stratio.deep.commons.functions.AbstractSerializableFunction;
 import com.stratio.deep.cassandra.testentity.Cql3CollectionsTestEntity;
@@ -34,14 +45,10 @@ import com.stratio.deep.commons.utils.Constants;
 import org.apache.cassandra.exceptions.ConfigurationException;
 import org.apache.log4j.Logger;
 import org.apache.spark.rdd.RDD;
-import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
-
-import java.io.*;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.util.*;
+import scala.Function1;
+import scala.reflect.ClassTag$;
 
 import static com.stratio.deep.commons.utils.Utils.quote;
 import static org.testng.Assert.*;
@@ -49,7 +56,7 @@ import static org.testng.Assert.*;
 /**
  * Integration tests for entity RDDs where cells contain Cassandra's collections.
  */
-@Test(suiteName = "cassandraRddTests",
+@Test(suiteName = "cassandraRddTests", dependsOnGroups = "ScalaCassandraEntityRDDTest",
         groups = "CassandraCollectionsEntityTest")
 public class CassandraCollectionsEntityTest extends CassandraRDDTest<Cql3CollectionsTestEntity> {
 
@@ -64,7 +71,7 @@ public class CassandraCollectionsEntityTest extends CassandraRDDTest<Cql3Collect
     }
 
     static void loadCollectionsData() {
-        truncateCf(AbstractDeepSparkContextTest.KEYSPACE_NAME, AbstractDeepSparkContextTest.CQL3_COLLECTION_COLUMN_FAMILY);
+        truncateCf(KEYSPACE_NAME, CQL3_COLLECTION_COLUMN_FAMILY);
 
         URL cql3TestData = Resources.getResource("cql3_collections_test_data.csv");
 
@@ -97,7 +104,7 @@ public class CassandraCollectionsEntityTest extends CassandraRDDTest<Cql3Collect
 
                 uuid2id.put(uuid, id);
 
-                Insert stmt = QueryBuilder.insertInto(AbstractDeepSparkContextTest.CQL3_COLLECTION_COLUMN_FAMILY).values(
+                Insert stmt = QueryBuilder.insertInto(CQL3_COLLECTION_COLUMN_FAMILY).values(
                         new String[]{"id", "first_name", "last_name", "emails", "phones", "uuid2id"},
                         new Object[]{Integer.parseInt(fields[0]), fields[1], fields[2], emails, phones, uuid2id});
 
@@ -113,7 +120,7 @@ public class CassandraCollectionsEntityTest extends CassandraRDDTest<Cql3Collect
 
         Cluster cluster = Cluster.builder().withPort(CassandraServer.CASSANDRA_CQL_PORT)
                 .addContactPoint(Constants.DEFAULT_CASSANDRA_HOST).build();
-        Session session = cluster.connect(quote(AbstractDeepSparkContextTest.KEYSPACE_NAME));
+        Session session = cluster.connect(quote(KEYSPACE_NAME));
         session.execute(batch);
     }
 
@@ -126,13 +133,13 @@ public class CassandraCollectionsEntityTest extends CassandraRDDTest<Cql3Collect
 
         for (Cql3CollectionsTestEntity e : entities) {
             if (e.getId().equals(470)) {
-                Assert.assertEquals(e.getFirstName(), "Amalda");
-                Assert.assertEquals(e.getLastName(), "Banks");
+                assertEquals(e.getFirstName(), "Amalda");
+                assertEquals(e.getLastName(), "Banks");
                 assertNotNull(e.getEmails());
-                Assert.assertEquals(e.getEmails().size(), 2);
-                Assert.assertEquals(e.getPhones().size(), 2);
-                Assert.assertEquals(e.getUuid2id().size(), 1);
-                Assert.assertEquals(e.getUuid2id().get(UUID.fromString("AE47FBFD-A086-47C2-8C73-77D8A8E99F35")),
+                assertEquals(e.getEmails().size(), 2);
+                assertEquals(e.getPhones().size(), 2);
+                assertEquals(e.getUuid2id().size(), 1);
+                assertEquals(e.getUuid2id().get(UUID.fromString("AE47FBFD-A086-47C2-8C73-77D8A8E99F35")),
                         Integer.valueOf(470));
 
                 Iterator<String> emails = e.getEmails().iterator();
@@ -160,13 +167,13 @@ public class CassandraCollectionsEntityTest extends CassandraRDDTest<Cql3Collect
                 .addContactPoint(Constants.DEFAULT_CASSANDRA_HOST).build();
         Session session = cluster.connect();
 
-        String command = "select count(*) from " + AbstractDeepSparkContextTest.OUTPUT_KEYSPACE_NAME + "." + AbstractDeepSparkContextTest.OUTPUT_CQL3_COLLECTION_COLUMN_FAMILY
+        String command = "select count(*) from " + OUTPUT_KEYSPACE_NAME + "." + OUTPUT_CQL3_COLLECTION_COLUMN_FAMILY
                 + ";";
 
         ResultSet rs = session.execute(command);
         assertEquals(rs.one().getLong(0), 500);
 
-        command = "select * from " + AbstractDeepSparkContextTest.OUTPUT_KEYSPACE_NAME + "." + AbstractDeepSparkContextTest.OUTPUT_CQL3_COLLECTION_COLUMN_FAMILY
+        command = "select * from " + OUTPUT_KEYSPACE_NAME + "." + OUTPUT_CQL3_COLLECTION_COLUMN_FAMILY
                 + " WHERE \"id\" = 351;";
 
         rs = session.execute(command);
@@ -196,54 +203,49 @@ public class CassandraCollectionsEntityTest extends CassandraRDDTest<Cql3Collect
 
     @Override
     protected RDD<Cql3CollectionsTestEntity> initRDD() {
-        return AbstractDeepSparkContextTest.context.createRDD(getReadConfig());
+        return context.createRDD(getReadConfig());
     }
 
     @Override
     protected ExtractorConfig<Cql3CollectionsTestEntity> initReadConfig() {
-        ExtractorConfig<Cql3CollectionsTestEntity> config = new ExtractorConfig<>(Cql3CollectionsTestEntity.class);
 
+
+        ExtractorConfig<Cql3CollectionsTestEntity> rddConfig = new ExtractorConfig<>(Cql3CollectionsTestEntity.class);
         Map<String, String> values = new HashMap<>();
-        values.put(ExtractorConstants.HOST,    Constants.DEFAULT_CASSANDRA_HOST);
-        values.put(ExtractorConstants.KEYSPACE, AbstractDeepSparkContextTest.KEYSPACE_NAME);
-        values.put(ExtractorConstants.COLUMN_FAMILY,  AbstractDeepSparkContextTest.CQL3_COLLECTION_COLUMN_FAMILY);
-        values.put(ExtractorConstants.CQLPORT,  String.valueOf(CassandraServer.CASSANDRA_CQL_PORT));
+        values.put(ExtractorConstants.HOST, Constants.DEFAULT_CASSANDRA_HOST);
         values.put(ExtractorConstants.RPCPORT, String.valueOf(CassandraServer.CASSANDRA_THRIFT_PORT));
+        values.put(ExtractorConstants.KEYSPACE, KEYSPACE_NAME);
+        values.put(ExtractorConstants.COLUMN_FAMILY, CQL3_COLLECTION_COLUMN_FAMILY);
+        values.put(ExtractorConstants.PAGE_SIZE, String.valueOf(DEFAULT_PAGE_SIZE));
         values.put(ExtractorConstants.BISECT_FACTOR, String.valueOf(testBisectFactor));
+        values.put(ExtractorConstants.CQLPORT, String.valueOf(CassandraServer.CASSANDRA_CQL_PORT));
+        rddConfig.setValues(values);
+        rddConfig.setExtractorImplClass(CassandraEntityExtractor.class);
+        return rddConfig;
 
-        values.put(ExtractorConstants.PAGE_SIZE,    String.valueOf(DEFAULT_PAGE_SIZE));
-
-        config.setValues(values);
-
-
-        return config;
     }
 
     @Override
     protected ExtractorConfig<Cql3CollectionsTestEntity> initWriteConfig() {
-        ExtractorConfig<Cql3CollectionsTestEntity> config = new ExtractorConfig<>(Cql3CollectionsTestEntity.class);
-
+        ExtractorConfig<Cql3CollectionsTestEntity> rddConfig = new ExtractorConfig<>(Cql3CollectionsTestEntity.class);
         Map<String, String> values = new HashMap<>();
-        values.put(ExtractorConstants.HOST,    Constants.DEFAULT_CASSANDRA_HOST);
-        values.put(ExtractorConstants.KEYSPACE, AbstractDeepSparkContextTest.OUTPUT_KEYSPACE_NAME);
-        values.put(ExtractorConstants.COLUMN_FAMILY,  AbstractDeepSparkContextTest.OUTPUT_CQL3_COLLECTION_COLUMN_FAMILY);
-        values.put(ExtractorConstants.CQLPORT,  String.valueOf(CassandraServer.CASSANDRA_CQL_PORT));
+        values.put(ExtractorConstants.HOST, Constants.DEFAULT_CASSANDRA_HOST);
         values.put(ExtractorConstants.RPCPORT, String.valueOf(CassandraServer.CASSANDRA_THRIFT_PORT));
+        values.put(ExtractorConstants.KEYSPACE, OUTPUT_KEYSPACE_NAME);
+        values.put(ExtractorConstants.COLUMN_FAMILY, OUTPUT_CQL3_COLLECTION_COLUMN_FAMILY);
+        values.put(ExtractorConstants.PAGE_SIZE, String.valueOf(DEFAULT_PAGE_SIZE));
         values.put(ExtractorConstants.BISECT_FACTOR, String.valueOf(testBisectFactor));
-        values.put(ExtractorConstants.BATCHSIZE, String.valueOf(2));
-        values.put(ExtractorConstants.CREATE_ON_WRITE,    String.valueOf(Boolean.TRUE));
-
-        config.setValues(values);
-
-        return config;
+        values.put(ExtractorConstants.CQLPORT, String.valueOf(CassandraServer.CASSANDRA_CQL_PORT));
+        values.put(ExtractorConstants.CREATE_ON_WRITE, "true");
+        rddConfig.setValues(values);
+        rddConfig.setExtractorImplClass(CassandraEntityExtractor.class);
+        return rddConfig;
     }
 
     @Override
     public void testSaveToCassandra() {
 
-        fail("revieW");
-       /*  TODO REVIEW
-      Function1<Cql3CollectionsTestEntity, Cql3CollectionsTestEntity> mappingFunc =
+        Function1<Cql3CollectionsTestEntity, Cql3CollectionsTestEntity> mappingFunc =
                 new TestEntityAbstractSerializableFunction();
 
         RDD<Cql3CollectionsTestEntity> mappedRDD =
@@ -257,22 +259,22 @@ public class CassandraCollectionsEntityTest extends CassandraRDDTest<Cql3Collect
 
         assertTrue(mappedRDD.count() > 0);
 
-        ICassandraDeepJobConfig<Cql3CollectionsTestEntity> writeConfig = getWriteConfig();
-        writeConfig.createTableOnWrite(Boolean.FALSE);
+        ExtractorConfig<Cql3CollectionsTestEntity> writeConfig = getWriteConfig();
+        writeConfig.putValue(ExtractorConstants.CREATE_ON_WRITE, "false");
 
         try {
-            CassandraRDD.saveRDDToCassandra(mappedRDD, writeConfig);
+            context.saveRDD(mappedRDD, writeConfig);
 
             fail();
         } catch (DeepIOException e) {
             // ok
             logger.info("Correctly catched DeepIOException: " + e.getMessage());
-            writeConfig.createTableOnWrite(Boolean.TRUE);
+            writeConfig.putValue(ExtractorConstants.CREATE_ON_WRITE, "true");
         }
 
-        CassandraRDD.saveRDDToCassandra(mappedRDD, writeConfig);
+        context.saveRDD(mappedRDD, writeConfig);
 
-        checkOutputTestData();*/
+        checkOutputTestData();
     }
 
     protected void checkOutputTestData() {
@@ -280,13 +282,13 @@ public class CassandraCollectionsEntityTest extends CassandraRDDTest<Cql3Collect
                 .addContactPoint(Constants.DEFAULT_CASSANDRA_HOST).build();
         Session session = cluster.connect();
 
-        String command = "select count(*) from " + AbstractDeepSparkContextTest.OUTPUT_KEYSPACE_NAME + "." + AbstractDeepSparkContextTest.OUTPUT_CQL3_COLLECTION_COLUMN_FAMILY
+        String command = "select count(*) from " + OUTPUT_KEYSPACE_NAME + "." + OUTPUT_CQL3_COLLECTION_COLUMN_FAMILY
                 + ";";
 
         ResultSet rs = session.execute(command);
         assertEquals(rs.one().getLong(0), 500);
 
-        command = "select * from " + AbstractDeepSparkContextTest.OUTPUT_KEYSPACE_NAME + "." + AbstractDeepSparkContextTest.OUTPUT_CQL3_COLLECTION_COLUMN_FAMILY
+        command = "select * from " + OUTPUT_KEYSPACE_NAME + "." + OUTPUT_CQL3_COLLECTION_COLUMN_FAMILY
                 + " WHERE \"id\" = 351;";
 
         rs = session.execute(command);
@@ -318,25 +320,24 @@ public class CassandraCollectionsEntityTest extends CassandraRDDTest<Cql3Collect
     @Override
     public void testSimpleSaveToCassandra() {
         ExtractorConfig<Cql3CollectionsTestEntity> writeConfig = getWriteConfig();
-
-        //writeConfig.createTableOnWrite(Boolean.FALSE);
+        writeConfig.putValue(ExtractorConstants.CREATE_ON_WRITE, "false");
 
         try {
-            AbstractDeepSparkContextTest.executeCustomCQL("DROP TABLE " + AbstractDeepSparkContextTest.OUTPUT_KEYSPACE_NAME + "." + AbstractDeepSparkContextTest.OUTPUT_CQL3_COLLECTION_COLUMN_FAMILY);
+            executeCustomCQL("DROP TABLE " + OUTPUT_KEYSPACE_NAME + "." + OUTPUT_CQL3_COLLECTION_COLUMN_FAMILY);
         } catch (Exception e) {
         }
 
         try {
-            //CassandraRDD.saveRDDToCassandra(getRDD(), writeConfig);
+            context.saveRDD(getRDD(), writeConfig);
 
             fail();
         } catch (Exception e) {
             // ok
             logger.info("Correctly catched Exception: " + e.getMessage());
-            //writeConfig.createTableOnWrite(Boolean.TRUE);
+            writeConfig.putValue(ExtractorConstants.CREATE_ON_WRITE, "true");
         }
 
-//        CassandraRDD.saveRDDToCassandra(getRDD(), writeConfig);
+        context.saveRDD(getRDD(), writeConfig);
 
         checkSimpleTestData();
     }
@@ -345,13 +346,13 @@ public class CassandraCollectionsEntityTest extends CassandraRDDTest<Cql3Collect
     public void testCql3SaveToCassandra() {
 
         try {
-            AbstractDeepSparkContextTest.executeCustomCQL("DROP TABLE " + AbstractDeepSparkContextTest.OUTPUT_KEYSPACE_NAME + "." + AbstractDeepSparkContextTest.OUTPUT_CQL3_COLLECTION_COLUMN_FAMILY);
+            executeCustomCQL("DROP TABLE " + OUTPUT_KEYSPACE_NAME + "." + OUTPUT_CQL3_COLLECTION_COLUMN_FAMILY);
         } catch (Exception e) {
         }
 
         ExtractorConfig<Cql3CollectionsTestEntity> writeConfig = getWriteConfig();
 
-        //CassandraRDD.cql3SaveRDDToCassandra(getRDD(), writeConfig);
+//        RDD.cql3SaveRDDToCassandra(getRDD(), writeConfig);
         checkSimpleTestData();
 
     }

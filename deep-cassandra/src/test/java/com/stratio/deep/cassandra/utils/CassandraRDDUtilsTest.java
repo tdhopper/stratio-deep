@@ -1,4 +1,4 @@
-package com.stratio.deep.cassandra.utils;/*
+/*
  * Copyright 2014, Stratio.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,6 +14,8 @@ package com.stratio.deep.cassandra.utils;/*
  * limitations under the License.
  */
 
+package com.stratio.deep.cassandra.utils;
+
 import java.util.Date;
 import java.util.UUID;
 
@@ -21,9 +23,9 @@ import com.stratio.deep.cassandra.entity.CassandraCell;
 import com.stratio.deep.commons.entity.Cells;
 import com.stratio.deep.commons.exception.DeepGenericException;
 import com.stratio.deep.testentity.CommonsTestEntity;
-
-import org.junit.Test;
+import org.testng.annotations.Test;
 import scala.Tuple2;
+
 
 import static com.stratio.deep.cassandra.util.CassandraUtils.createTableQueryGenerator;
 import static com.stratio.deep.cassandra.util.CassandraUtils.deepType2tuple;

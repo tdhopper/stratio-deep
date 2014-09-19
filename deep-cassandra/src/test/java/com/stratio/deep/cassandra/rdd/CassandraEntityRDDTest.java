@@ -14,16 +14,24 @@
  * limitations under the License.
  */
 
-package com.stratio.deep.cassandra.extractor;
+package com.stratio.deep.cassandra.rdd;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.nio.ByteBuffer;
+import java.util.HashMap;
+import java.util.Map;
 
 import com.datastax.driver.core.Cluster;
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
 import com.datastax.driver.core.Session;
 import com.stratio.deep.cassandra.config.CassandraConfigFactory;
-import com.stratio.deep.cassandra.context.AbstractDeepSparkContextTest;
-import com.stratio.deep.commons.config.ExtractorConfig;
+import com.stratio.deep.cassandra.config.ICassandraDeepJobConfig;
 import com.stratio.deep.cassandra.embedded.CassandraServer;
+import com.stratio.deep.cassandra.extractor.CassandraEntityExtractor;
+import com.stratio.deep.cassandra.testentity.Cql3CollectionsTestEntity;
+import com.stratio.deep.commons.config.ExtractorConfig;
 import com.stratio.deep.commons.exception.DeepIOException;
 import com.stratio.deep.commons.exception.DeepIndexNotFoundException;
 import com.stratio.deep.commons.exception.DeepNoSuchFieldException;
@@ -33,12 +41,15 @@ import com.stratio.deep.cassandra.testentity.TestEntity;
 import com.stratio.deep.commons.utils.Constants;
 import org.apache.log4j.Logger;
 import org.apache.spark.rdd.RDD;
-import org.testng.Assert;
+import org.apache.spark.serializer.DeserializationStream;
+import org.apache.spark.serializer.JavaSerializer;
+import org.apache.spark.serializer.SerializationStream;
+import org.apache.spark.serializer.SerializerInstance;
 import org.testng.annotations.Test;
 import scala.Function1;
-
-import java.util.HashMap;
-import java.util.Map;
+import scala.collection.Iterator;
+import scala.reflect.ClassTag;
+import scala.reflect.ClassTag$;
 
 import static com.stratio.deep.commons.utils.Utils.quote;
 import static org.testng.Assert.*;
@@ -66,13 +77,13 @@ public class CassandraEntityRDDTest extends CassandraRDDTest<TestEntity> {
     protected void checkComputedData(TestEntity[] entities) {
         boolean found = false;
 
-        Assert.assertEquals(entities.length, AbstractDeepSparkContextTest.entityTestDataSize);
+        assertEquals(entities.length, entityTestDataSize);
 
         for (TestEntity e : entities) {
             if (e.getId().equals("e71aa3103bb4a63b9e7d3aa081c1dc5ddef85fa7")) {
-                Assert.assertEquals(e.getUrl(), "http://11870.com/k/es/de");
-                Assert.assertEquals(e.getResponseTime(), new Integer(421));
-                Assert.assertEquals(e.getDownloadTime(), new Long(1380802049275L));
+                assertEquals(e.getUrl(), "http://11870.com/k/es/de");
+                assertEquals(e.getResponseTime(), new Integer(421));
+                assertEquals(e.getDownloadTime(), new Long(1380802049275L));
                 found = true;
                 break;
             }
@@ -88,12 +99,12 @@ public class CassandraEntityRDDTest extends CassandraRDDTest<TestEntity> {
                 .addContactPoint(Constants.DEFAULT_CASSANDRA_HOST).build();
         Session session = cluster.connect();
 
-        String command = "select count(*) from " + quote(AbstractDeepSparkContextTest.OUTPUT_KEYSPACE_NAME) + "." + quote(AbstractDeepSparkContextTest.OUTPUT_COLUMN_FAMILY) + ";";
+        String command = "select count(*) from " + quote(OUTPUT_KEYSPACE_NAME) + "." + quote(OUTPUT_COLUMN_FAMILY) + ";";
 
         ResultSet rs = session.execute(command);
-        Assert.assertEquals(rs.one().getLong(0), AbstractDeepSparkContextTest.entityTestDataSize);
+        assertEquals(rs.one().getLong(0), entityTestDataSize);
 
-        command = "SELECT * from " + quote(AbstractDeepSparkContextTest.OUTPUT_KEYSPACE_NAME) + "." + quote(AbstractDeepSparkContextTest.OUTPUT_COLUMN_FAMILY)
+        command = "SELECT * from " + quote(OUTPUT_KEYSPACE_NAME) + "." + quote(OUTPUT_COLUMN_FAMILY)
                 + " WHERE \"id\" = 'e71aa3103bb4a63b9e7d3aa081c1dc5ddef85fa7';";
 
         rs = session.execute(command);
@@ -114,12 +125,12 @@ public class CassandraEntityRDDTest extends CassandraRDDTest<TestEntity> {
                 .addContactPoint(Constants.DEFAULT_CASSANDRA_HOST).build();
         Session session = cluster.connect();
 
-        String command = "select count(*) from " + quote(AbstractDeepSparkContextTest.OUTPUT_KEYSPACE_NAME) + "." + quote(AbstractDeepSparkContextTest.OUTPUT_COLUMN_FAMILY) + ";";
+        String command = "select count(*) from " + quote(OUTPUT_KEYSPACE_NAME) + "." + quote(OUTPUT_COLUMN_FAMILY) + ";";
 
         ResultSet rs = session.execute(command);
-        Assert.assertEquals(rs.one().getLong(0), AbstractDeepSparkContextTest.entityTestDataSize);
+        assertEquals(rs.one().getLong(0), entityTestDataSize);
 
-        command = "select * from " + quote(AbstractDeepSparkContextTest.OUTPUT_KEYSPACE_NAME) + "." + quote(AbstractDeepSparkContextTest.OUTPUT_COLUMN_FAMILY)
+        command = "select * from " + quote(OUTPUT_KEYSPACE_NAME) + "." + quote(OUTPUT_COLUMN_FAMILY)
                 + " WHERE \"id\" = 'e71aa3103bb4a63b9e7d3aa081c1dc5ddef85fa7';";
 
         rs = session.execute(command);
@@ -142,8 +153,8 @@ public class CassandraEntityRDDTest extends CassandraRDDTest<TestEntity> {
                     .host(Constants.DEFAULT_CASSANDRA_HOST)
                     .rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT)
                     .cqlPort(CassandraServer.CASSANDRA_CQL_PORT)
-                    .keyspace(AbstractDeepSparkContextTest.KEYSPACE_NAME)
-                    .columnFamily(AbstractDeepSparkContextTest.COLUMN_FAMILY)
+                    .keyspace(KEYSPACE_NAME)
+                    .columnFamily(COLUMN_FAMILY)
                     .filterByField("notExistentField", "val")
                     .initialize();
 
@@ -158,8 +169,8 @@ public class CassandraEntityRDDTest extends CassandraRDDTest<TestEntity> {
                     .host(Constants.DEFAULT_CASSANDRA_HOST)
                     .rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT)
                     .cqlPort(CassandraServer.CASSANDRA_CQL_PORT)
-                    .keyspace(AbstractDeepSparkContextTest.KEYSPACE_NAME)
-                    .columnFamily(AbstractDeepSparkContextTest.COLUMN_FAMILY)
+                    .keyspace(KEYSPACE_NAME)
+                    .columnFamily(COLUMN_FAMILY)
                     .filterByField("url", "val")
                     .initialize();
 
@@ -172,19 +183,22 @@ public class CassandraEntityRDDTest extends CassandraRDDTest<TestEntity> {
         int allElements = entities.length;
         assertTrue(allElements > 2);
 
-        ExtractorConfig<TestEntity> config = new ExtractorConfig(TestEntity.class);
 
+
+        ExtractorConfig<TestEntity> rddConfig = new ExtractorConfig<>(TestEntity.class);
         Map<String, String> values = new HashMap<>();
-        values.put(ExtractorConstants.HOST,    Constants.DEFAULT_CASSANDRA_HOST);
-        values.put(ExtractorConstants.KEYSPACE, AbstractDeepSparkContextTest.KEYSPACE_NAME);
-        values.put(ExtractorConstants.COLUMN_FAMILY,  AbstractDeepSparkContextTest.COLUMN_FAMILY);
-        values.put(ExtractorConstants.CQLPORT,  String.valueOf(CassandraServer.CASSANDRA_CQL_PORT));
+        values.put(ExtractorConstants.HOST, Constants.DEFAULT_CASSANDRA_HOST);
         values.put(ExtractorConstants.RPCPORT, String.valueOf(CassandraServer.CASSANDRA_THRIFT_PORT));
-       // .filterByField("response_time", 371)
-        config.setValues(values);
+        values.put(ExtractorConstants.KEYSPACE, KEYSPACE_NAME);
+        values.put(ExtractorConstants.COLUMN_FAMILY, COLUMN_FAMILY);
+        values.put(ExtractorConstants.PAGE_SIZE, String.valueOf(DEFAULT_PAGE_SIZE));
+        values.put(ExtractorConstants.BISECT_FACTOR, String.valueOf(testBisectFactor));
+        values.put(ExtractorConstants.CQLPORT, String.valueOf(CassandraServer.CASSANDRA_CQL_PORT));
+        values.put(ExtractorConstants.FILTER_QUERY, "response_time,371");
+        rddConfig.setValues(values);
+        rddConfig.setExtractorImplClass(CassandraEntityExtractor.class);
 
-
-        RDD<TestEntity> otherRDD = AbstractDeepSparkContextTest.context.createRDD(config);
+        RDD<TestEntity> otherRDD = context.createRDD(rddConfig);
 
         entities = (TestEntity[]) otherRDD.collect();
         assertEquals(entities.length, 2);
@@ -210,76 +224,71 @@ public class CassandraEntityRDDTest extends CassandraRDDTest<TestEntity> {
 
     @Override
     protected RDD<TestEntity> initRDD() {
-        assertNotNull(AbstractDeepSparkContextTest.context);
-        return AbstractDeepSparkContextTest.context.createRDD(getReadConfig());
+        assertNotNull(context);
+        return (RDD)context.createRDD(getReadConfig());
     }
+
     @Override
     protected ExtractorConfig<TestEntity> initReadConfig() {
 
-
-        ExtractorConfig<TestEntity> writeConfig = new ExtractorConfig<>(TestEntity.class);
-
+        ExtractorConfig<TestEntity> rddConfig = new ExtractorConfig<>(TestEntity.class);
         Map<String, String> values = new HashMap<>();
-        values.put(ExtractorConstants.HOST,    Constants.DEFAULT_CASSANDRA_HOST);
-        values.put(ExtractorConstants.KEYSPACE, AbstractDeepSparkContextTest.KEYSPACE_NAME);
-        values.put(ExtractorConstants.COLUMN_FAMILY,  AbstractDeepSparkContextTest.COLUMN_FAMILY);
-        values.put(ExtractorConstants.CQLPORT,  String.valueOf(CassandraServer.CASSANDRA_CQL_PORT));
+        values.put(ExtractorConstants.HOST, Constants.DEFAULT_CASSANDRA_HOST);
         values.put(ExtractorConstants.RPCPORT, String.valueOf(CassandraServer.CASSANDRA_THRIFT_PORT));
-        values.put(ExtractorConstants.PAGE_SIZE,        String.valueOf(DEFAULT_PAGE_SIZE));
+        values.put(ExtractorConstants.KEYSPACE, KEYSPACE_NAME);
+        values.put(ExtractorConstants.COLUMN_FAMILY, COLUMN_FAMILY);
+        values.put(ExtractorConstants.PAGE_SIZE, String.valueOf(DEFAULT_PAGE_SIZE));
         values.put(ExtractorConstants.BISECT_FACTOR, String.valueOf(testBisectFactor));
-
-        writeConfig.setValues(values);
-
-
-        return writeConfig;
-
+        values.put(ExtractorConstants.CQLPORT, String.valueOf(CassandraServer.CASSANDRA_CQL_PORT));
+        rddConfig.setValues(values);
+        rddConfig.setExtractorImplClass(CassandraEntityExtractor.class);
+        return rddConfig;
     }
 
     @Override
     protected ExtractorConfig<TestEntity> initWriteConfig() {
 
-        ExtractorConfig<TestEntity> writeConfig = new ExtractorConfig<>(TestEntity.class);
-
+        ExtractorConfig<TestEntity> rddConfig = new ExtractorConfig<>(TestEntity.class);
         Map<String, String> values = new HashMap<>();
-        values.put(ExtractorConstants.HOST,    Constants.DEFAULT_CASSANDRA_HOST);
-        values.put(ExtractorConstants.KEYSPACE, AbstractDeepSparkContextTest.OUTPUT_KEYSPACE_NAME);
-        values.put(ExtractorConstants.COLUMN_FAMILY,  AbstractDeepSparkContextTest.OUTPUT_COLUMN_FAMILY);
-        values.put(ExtractorConstants.CQLPORT,  String.valueOf(CassandraServer.CASSANDRA_CQL_PORT));
+        values.put(ExtractorConstants.HOST, Constants.DEFAULT_CASSANDRA_HOST);
         values.put(ExtractorConstants.RPCPORT, String.valueOf(CassandraServer.CASSANDRA_THRIFT_PORT));
-        values.put(ExtractorConstants.BATCHSIZE,        String.valueOf(2));
-        values.put(ExtractorConstants.CREATE_ON_WRITE, String.valueOf(Boolean.TRUE));
+        values.put(ExtractorConstants.KEYSPACE, OUTPUT_KEYSPACE_NAME);
+        values.put(ExtractorConstants.COLUMN_FAMILY, OUTPUT_COLUMN_FAMILY);
+        values.put(ExtractorConstants.PAGE_SIZE, String.valueOf(DEFAULT_PAGE_SIZE));
+        values.put(ExtractorConstants.BISECT_FACTOR, String.valueOf(testBisectFactor));
+        values.put(ExtractorConstants.CQLPORT, String.valueOf(CassandraServer.CASSANDRA_CQL_PORT));
+        values.put(ExtractorConstants.CREATE_ON_WRITE, "true");
 
-        writeConfig.setValues(values);
+        rddConfig.setValues(values);
+        rddConfig.setExtractorImplClass(CassandraEntityExtractor.class);
 
-
-        return writeConfig;
+        return rddConfig;
 
     }
-
 
     @Test
     public void testCountWithInputColumns() {
         logger.info("testCountWithInputColumns()");
 
-        ExtractorConfig<TestEntity> tmpConfig = new ExtractorConfig<>(TestEntity.class);
-
+        ExtractorConfig<TestEntity> rddConfig = new ExtractorConfig<>(TestEntity.class);
         Map<String, String> values = new HashMap<>();
-        values.put(ExtractorConstants.HOST,    Constants.DEFAULT_CASSANDRA_HOST);
-        values.put(ExtractorConstants.KEYSPACE, AbstractDeepSparkContextTest.KEYSPACE_NAME);
-        values.put(ExtractorConstants.COLUMN_FAMILY,  AbstractDeepSparkContextTest.COLUMN_FAMILY);
-        values.put(ExtractorConstants.CQLPORT,  String.valueOf(CassandraServer.CASSANDRA_CQL_PORT));
+        values.put(ExtractorConstants.HOST, Constants.DEFAULT_CASSANDRA_HOST);
         values.put(ExtractorConstants.RPCPORT, String.valueOf(CassandraServer.CASSANDRA_THRIFT_PORT));
-        values.put(ExtractorConstants.BATCHSIZE,        String.valueOf(2));
-        values.put(ExtractorConstants.PAGE_SIZE, String.valueOf(DEFAULT_PAGE_SIZE));
-        //.inputColumns("domain_name", "response_time")
+        values.put(ExtractorConstants.KEYSPACE, KEYSPACE_NAME);
+        values.put(ExtractorConstants.COLUMN_FAMILY, COLUMN_FAMILY);
+        values.put(ExtractorConstants.PAGE_SIZE, String.valueOf(2));
+        values.put(ExtractorConstants.INPUT_COLUMNS, "domain_name, response_time");
+        values.put(ExtractorConstants.BISECT_FACTOR, String.valueOf(testBisectFactor));
+        values.put(ExtractorConstants.CQLPORT, String.valueOf(CassandraServer.CASSANDRA_CQL_PORT));
 
-        tmpConfig.setValues(values);
+        rddConfig.setValues(values);
+        rddConfig.setExtractorImplClass(CassandraEntityExtractor.class);
 
-        RDD<TestEntity> tmpRdd = AbstractDeepSparkContextTest.context.createRDD(tmpConfig);
+        RDD<TestEntity> tmpRdd = context.createRDD(rddConfig);
 
         TestEntity[] cells = (TestEntity[]) tmpRdd.collect();
 
-        Assert.assertEquals(cells.length, AbstractDeepSparkContextTest.entityTestDataSize);
+        assertEquals(cells.length, entityTestDataSize);
 
         for (TestEntity e : cells) {
             assertNotNull(e.getDomain());
@@ -297,28 +306,28 @@ public class CassandraEntityRDDTest extends CassandraRDDTest<TestEntity> {
     public void testSaveToCassandra() {
         Function1<TestEntity, TestEntity> mappingFunc = new TestEntityAbstractSerializableFunction();
 
-        //RDD<TestEntity> mappedRDD = getRDD().map(mappingFunc, ClassTag$.MODULE$.<TestEntity>apply(TestEntity.class));
+        RDD<TestEntity> mappedRDD = getRDD().map(mappingFunc, ClassTag$.MODULE$.<TestEntity>apply(TestEntity.class));
 
         try {
-            AbstractDeepSparkContextTest.executeCustomCQL("DROP TABLE " + quote(AbstractDeepSparkContextTest.OUTPUT_KEYSPACE_NAME) + "." + quote(AbstractDeepSparkContextTest.OUTPUT_COLUMN_FAMILY));
+            executeCustomCQL("DROP TABLE " + quote(OUTPUT_KEYSPACE_NAME) + "." + quote(OUTPUT_COLUMN_FAMILY));
         } catch (Exception e) {
         }
 
-       // assertTrue(mappedRDD.count() > 0);
+        assertTrue(mappedRDD.count() > 0);
 
         ExtractorConfig<TestEntity> writeConfig = getWriteConfig();
-        //writeConfig.createTableOnWrite(Boolean.FALSE);
+        writeConfig.putValue(ExtractorConstants.CREATE_ON_WRITE, "false");
 
         try {
-            //CassandraRDD.saveRDDToCassandra(mappedRDD, writeConfig);
+            context.saveRDD(mappedRDD, writeConfig);
 
             fail();
         } catch (DeepIOException e) {
             // ok
-            //writeConfig.createTableOnWrite(Boolean.TRUE);
+            writeConfig.putValue(ExtractorConstants.CREATE_ON_WRITE, "true");
         }
 
-        //CassandraRDD.saveRDDToCassandra(mappedRDD, writeConfig);
+        context.saveRDD(mappedRDD, writeConfig);
 
         checkOutputTestData();
 
@@ -327,26 +336,24 @@ public class CassandraEntityRDDTest extends CassandraRDDTest<TestEntity> {
     @Override
     public void testSimpleSaveToCassandra() {
         ExtractorConfig<TestEntity> writeConfig = getWriteConfig();
-
-
-        writeConfig.getValues().put(ExtractorConstants.CREATE_ON_WRITE, String.valueOf(Boolean.FALSE));
+        writeConfig.putValue(ExtractorConstants.CREATE_ON_WRITE, "false");
 
         try {
-	        AbstractDeepSparkContextTest.executeCustomCQL("DROP TABLE " + quote(AbstractDeepSparkContextTest.OUTPUT_KEYSPACE_NAME) + "." + quote(AbstractDeepSparkContextTest.OUTPUT_COLUMN_FAMILY));
+	        executeCustomCQL("DROP TABLE " + quote(OUTPUT_KEYSPACE_NAME) + "." + quote(OUTPUT_COLUMN_FAMILY));
         } catch (Exception e) {
         }
 
         try {
-            //CassandraRDD.saveRDDToCassandra(getRDD(), writeConfig);
+            context.saveRDD(getRDD(), writeConfig);
 
             fail();
         } catch (Exception e) {
             // ok
-            writeConfig.getValues().put(ExtractorConstants.CREATE_ON_WRITE, String.valueOf(Boolean.TRUE));
+            writeConfig.putValue(ExtractorConstants.CREATE_ON_WRITE, "true");
         }
 
-        Assert.assertEquals(getRDD().count(), AbstractDeepSparkContextTest.entityTestDataSize);
-        //CassandraRDD.saveRDDToCassandra(getRDD(), writeConfig);
+        assertEquals(getRDD().count(), entityTestDataSize);
+        context.saveRDD(getRDD(), writeConfig);
 
         checkSimpleTestData();
     }
@@ -355,44 +362,44 @@ public class CassandraEntityRDDTest extends CassandraRDDTest<TestEntity> {
     public void testCql3SaveToCassandra() {
 
         try {
-	        AbstractDeepSparkContextTest.executeCustomCQL("DROP TABLE " + quote(AbstractDeepSparkContextTest.OUTPUT_KEYSPACE_NAME) + "." + quote(AbstractDeepSparkContextTest.OUTPUT_COLUMN_FAMILY));
+	        executeCustomCQL("DROP TABLE " + quote(OUTPUT_KEYSPACE_NAME) + "." + quote(OUTPUT_COLUMN_FAMILY));
         } catch (Exception e) {
         }
 
         ExtractorConfig<TestEntity> writeConfig = getWriteConfig();
 
-        //CassandraRDD.cql3SaveRDDToCassandra(getRDD(), writeConfig);
+//        RDD.cql3SaveRDDToCassandra(getRDD(), writeConfig);
         checkSimpleTestData();
     }
 
 
     @Test
     public void testJavaSerialization() {
-//        JavaSerializer ser = new JavaSerializer(context.getConf());
-//
-//        SerializerInstance instance = ser.newInstance();
-//        ClassTag<RDD<TestEntity>> classTag = ClassTag$.MODULE$.<RDD<TestEntity>>apply(rdd.getClass());
-//
-//        ByteBuffer serializedRDD = instance.serialize(rdd, classTag);
-//
-//        RDD deserializedRDD = instance.deserialize(serializedRDD, classTag);
-//
-//        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-//
-//        SerializationStream serializationStream = instance.serializeStream(baos);
-//        serializationStream = serializationStream.writeObject(rdd, classTag);
-//
-//        serializationStream.flush();
-//        serializationStream.close();
-//
-//        ByteArrayInputStream bais = new ByteArrayInputStream(serializedRDD.array());
-//
-//        DeserializationStream deserializationStream = instance.deserializeStream(bais);
-//        Iterator<Object> iter = deserializationStream.asIterator();
-//        assertTrue(iter.hasNext());
-//
-//        deserializedRDD = (RDD) iter.next();
-//        assertNotNull(deserializedRDD);
+        JavaSerializer ser = new JavaSerializer(context.getConf());
+
+        SerializerInstance instance = ser.newInstance();
+        ClassTag<RDD<TestEntity>> classTag = ClassTag$.MODULE$.<RDD<TestEntity>>apply(rdd.getClass());
+
+        ByteBuffer serializedRDD = instance.serialize(rdd, classTag);
+
+        RDD deserializedRDD = instance.deserialize(serializedRDD, classTag);
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+        SerializationStream serializationStream = instance.serializeStream(baos);
+        serializationStream = serializationStream.writeObject(rdd, classTag);
+
+        serializationStream.flush();
+        serializationStream.close();
+
+        ByteArrayInputStream bais = new ByteArrayInputStream(serializedRDD.array());
+
+        DeserializationStream deserializationStream = instance.deserializeStream(bais);
+        Iterator<Object> iter = deserializationStream.asIterator();
+        assertTrue(iter.hasNext());
+
+        deserializedRDD = (RDD) iter.next();
+        assertNotNull(deserializedRDD);
     }
 
 }

@@ -199,7 +199,7 @@ public class CassandraServer {
 
 //        make a tmp dir and copy cassandra.yaml and log4j.properties to it
         try {
-            copy("/log4j.properties", dir.getAbsolutePath());
+            copy("/log4j.xml", dir.getAbsolutePath());
         } catch (Exception e1) {
             logger.error("Cannot copy log4j.properties");
         }

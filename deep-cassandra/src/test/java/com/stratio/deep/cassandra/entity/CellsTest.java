@@ -1,17 +1,17 @@
 /*
  * Copyright 2014, Stratio.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *  http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
  */
 
 package com.stratio.deep.cassandra.entity;
@@ -21,19 +21,17 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import com.stratio.deep.cassandra.entity.CassandraCell;
 import com.stratio.deep.commons.entity.Cell;
 import com.stratio.deep.commons.entity.Cells;
 import com.stratio.deep.commons.exception.DeepGenericException;
 import org.apache.cassandra.db.marshal.Int32Type;
 import org.apache.cassandra.db.marshal.LongType;
 import org.apache.cassandra.db.marshal.UTF8Type;
-import org.junit.Test;
-
+import org.testng.annotations.Test;
 
 import static org.testng.Assert.*;
 
-
+@Test
 public class CellsTest {
 
     @Test
@@ -41,7 +39,7 @@ public class CellsTest {
         Cells cells = new Cells("defaultTable");
         assertEquals(cells.size(), 0);
 
-        Cells keys = new Cells("defaultTable", CassandraCell.create("id1", "", true, false), CassandraCell.create("id2", "", false, true));
+        Cells keys = new Cells("defaultTable",CassandraCell.create("id1", "", true, false), CassandraCell.create("id2", "", false, true));
 
         assertEquals(keys.size(), 2);
 
