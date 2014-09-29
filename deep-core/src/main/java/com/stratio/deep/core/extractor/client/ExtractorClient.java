@@ -19,6 +19,7 @@ import javax.net.ssl.SSLException;
 import org.apache.spark.Partition;
 
 import com.stratio.deep.commons.config.ExtractorConfig;
+import com.stratio.deep.commons.config.IDeepJobConfig;
 import com.stratio.deep.commons.exception.DeepExtractorinitializationException;
 import com.stratio.deep.commons.rdd.IExtractor;
 
@@ -115,14 +116,24 @@ public class ExtractorClient<T> implements IExtractor<T> {
         return;
     }
 
+    @Override
+    public void initIterator(Partition dp, IDeepJobConfig<T, ?> deepJobConfig) {
+        throw new UnsupportedOperationException("this is not allowed when using IDeepJobConfig");
+    }
+
     /*
-     * (non-Javadoc)
-     *
-     * @see com.stratio.deep.rdd.IDeepRDD#getPartitions(IDeepJobConfig, int)
-     */
+         * (non-Javadoc)
+         *
+         * @see com.stratio.deep.rdd.IDeepRDD#getPartitions(IDeepJobConfig, int)
+         */
     @Override
     public Partition[] getPartitions(ExtractorConfig<T> config) {
         return this.handler.getPartitions(config);
+    }
+
+    @Override
+    public Partition[] getPartitions(IDeepJobConfig<T, ?> deepJobConfig) {
+        throw new UnsupportedOperationException("this is not allowed when using IDeepJobConfig");
     }
 
 }

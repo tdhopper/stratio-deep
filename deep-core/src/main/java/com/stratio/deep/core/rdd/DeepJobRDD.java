@@ -60,6 +60,7 @@ public class DeepJobRDD<T> extends RDD<T> implements Serializable {
         Map<String, Serializable> serializableMap = new HashMap<>();
         serializableMap.put(SPARK_RDD_ID, id());
         Map<String, Serializable> serializableMapCustom = config.getCustomConfiguration();
+        serializableMapCustom = serializableMapCustom!=null?serializableMapCustom: new HashMap<String, Serializable>();
         serializableMapCustom.putAll(serializableMap);
         config.customConfiguration(serializableMapCustom);
 

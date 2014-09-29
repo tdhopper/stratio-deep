@@ -34,13 +34,13 @@ import org.testng.annotations.Test;
 
 import com.stratio.deep.commons.entity.Cell;
 import com.stratio.deep.commons.entity.Cells;
+import com.stratio.deep.core.entity.WordCount;
 import com.stratio.deep.mongodb.entity.MongoCell;
 import com.stratio.deep.mongodb.utils.UtilMongoDB;
 import com.stratio.deep.testentity.BookEntity;
 import com.stratio.deep.testentity.CantoEntity;
 import com.stratio.deep.testentity.MetadataEntity;
 import com.stratio.deep.testentity.MongoDBTestEntity;
-import com.stratio.deep.testentity.WordCount;
 
 /**
  * Created by rcrespo on 18/06/14.

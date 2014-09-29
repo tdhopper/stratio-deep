@@ -20,6 +20,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import org.apache.spark.Partition;
 
 import com.stratio.deep.commons.config.ExtractorConfig;
+import com.stratio.deep.commons.config.IDeepJobConfig;
 import com.stratio.deep.commons.extractor.actions.CloseAction;
 import com.stratio.deep.commons.extractor.actions.ExtractorInstanceAction;
 import com.stratio.deep.commons.extractor.actions.GetPartitionsAction;
@@ -74,11 +75,16 @@ public class ExtractorClientHandler<T> extends SimpleChannelInboundHandler<Respo
         answer.add(msg);
     }
 
+    @Override
+    public void initIterator(Partition dp, IDeepJobConfig<T, ?> deepJobConfig) {
+        throw new UnsupportedOperationException("this is not allowed when using IDeepJobConfig");
+    }
+
     /*
-     * (non-Javadoc)
-     *
-     * @see com.stratio.deep.rdd.IDeepRDD#getPartitions(org.apache.spark.broadcast.Broadcast, int)
-     */
+         * (non-Javadoc)
+         *
+         * @see com.stratio.deep.rdd.IDeepRDD#getPartitions(org.apache.spark.broadcast.Broadcast, int)
+         */
     @Override
     public Partition[] getPartitions(ExtractorConfig<T> config) {
 
@@ -102,6 +108,10 @@ public class ExtractorClientHandler<T> extends SimpleChannelInboundHandler<Respo
         }
 
         return ((GetPartitionsResponse) response).getPartitions();
+    }
+
+    @Override public Partition[] getPartitions(IDeepJobConfig<T, ?> deepJobConfig) {
+        throw new UnsupportedOperationException("this is not allowed when using IDeepJobConfig");
     }
 
     @Override
