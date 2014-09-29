@@ -15,17 +15,31 @@
 package com.stratio.deep.core.extractor.client;
 
 
-import com.stratio.deep.commons.config.ExtractorConfig;
-import com.stratio.deep.commons.extractor.actions.*;
-import com.stratio.deep.commons.extractor.response.*;
-import com.stratio.deep.commons.rdd.IExtractor;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
-import org.apache.spark.Partition;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
+
+import org.apache.spark.Partition;
+
+import com.stratio.deep.commons.config.DeepJobConfig;
+import com.stratio.deep.commons.config.ExtractorConfig;
+import com.stratio.deep.commons.extractor.actions.CloseAction;
+import com.stratio.deep.commons.extractor.actions.ExtractorInstanceAction;
+import com.stratio.deep.commons.extractor.actions.GetPartitionsAction;
+import com.stratio.deep.commons.extractor.actions.HasNextAction;
+import com.stratio.deep.commons.extractor.actions.InitIteratorAction;
+import com.stratio.deep.commons.extractor.actions.InitSaveAction;
+import com.stratio.deep.commons.extractor.actions.NextAction;
+import com.stratio.deep.commons.extractor.actions.SaveAction;
+import com.stratio.deep.commons.extractor.response.ExtractorInstanceResponse;
+import com.stratio.deep.commons.extractor.response.GetPartitionsResponse;
+import com.stratio.deep.commons.extractor.response.HasNextResponse;
+import com.stratio.deep.commons.extractor.response.NextResponse;
+import com.stratio.deep.commons.extractor.response.Response;
+import com.stratio.deep.commons.rdd.IExtractor;
 
 public class ExtractorClientHandler<T> extends SimpleChannelInboundHandler<Response> implements
         IExtractor<T> {
@@ -68,7 +82,7 @@ public class ExtractorClientHandler<T> extends SimpleChannelInboundHandler<Respo
      * @see com.stratio.deep.rdd.IDeepRDD#getPartitions(org.apache.spark.broadcast.Broadcast, int)
      */
     @Override
-    public Partition[] getPartitions(ExtractorConfig<T> config) {
+    public Partition[] getPartitions(DeepJobConfig<T> config) {
 
         GetPartitionsAction<T> getPartitionsAction = new GetPartitionsAction<>(config);
 
@@ -167,7 +181,7 @@ public class ExtractorClientHandler<T> extends SimpleChannelInboundHandler<Respo
 
 
     @Override
-    public void initIterator(Partition dp, ExtractorConfig<T> config) {
+    public void initIterator(Partition dp, DeepJobConfig<T> config) {
         InitIteratorAction<T> initIteratorAction = new InitIteratorAction<>(dp, config);
 
         channel.writeAndFlush(initIteratorAction);
@@ -190,7 +204,7 @@ public class ExtractorClientHandler<T> extends SimpleChannelInboundHandler<Respo
     }
 
     @Override
-    public IExtractor<T> getExtractorInstance(ExtractorConfig<T> config) {
+    public IExtractor<T> getExtractorInstance(DeepJobConfig<T> config) {
         ExtractorInstanceAction<T> instanceAction = new ExtractorInstanceAction<>(config);
 
         channel.writeAndFlush(instanceAction);
@@ -238,7 +252,7 @@ public class ExtractorClientHandler<T> extends SimpleChannelInboundHandler<Respo
     }
 
     @Override
-    public void initSave(ExtractorConfig<T> config, T first) {
+    public void initSave(DeepJobConfig<T> config, T first) {
         InitSaveAction<T> initSaveAction = new InitSaveAction<>(config, first);
 
         channel.writeAndFlush(initSaveAction);

@@ -23,6 +23,7 @@ import com.stratio.deep.core.extractor.client.ExtractorClient;
 import com.stratio.deep.commons.exception.DeepExtractorinitializationException;
 import com.stratio.deep.commons.exception.DeepIOException;
 import com.stratio.deep.commons.rdd.IExtractor;
+import com.stratio.deep.commons.config.DeepJobConfig;
 import org.apache.spark.InterruptibleIterator;
 import org.apache.spark.Partition;
 import org.apache.spark.SparkContext;
@@ -48,19 +49,19 @@ public class DeepRDD<T> extends RDD<T> implements Serializable {
 
     private transient IExtractor<T> extractorClient;
 
-    protected Broadcast<ExtractorConfig<T>> config;
+    protected Broadcast<DeepJobConfig<T>> config;
 
-    public Broadcast<ExtractorConfig<T>> getConfig() {
+    public Broadcast<DeepJobConfig<T>> getConfig() {
         return config;
     }
 
-    public DeepRDD(SparkContext sc, ExtractorConfig<T> config) {
+    public DeepRDD(SparkContext sc, DeepJobConfig<T> config) {
         super(sc, scala.collection.Seq$.MODULE$.empty(), ClassTag$.MODULE$.<T>apply(config
                 .getEntityClass()));
         config.putValue(SPARK_RDD_ID, String.valueOf(id()));
         this.config =
                 sc.broadcast(config, ClassTag$.MODULE$
-                        .<ExtractorConfig<T>>apply(config.getClass()));
+                        .<DeepJobConfig<T>>apply(config.getClass()));
 
 
         initExtractorClient();
@@ -101,7 +102,6 @@ public class DeepRDD<T> extends RDD<T> implements Serializable {
         };
 
         return new InterruptibleIterator<>(context, asScalaIterator(iterator));
-
     }
 
     @Override
@@ -110,7 +110,6 @@ public class DeepRDD<T> extends RDD<T> implements Serializable {
         return extractorClient.getPartitions(config.getValue());
     }
 
-
     /**
      * It tries to get an Extractor Instance,
      * if there is any problem try to instance an extractorClient
@@ -118,14 +117,10 @@ public class DeepRDD<T> extends RDD<T> implements Serializable {
     private void initExtractorClient() {
         try{
             if (extractorClient == null) {
-                extractorClient = getExtractorInstance(config.getValue());
+                extractorClient = getExtractorInstance(config.getValue().getExtractorConfiguration());
             }
         }catch (DeepExtractorinitializationException e){
             extractorClient = getExtractorClient();
         }
-
-
     }
-
-
 }

@@ -34,7 +34,7 @@ public class ExtractorConfig<T> implements Serializable {
 
   private String extractorImplClassName;
 
-  private Class entityClass;
+  protected Class entityClass;
 
   public ExtractorConfig(Class<T> t) {
     super();

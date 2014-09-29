@@ -15,9 +15,6 @@
 package com.stratio.deep.core.extractor.client;
 
 
-import com.stratio.deep.commons.config.ExtractorConfig;
-import com.stratio.deep.commons.exception.DeepExtractorinitializationException;
-import com.stratio.deep.commons.rdd.IExtractor;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.EventLoopGroup;
@@ -25,9 +22,15 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.util.InsecureTrustManagerFactory;
-import org.apache.spark.Partition;
 
 import javax.net.ssl.SSLException;
+
+import org.apache.spark.Partition;
+
+import com.stratio.deep.commons.config.DeepJobConfig;
+import com.stratio.deep.commons.config.ExtractorConfig;
+import com.stratio.deep.commons.exception.DeepExtractorinitializationException;
+import com.stratio.deep.commons.rdd.IExtractor;
 
 /**
  * Sends a list of continent/city pairs to a {@link } to get the local times of the
@@ -92,12 +95,12 @@ public class ExtractorClient<T> implements IExtractor<T> {
 
 
     @Override
-    public void initIterator(Partition dp, ExtractorConfig<T> config) {
+    public void initIterator(Partition dp, DeepJobConfig<T> config) {
         handler.initIterator(dp, config);
     }
 
     @Override
-    public IExtractor<T> getExtractorInstance(ExtractorConfig<T> config) {
+    public IExtractor<T> getExtractorInstance(DeepJobConfig<T> config) {
         return handler.getExtractorInstance(config);
     }
 
@@ -107,7 +110,7 @@ public class ExtractorClient<T> implements IExtractor<T> {
     }
 
     @Override
-    public void initSave(ExtractorConfig<T> config, T first) {
+    public void initSave(DeepJobConfig<T> config, T first) {
         handler.initSave(config, first);
     }
 
@@ -125,7 +128,7 @@ public class ExtractorClient<T> implements IExtractor<T> {
      * @see com.stratio.deep.rdd.IDeepRDD#getPartitions(IDeepJobConfig, int)
      */
     @Override
-    public Partition[] getPartitions(ExtractorConfig<T> config) {
+    public Partition[] getPartitions(DeepJobConfig<T> config) {
         return this.handler.getPartitions(config);
     }
 

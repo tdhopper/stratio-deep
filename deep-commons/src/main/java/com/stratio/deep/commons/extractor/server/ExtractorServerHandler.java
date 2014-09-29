@@ -14,17 +14,32 @@
  */
 package com.stratio.deep.commons.extractor.server;
 
-import com.stratio.deep.commons.extractor.actions.*;
-import com.stratio.deep.commons.extractor.response.*;
-import com.stratio.deep.commons.config.ExtractorConfig;
-import com.stratio.deep.commons.entity.Cells;
-import com.stratio.deep.commons.rdd.IExtractor;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
-import org.apache.spark.Partition;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+
+import org.apache.spark.Partition;
+
+import com.stratio.deep.commons.config.DeepJobConfig;
+import com.stratio.deep.commons.entity.Cells;
+import com.stratio.deep.commons.extractor.actions.Action;
+import com.stratio.deep.commons.extractor.actions.GetPartitionsAction;
+import com.stratio.deep.commons.extractor.actions.HasNextAction;
+import com.stratio.deep.commons.extractor.actions.InitIteratorAction;
+import com.stratio.deep.commons.extractor.actions.InitSaveAction;
+import com.stratio.deep.commons.extractor.actions.NextAction;
+import com.stratio.deep.commons.extractor.actions.SaveAction;
+import com.stratio.deep.commons.extractor.response.CloseResponse;
+import com.stratio.deep.commons.extractor.response.GetPartitionsResponse;
+import com.stratio.deep.commons.extractor.response.HasNextResponse;
+import com.stratio.deep.commons.extractor.response.InitIteratorResponse;
+import com.stratio.deep.commons.extractor.response.InitSaveResponse;
+import com.stratio.deep.commons.extractor.response.NextResponse;
+import com.stratio.deep.commons.extractor.response.Response;
+import com.stratio.deep.commons.extractor.response.SaveResponse;
+import com.stratio.deep.commons.rdd.IExtractor;
 
 public class ExtractorServerHandler<T> extends SimpleChannelInboundHandler<Action> {
 
@@ -128,9 +143,9 @@ public class ExtractorServerHandler<T> extends SimpleChannelInboundHandler<Actio
      * @param config
      */
     @SuppressWarnings("unchecked")
-    private void initExtractor(ExtractorConfig<T> config) {
+    private void initExtractor(DeepJobConfig<T> config) {
 
-        Class<T> rdd = (Class<T>) config.getExtractorImplClass();
+        Class<T> rdd = (Class<T>) config.getExtractorConfiguration().getExtractorImplClass();
         try {
             Constructor<T> c = null;
             if (config.getEntityClass().isAssignableFrom(Cells.class)){

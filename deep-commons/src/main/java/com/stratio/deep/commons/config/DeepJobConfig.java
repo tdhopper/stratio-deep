@@ -15,9 +15,11 @@
 package com.stratio.deep.commons.config;
 
 import com.stratio.deep.commons.entity.Cell;
+
 import org.apache.hadoop.conf.Configuration;
 
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -31,15 +33,19 @@ public class DeepJobConfig<T> implements Serializable {
 
   private String password;
   
+  private Map<String, String> values = new HashMap<>();
+
   private Map<String, Cell> columnDefinitions;
   
   private int pageSize;
   
-  private Class<T> entityClass;
-  
   private String host;
   
   private String[] inputColumns;
+  
+  private String catalogName;
+  
+  private String tableName;
   
   private String userName;
   
@@ -47,12 +53,16 @@ public class DeepJobConfig<T> implements Serializable {
   
   private Configuration hadoopConfiguration;
 
+  public DeepJobConfig(ExtractorConfig<T> extractorConfiguration) {
+    this.extractorConfiguration = extractorConfiguration;
+  }
+  
   /**
    * Returns the password needed to authenticate to the remote datastore cluster.
    * 
    * @return the password used to login to the remote cluster.
    */
-  String getPassword() {
+  public String getPassword() {
     return this.password;
   }
 
@@ -63,7 +73,7 @@ public class DeepJobConfig<T> implements Serializable {
    * 
    * @return the map of column names and the corresponding Cell object containing its metadata.
    */
-  Map<String, Cell> columnDefinitions() {
+  public Map<String, Cell> columnDefinitions() {
     return this.columnDefinitions;
   }
 
@@ -74,7 +84,7 @@ public class DeepJobConfig<T> implements Serializable {
    * @param pageSize the number of rows per page
    * @return this configuration object.
    */
-  DeepJobConfig<T> pageSize(int pageSize) {
+  public DeepJobConfig<T> pageSize(int pageSize) {
     this.pageSize = pageSize;
     return this;
   }
@@ -83,20 +93,11 @@ public class DeepJobConfig<T> implements Serializable {
   /* Getters */
 
   /**
-   * Returns the underlying testentity class used to map the Cassandra Column family.
-   * 
-   * @return the entity class object associated to this configuration object.
-   */
-  Class<T> getEntityClass() {
-    return this.entityClass;
-  }
-
-  /**
    * Returns the hostname of the cassandra server.
    * 
    * @return the endpoint of the cassandra server.
    */
-  String getHost() {
+  public String getHost() {
     return this.host;
   }
 
@@ -105,17 +106,35 @@ public class DeepJobConfig<T> implements Serializable {
    * 
    * @return the array of column names that will be retrieved from the data store.
    */
-  String[] getInputColumns() {
+  public String[] getInputColumns() {
     return this.inputColumns;
   }
 
+  /**
+   * Returns the table name.
+   * 
+   * @return table name
+   */
+  public String getTableName() {
+    return this.tableName;
+  }
+
+  /**
+   * Returns the catalog name.
+   * 
+   * @return catalog name
+   */
+  public String getCatalogName() {
+    return this.tableName;
+  }
+  
   /**
    * Returns the username used to authenticate to the cassandra server. Defaults to the empty
    * string.
    * 
    * @return the username to use to login to the remote server.
    */
-  String getUsername() {
+  public String getUsername() {
     return this.userName;
   }
 
@@ -125,7 +144,7 @@ public class DeepJobConfig<T> implements Serializable {
    * @param hostname the cassandra server endpoint.
    * @return this object.
    */
-  DeepJobConfig<T> host(String hostname) {
+  public DeepJobConfig<T> host(String hostname) {
     this.host = hostname;
     return this;
   }
@@ -135,11 +154,11 @@ public class DeepJobConfig<T> implements Serializable {
    * 
    * @return this object.
    */
-  DeepJobConfig<T> initialize() {
+  public DeepJobConfig<T> initialize() {
     return this;
   }
 
-  DeepJobConfig<T> initialize(ExtractorConfig<T> extractorConfig) {
+  public DeepJobConfig<T> initialize(ExtractorConfig<T> extractorConfig) {
     
     this.extractorConfiguration = extractorConfig;
     return this;
@@ -152,18 +171,40 @@ public class DeepJobConfig<T> implements Serializable {
    * @param columns list of columns we want to retrieve from the datastore.
    * @return this object.
    */
-  DeepJobConfig<T> inputColumns(String... columns) {
+  public DeepJobConfig<T> inputColumns(String... columns) {
     
     this.inputColumns = columns;
     return this;
   }
 
   /**
+   * Defines the table name.
+   * 
+   * @param tableName Name of the table
+   * @return this object
+   */
+  public DeepJobConfig<T> tableName(String tableName) {
+    this.tableName = tableName;
+    return this;
+  }
+
+  /**
+   * Defines the catalog name.
+   * 
+   * @param catalogName Name of the catalog
+   * @return this object
+   */
+  public DeepJobConfig<T> catalogName(String catalogName) {
+    this.catalogName = catalogName;
+    return this;
+  }
+  
+  /**
    * Sets the password to use to login to Cassandra. Leave empty if you do not need authentication.
    * 
    * @return this object.
    */
-  DeepJobConfig<T> password(String password) {
+  public DeepJobConfig<T> password(String password) {
    
     this.password = password;
     return this;
@@ -175,7 +216,7 @@ public class DeepJobConfig<T> implements Serializable {
    * 
    * @return this object.
    */
-  DeepJobConfig<T> username(String username) {
+  public DeepJobConfig<T> username(String username) {
     
     this.userName = username;
     return this;
@@ -188,16 +229,17 @@ public class DeepJobConfig<T> implements Serializable {
    * 
    * @return the page size
    */
-  int getPageSize() {
+  public int getPageSize() {
     return this.pageSize;
   }
 
-  /**
+  /**    val rddConfig: DeepJobConfig[DeepScalaPageEntity] = new DeepJobConfig[DeepScalaPageEntity](classOf[DeepScalaPageEntity])
+
    * Returns the extractor specific configuration
    *  
    * @return the extractor configuration
    */
-  ExtractorConfig<T> getExtractorConfiguration() {
+  public ExtractorConfig<T> getExtractorConfiguration() {
     return this.extractorConfiguration;
   }
   
@@ -205,10 +247,34 @@ public class DeepJobConfig<T> implements Serializable {
   // * Just in case you have a hadoopInputFormat
   // * @return
   // */
-  Configuration getHadoopConfiguration() {
+  public Configuration getHadoopConfiguration() {
     
     return this.hadoopConfiguration;
   }
 
+  /**
+   * Returns the underlying testentity class used to map the Cassandra Column family.
+   * 
+   * @return the entity class object associated to this configuration object.
+   */
+  public Class getEntityClass() {
+    return this.getExtractorConfiguration().getEntityClass();
+  }
 
+  public void setEntityClass(Class entityClass) {
+    this.extractorConfiguration.entityClass = entityClass;
+  }
+  
+  public DeepJobConfig<T> putValue(String key, String value) {
+    values.put(key, value);
+    return this;
+  }
+  
+  public Map<String, String> getValues() {
+    return values;
+  }
+
+  public void setValues(Map<String, String> values) {
+    this.values  = values;
+  }
 }

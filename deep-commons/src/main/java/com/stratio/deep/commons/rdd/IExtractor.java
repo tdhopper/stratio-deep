@@ -1,9 +1,11 @@
 package com.stratio.deep.commons.rdd;
 
-import com.stratio.deep.commons.config.ExtractorConfig;
+import java.io.Serializable;
+
 import org.apache.spark.Partition;
 
-import java.io.Serializable;
+import com.stratio.deep.commons.config.DeepJobConfig;
+import com.stratio.deep.commons.config.ExtractorConfig;
 
 /**
  * Created by rcrespo on 4/08/14.
@@ -11,7 +13,7 @@ import java.io.Serializable;
 public interface IExtractor<T> extends Serializable {
 
 
-    Partition[] getPartitions(ExtractorConfig<T> config);
+    Partition[] getPartitions(DeepJobConfig<T> config);
 
     boolean hasNext();
 
@@ -19,12 +21,12 @@ public interface IExtractor<T> extends Serializable {
 
     void close();
 
-    void initIterator(Partition dp, ExtractorConfig<T> config);
+    void initIterator(Partition dp, DeepJobConfig<T> config);
 
 
-    IExtractor<T> getExtractorInstance(ExtractorConfig<T> config);
+    IExtractor<T> getExtractorInstance(DeepJobConfig<T> config);
 
     void saveRDD(T t);
 
-    void initSave(ExtractorConfig<T> config, T first);
+    void initSave(DeepJobConfig<T> config, T first);
 }

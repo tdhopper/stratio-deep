@@ -3,8 +3,9 @@
  */
 package com.stratio.deep.commons.extractor.actions;
 
-import com.stratio.deep.commons.config.ExtractorConfig;
 import org.apache.spark.Partition;
+
+import com.stratio.deep.commons.config.DeepJobConfig;
 
 /**
  * @author Óscar Puertas
@@ -13,7 +14,7 @@ public class InitIteratorAction<T> extends Action {
 
     private static final long serialVersionUID = -1270097974102584045L;
 
-    private ExtractorConfig<T> config;
+    private DeepJobConfig<T> config;
 
 
     private Partition partition;
@@ -22,14 +23,14 @@ public class InitIteratorAction<T> extends Action {
         super();
     }
 
-    public InitIteratorAction(Partition partition, ExtractorConfig<T> config) {
+    public InitIteratorAction(Partition partition, DeepJobConfig<T> config) {
         super(ActionType.INIT_ITERATOR);
         this.config = config;
         this.partition = partition;
     }
 
 
-    public ExtractorConfig<T> getConfig() {
+    public DeepJobConfig<T> getConfig() {
         return config;
     }
 

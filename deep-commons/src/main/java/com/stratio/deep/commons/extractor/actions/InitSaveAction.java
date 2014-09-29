@@ -19,7 +19,7 @@
  */
 package com.stratio.deep.commons.extractor.actions;
 
-import com.stratio.deep.commons.config.ExtractorConfig;
+import com.stratio.deep.commons.config.DeepJobConfig;
 
 /**
  * Created by rcrespo on 27/08/14.
@@ -28,7 +28,7 @@ public class InitSaveAction<T> extends Action {
 
     private static final long serialVersionUID = -1270097974102584045L;
 
-    private ExtractorConfig<T> config;
+    private DeepJobConfig<T> config;
 
     private T first;
 
@@ -36,14 +36,14 @@ public class InitSaveAction<T> extends Action {
         super();
     }
 
-    public InitSaveAction(ExtractorConfig<T> config, T first) {
+    public InitSaveAction(DeepJobConfig<T> config, T first) {
         super(ActionType.INIT_SAVE);
         this.config = config;
         this.first=first;
     }
 
 
-    public ExtractorConfig<T> getConfig() {
+    public DeepJobConfig<T> getConfig() {
         return config;
     }
 

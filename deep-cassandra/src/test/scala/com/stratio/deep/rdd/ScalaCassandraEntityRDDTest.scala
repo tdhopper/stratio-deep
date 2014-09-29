@@ -17,7 +17,6 @@
 package com.stratio.deep.rdd
 
 import java.util
-
 import com.datastax.driver.core.{Cluster, ResultSet, Row, Session}
 import com.stratio.deep.cassandra.embedded.CassandraServer
 import com.stratio.deep.cassandra.config.{CassandraConfigFactory, ICassandraDeepJobConfig}
@@ -34,6 +33,7 @@ import org.apache.spark.Partition
 import org.apache.spark.rdd.RDD
 import org.testng.Assert._
 import org.testng.annotations.{BeforeClass, Test}
+import com.stratio.deep.commons.config.DeepJobConfig
 
 /**
  * Created by luca on 20/03/14.
@@ -41,8 +41,8 @@ import org.testng.annotations.{BeforeClass, Test}
 @Test(suiteName = "cassandraRddTests", dependsOnGroups = Array("CassandraJavaRDDTest"), groups = Array("ScalaCassandraEntityRDDTest"))
 class ScalaCassandraEntityRDDTest extends AbstractDeepSparkContextTest {
   private var rdd: RDD[DeepScalaPageEntity] = _
-  private var rddConfig: ExtractorConfig[DeepScalaPageEntity] = _
-  private var writeConfig: ExtractorConfig[DeepScalaPageEntity] = _
+  private var rddConfig: DeepJobConfig[DeepScalaPageEntity] = _
+  private var writeConfig: DeepJobConfig[DeepScalaPageEntity] = _
   private val OUTPUT_COLUMN_FAMILY: String = "out_scalatest_page"
 
   @BeforeClass
@@ -97,9 +97,9 @@ class ScalaCassandraEntityRDDTest extends AbstractDeepSparkContextTest {
     checkSimpleTestData()
   }
 
-  private def initWriteConfig(): ExtractorConfig[DeepScalaPageEntity] = {
+  private def initWriteConfig(): DeepJobConfig[DeepScalaPageEntity] = {
 
-    val rddConfig: ExtractorConfig[DeepScalaPageEntity] = new ExtractorConfig[DeepScalaPageEntity](classOf[DeepScalaPageEntity])
+    val rddConfig: DeepJobConfig[DeepScalaPageEntity] = new DeepJobConfig[DeepScalaPageEntity](new ExtractorConfig(classOf[DeepScalaPageEntity]))
     val values: java.util.Map[String, String] = new util.HashMap[String, String]
     values.put(ExtractorConstants.HOST, Constants.DEFAULT_CASSANDRA_HOST)
     values.put(ExtractorConstants.RPCPORT, String.valueOf(CassandraServer.CASSANDRA_THRIFT_PORT))
@@ -110,13 +110,13 @@ class ScalaCassandraEntityRDDTest extends AbstractDeepSparkContextTest {
 
     rddConfig.setValues(values)
 
-    rddConfig.setExtractorImplClass(classOf[CassandraEntityExtractor[_ <: IDeepType]])
+    rddConfig.getExtractorConfiguration().setExtractorImplClass(classOf[CassandraEntityExtractor[_ <: IDeepType]])
     return rddConfig
   }
 
-  private def initReadConfig(): ExtractorConfig[DeepScalaPageEntity] = {
+  private def initReadConfig(): DeepJobConfig[DeepScalaPageEntity] = {
 
-    val rddConfig: ExtractorConfig[DeepScalaPageEntity] = new ExtractorConfig[DeepScalaPageEntity](classOf[DeepScalaPageEntity])
+    val rddConfig: DeepJobConfig[DeepScalaPageEntity] = new DeepJobConfig[DeepScalaPageEntity](new ExtractorConfig(classOf[DeepScalaPageEntity]))
     val values: java.util.Map[String, String] = new util.HashMap[String, String]
     values.put(ExtractorConstants.HOST, Constants.DEFAULT_CASSANDRA_HOST)
     values.put(ExtractorConstants.RPCPORT, String.valueOf(CassandraServer.CASSANDRA_THRIFT_PORT))
@@ -126,7 +126,7 @@ class ScalaCassandraEntityRDDTest extends AbstractDeepSparkContextTest {
 
     rddConfig.setValues(values)
 
-    rddConfig.setExtractorImplClass(classOf[CassandraEntityExtractor[_ <: IDeepType]])
+    rddConfig.getExtractorConfiguration().setExtractorImplClass(classOf[CassandraEntityExtractor[_ <: IDeepType]])
     return rddConfig
 
   }

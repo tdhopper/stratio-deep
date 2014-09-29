@@ -1,12 +1,15 @@
 package com.stratio.deep.core.rdd;
 
-import com.stratio.deep.commons.config.ExtractorConfig;
-import com.stratio.deep.core.extractor.client.ExtractorClient;
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertNotNull;
+import static junit.framework.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static org.powermock.api.mockito.PowerMockito.whenNew;
 
-
-import com.stratio.deep.commons.rdd.DeepTokenRange;
-import com.stratio.deep.commons.rdd.IDeepPartition;
-import com.stratio.deep.commons.rdd.IExtractor;
 import org.apache.spark.Partition;
 import org.apache.spark.SparkContext;
 import org.apache.spark.TaskContext;
@@ -17,15 +20,16 @@ import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.powermock.reflect.Whitebox;
+
 import scala.collection.Iterator;
+
+import com.stratio.deep.commons.config.DeepJobConfig;
+import com.stratio.deep.commons.config.ExtractorConfig;
 import com.stratio.deep.commons.impl.DeepPartition;
-import static junit.framework.Assert.*;
-import static org.junit.Assert.assertFalse;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-import static org.powermock.api.mockito.PowerMockito.whenNew;
+import com.stratio.deep.commons.rdd.DeepTokenRange;
+import com.stratio.deep.commons.rdd.IDeepPartition;
+import com.stratio.deep.commons.rdd.IExtractor;
+import com.stratio.deep.core.extractor.client.ExtractorClient;
 
 /** 
 * DeepRDD Tester. 
@@ -51,7 +55,7 @@ public void testCompute() throws Exception {
     DeepRDD deepRDD = createDeepRDD();
 
     Partition partition = mock(Partition.class);
-    ExtractorConfig extractorConfig = mock(ExtractorConfig.class);
+    DeepJobConfig extractorConfig = mock(DeepJobConfig.class);
 
     configureExtractorCompute(partition, extractorConfig);
     Broadcast config = createConfig(extractorConfig);
@@ -88,7 +92,7 @@ public void testCompute() throws Exception {
         DeepRDD deepRDD = createDeepRDD();
 
         IExtractor extractorClient = createExtractorClient();
-        ExtractorConfig extractorConfig = mock(ExtractorConfig.class);
+        DeepJobConfig extractorConfig = mock(DeepJobConfig.class);
         Broadcast config = createConfig(extractorConfig);
         deepRDD.config = config;
         DeepPartition deepPartition = mock(DeepPartition.class);
@@ -121,7 +125,7 @@ public void testCompute() throws Exception {
         return partition;
     }
 
-    private Broadcast createConfig(ExtractorConfig extractorConfig) {
+    private Broadcast createConfig(DeepJobConfig extractorConfig) {
         Broadcast config = mock(Broadcast.class);
 
 
@@ -129,7 +133,7 @@ public void testCompute() throws Exception {
         return config;
     }
 
-    private ExtractorClient configureExtractorCompute(Partition deepTokenRange, ExtractorConfig extractorConfig ) throws Exception {
+    private ExtractorClient configureExtractorCompute(Partition deepTokenRange, DeepJobConfig extractorConfig ) throws Exception {
         ExtractorClient extractorClient = createExtractorClient();
         when(extractorClient.hasNext()).thenReturn(true,true,false);
         when(extractorClient.next()).thenReturn(FIRST_RESULT, SECOND_RESULT);

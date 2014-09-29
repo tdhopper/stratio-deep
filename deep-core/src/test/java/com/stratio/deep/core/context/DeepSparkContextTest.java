@@ -16,9 +16,15 @@
 
 package com.stratio.deep.core.context;
 
-import com.stratio.deep.commons.config.ExtractorConfig;
-import com.stratio.deep.core.rdd.DeepJavaRDD;
-import com.stratio.deep.core.rdd.DeepRDD;
+import static junit.framework.Assert.assertSame;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static org.powermock.api.mockito.PowerMockito.whenNew;
+
+import java.lang.reflect.AccessibleObject;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+
 import org.apache.spark.SparkContext;
 import org.apache.spark.api.java.JavaRDD;
 import org.junit.Test;
@@ -28,14 +34,9 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.powermock.reflect.Whitebox;
 
-import java.lang.reflect.AccessibleObject;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-
-import static junit.framework.Assert.assertSame;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-import static org.powermock.api.mockito.PowerMockito.whenNew;
+import com.stratio.deep.commons.config.DeepJobConfig;
+import com.stratio.deep.core.rdd.DeepJavaRDD;
+import com.stratio.deep.core.rdd.DeepRDD;
 
 
 /**
@@ -49,7 +50,7 @@ public class DeepSparkContextTest {
     @Test
     public void createRDDTest() throws Exception {
         DeepSparkContext deepSparkContext = createDeepSparkContext();
-        ExtractorConfig deepJobConfig = createDeepJobConfig();
+        DeepJobConfig deepJobConfig = createDeepJobConfig();
         DeepRDD deepRDD = createDeepRDD(deepSparkContext.sc(), deepJobConfig);
 
 
@@ -62,7 +63,7 @@ public class DeepSparkContextTest {
     @Test
     public void JavaRDDTest() throws Exception {
         DeepSparkContext deepSparkContext = createDeepSparkContext();
-        ExtractorConfig deepJobConfig = createDeepJobConfig();
+        DeepJobConfig deepJobConfig = createDeepJobConfig();
         DeepRDD deepRDD = createDeepRDD(deepSparkContext.sc(), deepJobConfig);
         DeepJavaRDD javaRdd = createDeepJAvaRDD(deepRDD);
 
@@ -105,14 +106,14 @@ public class DeepSparkContextTest {
         return Whitebox.newInstance(DeepSparkContext.class);
     }
 
-    private ExtractorConfig createDeepJobConfig() {
-        ExtractorConfig extractorConfig = mock(ExtractorConfig.class);
-        when(extractorConfig.getExtractorImplClass()).thenReturn(new Object().getClass());
+    private DeepJobConfig createDeepJobConfig() {
+      DeepJobConfig extractorConfig = mock(DeepJobConfig.class);
+        when(extractorConfig.getExtractorConfiguration().getExtractorImplClass()).thenReturn(new Object().getClass());
         //when(extractorConfig.getInputFormatClass()).thenReturn(null);
         return extractorConfig;
     }
 
-    private DeepRDD createDeepRDD(SparkContext sc, ExtractorConfig deepJobConfig) throws Exception {
+    private DeepRDD createDeepRDD(SparkContext sc, DeepJobConfig deepJobConfig) throws Exception {
 
         DeepRDD deepRDD = mock(DeepRDD.class);
 

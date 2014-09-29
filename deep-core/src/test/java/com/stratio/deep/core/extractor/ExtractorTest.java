@@ -16,14 +16,12 @@
 
 package com.stratio.deep.core.extractor;
 
-import com.stratio.deep.commons.config.ExtractorConfig;
-import com.stratio.deep.commons.entity.Cells;
-import com.stratio.deep.commons.entity.IDeepType;
-import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
-import com.stratio.deep.commons.rdd.IExtractor;
-import com.stratio.deep.core.context.DeepSparkContext;
-import com.stratio.deep.core.entity.BookEntity;
-import com.stratio.deep.core.entity.MessageTestEntity;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.assertNull;
+
+import java.io.Serializable;
+
 import org.apache.spark.rdd.RDD;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,11 +29,14 @@ import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import java.io.Serializable;
-
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertNotNull;
-import static org.testng.Assert.assertNull;
+import com.stratio.deep.commons.config.DeepJobConfig;
+import com.stratio.deep.commons.config.ExtractorConfig;
+import com.stratio.deep.commons.entity.Cells;
+import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
+import com.stratio.deep.commons.rdd.IExtractor;
+import com.stratio.deep.core.context.DeepSparkContext;
+import com.stratio.deep.core.entity.BookEntity;
+import com.stratio.deep.core.entity.MessageTestEntity;
 
 
 /**
@@ -178,7 +179,7 @@ public abstract class ExtractorTest<T> implements Serializable {
 
         DeepSparkContext context = new DeepSparkContext("local", "deepSparkContextTest");
 
-        ExtractorConfig<W> inputConfigEntity = getReadExtractorConfig();
+        DeepJobConfig<W> inputConfigEntity = getReadExtractorConfig();
 
         RDD<W> inputRDDEntity = context.createRDD(inputConfigEntity);
 
@@ -206,7 +207,7 @@ public abstract class ExtractorTest<T> implements Serializable {
 
         DeepSparkContext context = new DeepSparkContext("local", "deepSparkContextTest");
 
-        ExtractorConfig<W> inputConfigEntity = getReadExtractorConfig();
+        DeepJobConfig<W> inputConfigEntity = getReadExtractorConfig();
 
 
 
@@ -214,7 +215,7 @@ public abstract class ExtractorTest<T> implements Serializable {
 
 
 
-        ExtractorConfig<W> outputConfigEntity;
+        DeepJobConfig<W> outputConfigEntity;
         if(inputConfigEntity.getEntityClass().isAssignableFrom(Cells.class)) {
             outputConfigEntity = getWriteExtractorConfig("outputCells");
         }else{
@@ -242,7 +243,7 @@ public abstract class ExtractorTest<T> implements Serializable {
 
         DeepSparkContext context = new DeepSparkContext("local", "deepSparkContextTest");
 
-        ExtractorConfig<W> inputConfigEntity = getInputColumnConfig("_id, metadata");
+        DeepJobConfig<W> inputConfigEntity = getInputColumnConfig("_id, metadata");
 
         RDD<W> inputRDDEntity = context.createRDD(inputConfigEntity);
 
@@ -265,7 +266,7 @@ public abstract class ExtractorTest<T> implements Serializable {
 
 
 
-        ExtractorConfig<W> inputConfigEntity2 = getInputColumnConfig( "cantos");
+        DeepJobConfig<W> inputConfigEntity2 = getInputColumnConfig( "cantos");
 
 
         RDD<W> inputRDDEntity2 = context.createRDD(inputConfigEntity2);
@@ -290,7 +291,7 @@ public abstract class ExtractorTest<T> implements Serializable {
 
 
 
-        ExtractorConfig<W> inputConfigEntity3 = getInputColumnConfig("cantos, metadata");
+        DeepJobConfig<W> inputConfigEntity3 = getInputColumnConfig("cantos, metadata");
 
 
 
@@ -320,8 +321,8 @@ public abstract class ExtractorTest<T> implements Serializable {
     }
 
 
-    private <W> ExtractorConfig<W> getExtractorConfig(Class<W> clazz){
-        return new ExtractorConfig<>(clazz);
+    private <W> DeepJobConfig<W> getExtractorConfig(Class<W> clazz){
+        return new DeepJobConfig<>(new ExtractorConfig(clazz));
     }
 
     @Test
@@ -329,61 +330,61 @@ public abstract class ExtractorTest<T> implements Serializable {
         assertEquals(true,true);
     }
 
-    public <W>ExtractorConfig<W> getWriteExtractorConfig(String output) {
-        ExtractorConfig<W> extractorConfig = getExtractorConfig(outputEntity);
-        extractorConfig.putValue(ExtractorConstants.HOST,host)
+    public <W>DeepJobConfig<W> getWriteExtractorConfig(String output) {
+      DeepJobConfig<W> deepJobConfig = getExtractorConfig(outputEntity);
+        deepJobConfig.putValue(ExtractorConstants.HOST,host)
                 .putValue(ExtractorConstants.DATABASE, database)
                 .putValue(ExtractorConstants.PORT, String.valueOf(port))
                 .putValue(ExtractorConstants.COLLECTION, output)
                 .putValue(ExtractorConstants.CREATE_ON_WRITE, "true");
-        extractorConfig.setExtractorImplClass(extractor);
-        return extractorConfig;
+        deepJobConfig.getExtractorConfiguration().setExtractorImplClass(extractor);
+        return deepJobConfig;
     }
 
-    public <W>ExtractorConfig<W> getReadExtractorConfig() {
+    public <W>DeepJobConfig<W> getReadExtractorConfig() {
 
-        ExtractorConfig<W> extractorConfig = getExtractorConfig(inputEntity);
-        extractorConfig.putValue(ExtractorConstants.HOST, host)
+      DeepJobConfig<W> deepJobConfig = getExtractorConfig(inputEntity);
+        deepJobConfig.putValue(ExtractorConstants.HOST, host)
                 .putValue(ExtractorConstants.DATABASE, database)
                 .putValue(ExtractorConstants.PORT, String.valueOf(port))
                 .putValue(ExtractorConstants.COLLECTION, tableRead);
-        extractorConfig.setExtractorImplClass(extractor);
-        return extractorConfig;
+        deepJobConfig.getExtractorConfiguration().setExtractorImplClass(extractor);
+        return deepJobConfig;
     }
 
-    public <W>ExtractorConfig<W> getInputColumnConfig(String inputColumns) {
+    public <W>DeepJobConfig<W> getInputColumnConfig(String inputColumns) {
 
-        ExtractorConfig<W> extractorConfig = getExtractorConfig(configEntity);
-        extractorConfig.putValue(ExtractorConstants.HOST, host)
+      DeepJobConfig<W> deepJobConfig = getExtractorConfig(configEntity);
+        deepJobConfig.putValue(ExtractorConstants.HOST, host)
                 .putValue(ExtractorConstants.DATABASE, databaseInputColumns)
                 .putValue(ExtractorConstants.PORT, String.valueOf(port))
                 .putValue(ExtractorConstants.COLLECTION, tableRead)
                 .putValue(ExtractorConstants.INPUT_COLUMNS, inputColumns);
-        extractorConfig.setExtractorImplClass(extractor);
-        return extractorConfig;
+        deepJobConfig.getExtractorConfiguration().setExtractorImplClass(extractor);
+        return deepJobConfig;
     }
 
-    public <W>ExtractorConfig<W> getFilterConfig() {
+    public <W>DeepJobConfig<W> getFilterConfig() {
 
-        ExtractorConfig<W> extractorConfig = getExtractorConfig(inputEntity);
-        extractorConfig.setEntityClass(inputEntity);
-        extractorConfig.putValue(ExtractorConstants.HOST,host)
+        DeepJobConfig<W> deepJobConfig = getExtractorConfig(inputEntity);
+        deepJobConfig.setEntityClass(inputEntity);
+        deepJobConfig.putValue(ExtractorConstants.HOST,host)
                 .putValue(ExtractorConstants.DATABASE, database)
                 .putValue(ExtractorConstants.COLLECTION,tableRead)
                 .putValue(ExtractorConstants.PORT, String.valueOf(port))
                 .putValue(ExtractorConstants.FILTER_QUERY, filter);
 
 
-        extractorConfig.setExtractorImplClass(extractor);
-        return extractorConfig;
+        deepJobConfig.getExtractorConfiguration().setExtractorImplClass(extractor);
+        return deepJobConfig;
     }
 
     /**
      * It closes spark's context
      */
 
-    private boolean isEntityClassCells(ExtractorConfig extractorConfig){
-        if(extractorConfig.getEntityClass().isAssignableFrom(Cells.class)) {
+    private boolean isEntityClassCells(DeepJobConfig extractorConfig){
+        if(extractorConfig.getExtractorConfiguration().getEntityClass().isAssignableFrom(Cells.class)) {
             return true;
         }
         return false;
