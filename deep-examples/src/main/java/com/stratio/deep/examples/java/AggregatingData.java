@@ -16,30 +16,32 @@
 
 package com.stratio.deep.examples.java;
 
-import com.google.common.collect.Lists;
-import com.stratio.deep.cassandra.extractor.CassandraEntityExtractor;
-import com.stratio.deep.commons.config.ExtractorConfig;
-import com.stratio.deep.commons.extractor.server.ExtractorServer;
-import com.stratio.deep.core.context.DeepSparkContext;
-import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
-import com.stratio.deep.testentity.TweetEntity;
-import com.stratio.deep.utils.ContextProperties;
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.log4j.Logger;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.function.Function;
 import org.apache.spark.api.java.function.Function2;
 import org.apache.spark.api.java.function.PairFunction;
+
 import scala.Tuple2;
 import scala.Tuple3;
 
-
-import java.util.HashMap;
-import java.util.Map;
+import com.google.common.collect.Lists;
+import com.stratio.deep.cassandra.extractor.CassandraEntityExtractor;
+import com.stratio.deep.commons.config.DeepJobConfig;
+import com.stratio.deep.commons.config.ExtractorConfig;
+import com.stratio.deep.commons.extractor.server.ExtractorServer;
+import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
+import com.stratio.deep.core.context.DeepSparkContext;
+import com.stratio.deep.testentity.TweetEntity;
+import com.stratio.deep.utils.ContextProperties;
 
 /**
- * Author: Emmanuelle Raffenne
- * Date..: 13-feb-2014
+ * Author: Emmanuelle Raffenne Date..: 13-feb-2014
  */
 public final class AggregatingData {
     private static final Logger LOG = Logger.getLogger(AggregatingData.class);
@@ -55,8 +57,9 @@ public final class AggregatingData {
 
     /**
      * Application entry point.
-     *
-     * @param args the arguments passed to the application.
+     * 
+     * @param args
+     *            the arguments passed to the application.
      */
     public static void main(String[] args) {
         doMain(args);
@@ -64,20 +67,19 @@ public final class AggregatingData {
 
     /**
      * This is the method called by both main and tests.
-     *
+     * 
      * @param args
      */
     public static void doMain(String[] args) {
         String job = "java:aggregatingData";
 
         String keySpace = "test";
-        String tableName    = "tweets";
-        String cqlPort      = "9042";
-        String rcpPort      = "9160";
-        String host         = "127.0.0.1";
+        String tableName = "tweets";
+        String cqlPort = "9042";
+        String rcpPort = "9160";
+        String host = "127.0.0.1";
 
-
-       //Call async the Extractor netty Server
+        // Call async the Extractor netty Server
         ExtractorServer.initExtractorServer();
 
         // Creating the Deep Context where args are Spark Master and Job Name
@@ -85,19 +87,18 @@ public final class AggregatingData {
         DeepSparkContext deepContext = new DeepSparkContext(p.getCluster(), job, p.getSparkHome(), p.getJars());
 
         // Creating a configuration for the Extractor and initialize it
-        ExtractorConfig<TweetEntity> config = new ExtractorConfig<>(TweetEntity.class);
+        DeepJobConfig<TweetEntity> config = new DeepJobConfig<>(new ExtractorConfig<>(TweetEntity.class));
 
-        config.setExtractorImplClass(CassandraEntityExtractor.class);
+        config.getExtractorConfiguration().setExtractorImplClass(CassandraEntityExtractor.class);
 
-        Map<String, String> values = new HashMap<>();
+        Map<String, Serializable> values = new HashMap<>();
         values.put(ExtractorConstants.KEYSPACE, keySpace);
-        values.put(ExtractorConstants.TABLE,    tableName);
-        values.put(ExtractorConstants.CQLPORT,  cqlPort);
-        values.put(ExtractorConstants.RPCPORT,  rcpPort);
-        values.put(ExtractorConstants.HOST,     host );
+        values.put(ExtractorConstants.TABLE, tableName);
+        values.put(ExtractorConstants.CQLPORT, cqlPort);
+        values.put(ExtractorConstants.RPCPORT, rcpPort);
+        values.put(ExtractorConstants.HOST, host);
 
         config.setValues(values);
-
 
         // Creating the RDD
         JavaRDD<TweetEntity> rdd = deepContext.createJavaRDD(config);
@@ -120,7 +121,7 @@ public final class AggregatingData {
         Tuple3<Double, Double, Double> initValues = new Tuple3<Double, Double, Double>(zero, zero, zero);
         Tuple3<Double, Double, Double> results = groups.aggregate(initValues,
                 new Function2<Tuple3<Double, Double, Double>, Tuple2<String, Integer>, Tuple3<Double, Double,
-                        Double>>() {
+                Double>>() {
                     @Override
                     public Tuple3<Double, Double, Double> call(Tuple3<Double, Double, Double> n, Tuple2<String,
                             Integer> t) {
@@ -130,7 +131,7 @@ public final class AggregatingData {
                         return new Tuple3<>(sumOfX, numOfX, sumOfSquares);
                     }
                 }, new Function2<Tuple3<Double, Double, Double>, Tuple3<Double, Double, Double>, Tuple3<Double,
-                        Double, Double>>() {
+                Double, Double>>() {
                     @Override
                     public Tuple3<Double, Double, Double> call(Tuple3<Double, Double, Double> a, Tuple3<Double,
                             Double, Double> b) {
@@ -140,7 +141,7 @@ public final class AggregatingData {
                         return new Tuple3<>(sumOfX, numOfX, sumOfSquares);
                     }
                 }
-        );
+                );
 
         // computing stats
         Double sumOfX = results._1();

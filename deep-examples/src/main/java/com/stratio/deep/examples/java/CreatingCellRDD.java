@@ -16,26 +16,26 @@
 
 package com.stratio.deep.examples.java;
 
-import com.stratio.deep.commons.config.ExtractorConfig;
-import com.stratio.deep.core.context.DeepSparkContext;
-import com.stratio.deep.commons.entity.Cells;
-import com.stratio.deep.commons.extractor.server.ExtractorServer;
-import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
-import com.stratio.deep.cassandra.extractor.CassandraCellExtractor;
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
 
-import com.stratio.deep.utils.ContextProperties;
 import org.apache.log4j.Logger;
 import org.apache.spark.SparkConf;
 import org.apache.spark.SparkContext;
 import org.apache.spark.rdd.RDD;
 
-
-import java.util.HashMap;
-import java.util.Map;
+import com.stratio.deep.cassandra.extractor.CassandraCellExtractor;
+import com.stratio.deep.commons.config.DeepJobConfig;
+import com.stratio.deep.commons.config.ExtractorConfig;
+import com.stratio.deep.commons.entity.Cells;
+import com.stratio.deep.commons.extractor.server.ExtractorServer;
+import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
+import com.stratio.deep.core.context.DeepSparkContext;
+import com.stratio.deep.utils.ContextProperties;
 
 /**
- * Author: Emmanuelle Raffenne
- * Date..: 19-feb-2014
+ * Author: Emmanuelle Raffenne Date..: 19-feb-2014
  */
 public final class CreatingCellRDD {
     private static final Logger LOG = Logger.getLogger(CreatingCellRDD.class);
@@ -47,8 +47,9 @@ public final class CreatingCellRDD {
 
     /**
      * Application entry point.
-     *
-     * @param args the arguments passed to the application.
+     * 
+     * @param args
+     *            the arguments passed to the application.
      */
     public static void main(String[] args) {
         doMain(args);
@@ -56,21 +57,20 @@ public final class CreatingCellRDD {
 
     /**
      * This is the method called by both main and tests.
-     *
+     * 
      * @param args
      */
     public static void doMain(String[] args) {
         String job = "java:creatingCellRDD";
 
         String KEYSPACENAME = "test";
-        String TABLENAME    = "tweets";
-        String CQLPORT      = "9042";
-        String RPCPORT      = "9160";
-        String HOST         = "127.0.0.1";
+        String TABLENAME = "tweets";
+        String CQLPORT = "9042";
+        String RPCPORT = "9160";
+        String HOST = "127.0.0.1";
 
-//        //Call async the Extractor netty Server
+        // //Call async the Extractor netty Server
         ExtractorServer.initExtractorServer();
-
 
         // Creating the Deep Context
         ContextProperties p = new ContextProperties(args);
@@ -87,24 +87,24 @@ public final class CreatingCellRDD {
         LOG.info("spark.serializer: " + System.getProperty("spark.serializer"));
         LOG.info("spark.kryo.registrator: " + System.getProperty("spark.kryo.registrator"));
 
-	    DeepSparkContext deepContext = new DeepSparkContext(sc);
+        DeepSparkContext deepContext = new DeepSparkContext(sc);
 
         // Creating a configuration for the Extractor and initialize it
-        ExtractorConfig<Cells> config = new ExtractorConfig();
+        DeepJobConfig<Cells> config = new DeepJobConfig<>(new ExtractorConfig(Cells.class));
 
-        config.setExtractorImplClass(CassandraCellExtractor.class);
+        config.getExtractorConfiguration().setExtractorImplClass(CassandraCellExtractor.class);
 
-        Map<String, String> values = new HashMap<>();
+        Map<String, Serializable> values = new HashMap<>();
         values.put(ExtractorConstants.KEYSPACE, KEYSPACENAME);
-        values.put(ExtractorConstants.TABLE,    TABLENAME);
-        values.put(ExtractorConstants.CQLPORT,  CQLPORT);
-        values.put(ExtractorConstants.RPCPORT,  RPCPORT);
-        values.put(ExtractorConstants.HOST,     HOST );
+        values.put(ExtractorConstants.TABLE, TABLENAME);
+        values.put(ExtractorConstants.CQLPORT, CQLPORT);
+        values.put(ExtractorConstants.RPCPORT, RPCPORT);
+        values.put(ExtractorConstants.HOST, HOST);
 
         config.setValues(values);
 
         // Creating the RDD
-        RDD rdd =  deepContext.createRDD(config);
+        RDD rdd = deepContext.createRDD(config);
 
         counts = rdd.count();
 

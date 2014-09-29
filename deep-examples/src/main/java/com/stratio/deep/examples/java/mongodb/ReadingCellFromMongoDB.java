@@ -16,22 +16,25 @@
 
 package com.stratio.deep.examples.java.mongodb;
 
-import com.mongodb.QueryBuilder;
-import com.stratio.deep.commons.config.ExtractorConfig;
-import com.stratio.deep.core.context.DeepSparkContext;
-import com.stratio.deep.commons.entity.Cells;
-import com.stratio.deep.mongodb.extractor.MongoCellExtractor;
-import com.stratio.deep.utils.ContextProperties;
+import static com.stratio.deep.commons.extractor.server.ExtractorServer.initExtractorServer;
+import static com.stratio.deep.commons.extractor.server.ExtractorServer.stopExtractorServer;
+
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.log4j.Logger;
 import org.apache.spark.rdd.RDD;
 import org.bson.BSONObject;
 import org.bson.BasicBSONObject;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import static com.stratio.deep.commons.extractor.server.ExtractorServer.initExtractorServer;
-import static com.stratio.deep.commons.extractor.server.ExtractorServer.stopExtractorServer;
+import com.mongodb.QueryBuilder;
+import com.stratio.deep.commons.config.DeepJobConfig;
+import com.stratio.deep.commons.config.ExtractorConfig;
+import com.stratio.deep.commons.entity.Cells;
+import com.stratio.deep.core.context.DeepSparkContext;
+import com.stratio.deep.mongodb.extractor.MongoCellExtractor;
+import com.stratio.deep.utils.ContextProperties;
 
 /**
  * Example class to read a collection from mongoDB
@@ -42,11 +45,9 @@ public final class ReadingCellFromMongoDB {
     private ReadingCellFromMongoDB() {
     }
 
-
     public static void main(String[] args) {
         doMain(args);
     }
-
 
     public static void doMain(String[] args) {
         String job = "java:readingCellFromMongoDB";
@@ -56,7 +57,6 @@ public final class ReadingCellFromMongoDB {
         String database = "test";
         String inputCollection = "input";
 
-
         initExtractorServer();
 
         // Creating the Deep Context where args are Spark Master and Job Name
@@ -65,36 +65,32 @@ public final class ReadingCellFromMongoDB {
                 p.getJars());
 
         QueryBuilder query = QueryBuilder.start();
-//        query.and("number").greaterThan(27).lessThan(30);
+        // query.and("number").greaterThan(27).lessThan(30);
 
         BSONObject bsonSort = new BasicBSONObject();
-        bsonSort.put("number",1);
+        bsonSort.put("number", 1);
 
         BSONObject bsonFields = new BasicBSONObject();
-        bsonFields.put("number",1);
-        bsonFields.put("text",1);
-        bsonFields.put("_id",0);
-        //TODO review
+        bsonFields.put("number", 1);
+        bsonFields.put("text", 1);
+        bsonFields.put("_id", 0);
+        // TODO review
 
-        ExtractorConfig<Cells> config = new ExtractorConfig();
+        DeepJobConfig<Cells> config = new DeepJobConfig<>(new ExtractorConfig<>(Cells.class));
 
         config.setExtractorImplClass(MongoCellExtractor.class);
-        Map<String, String> values = new HashMap<>();
+        Map<String, Serializable> values = new HashMap<>();
         values.put("database", database);
-        values.put("collection",    inputCollection);
-        values.put("host",  host);
+        values.put("collection", inputCollection);
+        values.put("host", host);
 
         config.setValues(values);
-
-
 
         RDD<Cells> inputRDDEntity = deepContext.createRDD(config);
 
         LOG.info("count : " + inputRDDEntity.count());
 
         LOG.info("prints first cell  : " + inputRDDEntity.first());
-
-
 
         stopExtractorServer();
 

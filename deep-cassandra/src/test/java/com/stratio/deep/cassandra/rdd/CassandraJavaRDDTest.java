@@ -16,34 +16,18 @@
 
 package com.stratio.deep.cassandra.rdd;
 
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.fail;
+
 import java.io.IOException;
+import java.io.Serializable;
 import java.net.URISyntaxException;
 import java.nio.charset.CharacterCodingException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.google.common.collect.Lists;
-
-import com.datastax.driver.core.Cluster;
-import com.datastax.driver.core.ResultSet;
-import com.datastax.driver.core.Row;
-import com.datastax.driver.core.Session;
-import com.stratio.deep.cassandra.config.CassandraConfigFactory;
-import com.stratio.deep.cassandra.config.ICassandraDeepJobConfig;
-import com.stratio.deep.cassandra.context.AbstractDeepSparkContextTest;
-import com.stratio.deep.cassandra.embedded.CassandraServer;
-import com.stratio.deep.cassandra.entity.CassandraCell;
-import com.stratio.deep.cassandra.extractor.CassandraCellExtractor;
-import com.stratio.deep.cassandra.extractor.CassandraEntityExtractor;
-import com.stratio.deep.commons.config.ExtractorConfig;
-import com.stratio.deep.commons.entity.Cell;
-import com.stratio.deep.commons.entity.Cells;
-import com.stratio.deep.commons.exception.DeepNoSuchFieldException;
-import com.stratio.deep.cassandra.testentity.StrippedTestEntity;
-import com.stratio.deep.cassandra.testentity.TestEntity;
-import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
-import com.stratio.deep.commons.utils.Constants;
 import org.apache.cassandra.exceptions.ConfigurationException;
 import org.apache.cassandra.utils.UUIDGen;
 import org.apache.log4j.Logger;
@@ -54,19 +38,37 @@ import org.apache.spark.api.java.function.Function2;
 import org.apache.spark.api.java.function.PairFunction;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
+
 import scala.Tuple2;
 
-import static org.testng.Assert.*;
+import com.datastax.driver.core.Cluster;
+import com.datastax.driver.core.ResultSet;
+import com.datastax.driver.core.Row;
+import com.datastax.driver.core.Session;
+import com.google.common.collect.Lists;
+import com.stratio.deep.cassandra.context.AbstractDeepSparkContextTest;
+import com.stratio.deep.cassandra.embedded.CassandraServer;
+import com.stratio.deep.cassandra.entity.CassandraCell;
+import com.stratio.deep.cassandra.extractor.CassandraCellExtractor;
+import com.stratio.deep.cassandra.extractor.CassandraEntityExtractor;
+import com.stratio.deep.cassandra.testentity.StrippedTestEntity;
+import com.stratio.deep.cassandra.testentity.TestEntity;
+import com.stratio.deep.commons.config.DeepJobConfig;
+import com.stratio.deep.commons.config.ExtractorConfig;
+import com.stratio.deep.commons.entity.Cell;
+import com.stratio.deep.commons.entity.Cells;
+import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
+import com.stratio.deep.commons.utils.Constants;
 
 /**
  * Integration tests for Java RDDs.
  */
-@Test(suiteName = "cassandraRddTests", dependsOnGroups = {"CassandraCellRDDTest"}, groups = {"CassandraJavaRDDTest"})
+@Test(suiteName = "cassandraRddTests", dependsOnGroups = { "CassandraCellRDDTest" }, groups = { "CassandraJavaRDDTest" })
 public final class CassandraJavaRDDTest extends AbstractDeepSparkContextTest {
-    private Logger logger = Logger.getLogger(getClass());
+    private final Logger logger = Logger.getLogger(getClass());
 
     private JavaRDD<TestEntity> rdd;
-    protected ExtractorConfig<TestEntity> rddConfig;
+    protected DeepJobConfig<TestEntity> rddConfig;
 
     JavaRDD<TestEntity> slowPages = null;
     JavaRDD<TestEntity> quickPages = null;
@@ -75,26 +77,22 @@ public final class CassandraJavaRDDTest extends AbstractDeepSparkContextTest {
     protected void initServerAndRDD() throws IOException, URISyntaxException, ConfigurationException,
             InterruptedException {
 
-
-
-        rddConfig = new ExtractorConfig<>(TestEntity.class);
-        Map<String, String> values = new HashMap<>();
+        rddConfig = new DeepJobConfig<>(new ExtractorConfig(TestEntity.class));
+        Map<String, Serializable> values = new HashMap<>();
         values.put(ExtractorConstants.HOST, Constants.DEFAULT_CASSANDRA_HOST);
-        values.put(ExtractorConstants.RPCPORT, String.valueOf(CassandraServer.CASSANDRA_THRIFT_PORT));
+        values.put(ExtractorConstants.RPCPORT, CassandraServer.CASSANDRA_THRIFT_PORT);
         values.put(ExtractorConstants.KEYSPACE, KEYSPACE_NAME);
         values.put(ExtractorConstants.COLUMN_FAMILY, COLUMN_FAMILY);
-        values.put(ExtractorConstants.CQLPORT, String.valueOf(CassandraServer.CASSANDRA_CQL_PORT));
-//        values.put(ExtractorConstants.P, "org.apache.cassandra.dht.Murmur3Partitioner")
+        values.put(ExtractorConstants.CQLPORT, CassandraServer.CASSANDRA_CQL_PORT);
+        // values.put(ExtractorConstants.P, "org.apache.cassandra.dht.Murmur3Partitioner")
 
-        rddConfig.setValues(values);
-        rddConfig.setExtractorImplClass(CassandraEntityExtractor.class);
-
-
+        rddConfig.getExtractorConfiguration().setValues(values);
+        rddConfig.getExtractorConfiguration().setExtractorImplClass(CassandraEntityExtractor.class);
 
         logger.info("Constructed configuration object: " + rddConfig);
         logger.info("Constructiong cassandraRDD");
 
-        rdd = (JavaRDD<TestEntity>) context.createJavaRDD(rddConfig);
+        rdd = context.createJavaRDD(rddConfig);
     }
 
     @Test
@@ -148,7 +146,7 @@ public final class CassandraJavaRDDTest extends AbstractDeepSparkContextTest {
         /* 1. I need to define which is the key, let's say it's the domain */
         JavaPairRDD<String, TestEntity> pairRDD = rdd.mapToPair(new DomainEntityPairFunction());
 
-	    /* 2. Not I can group by domain */
+        /* 2. Not I can group by domain */
         JavaPairRDD<String, Iterable<TestEntity>> groupedPairRDD = pairRDD.groupByKey();
 
         assertNotNull(groupedPairRDD);
@@ -193,10 +191,10 @@ public final class CassandraJavaRDDTest extends AbstractDeepSparkContextTest {
 
     @Test(dependsOnMethods = "testMap")
     public void testReduceByKey() {
-  /* 1. I need to define which is the key, let's say it's the domain */
+        /* 1. I need to define which is the key, let's say it's the domain */
         JavaPairRDD<String, Integer> pairRDD = rdd.mapToPair(new DomainCounterPairFunction());
 
-	/* 2. Not I can group by domain */
+        /* 2. Not I can group by domain */
         JavaPairRDD<String, Integer> reducedRDD = pairRDD.reduceByKey(new IntegerReducer());
 
         assertNotNull(reducedRDD);
@@ -229,29 +227,25 @@ public final class CassandraJavaRDDTest extends AbstractDeepSparkContextTest {
     public void testSaveToCassandra() {
         final String table = "save_java_rdd";
 
-        //executeCustomCQL("create table  " + OUTPUT_KEYSPACE_NAME + "." + table + " (domain text, count int,
+        // executeCustomCQL("create table  " + OUTPUT_KEYSPACE_NAME + "." + table + " (domain text, count int,
         // PRIMARY KEY(domain));");
 
-
-        ExtractorConfig<Cells> writeConfig = new ExtractorConfig<>();
-        Map<String, String> values = new HashMap<>();
+        DeepJobConfig<Cells> writeConfig = new DeepJobConfig<>(new ExtractorConfig<>(Cells.class));
+        Map<String, Serializable> values = new HashMap<>();
         values.put(ExtractorConstants.HOST, Constants.DEFAULT_CASSANDRA_HOST);
-        values.put(ExtractorConstants.RPCPORT, String.valueOf(CassandraServer.CASSANDRA_THRIFT_PORT));
+        values.put(ExtractorConstants.RPCPORT, CassandraServer.CASSANDRA_THRIFT_PORT);
         values.put(ExtractorConstants.KEYSPACE, OUTPUT_KEYSPACE_NAME);
         values.put(ExtractorConstants.COLUMN_FAMILY, table);
-        values.put(ExtractorConstants.CQLPORT, String.valueOf(CassandraServer.CASSANDRA_CQL_PORT));
-        values.put(ExtractorConstants.CREATE_ON_WRITE, "true");
+        values.put(ExtractorConstants.CQLPORT, CassandraServer.CASSANDRA_CQL_PORT);
+        values.put(ExtractorConstants.CREATE_ON_WRITE, true);
 
-        writeConfig.setValues(values);
-        writeConfig.setExtractorImplClass(CassandraCellExtractor.class);
+        writeConfig.getExtractorConfiguration().setValues(values);
+        writeConfig.getExtractorConfiguration().setExtractorImplClass(CassandraCellExtractor.class);
 
-
-
-
-	/* 1. I need to define which is the key, let's say it's the domain */
+        /* 1. I need to define which is the key, let's say it's the domain */
         JavaPairRDD<String, Integer> pairRDD = rdd.mapToPair(new DomainCounterPairFunction());
 
-	/* 2. Not I can group by domain */
+        /* 2. Not I can group by domain */
         JavaPairRDD<String, Integer> reducedRDD = pairRDD.reduceByKey(new IntegerReducer());
 
         JavaRDD<Cells> cells = reducedRDD
@@ -266,18 +260,17 @@ public final class CassandraJavaRDDTest extends AbstractDeepSparkContextTest {
     @Test(dependsOnMethods = "testSaveToCassandra")
     public void testSaveToCassandra2() {
 
-
-        ExtractorConfig<Cells> writeConfig = new ExtractorConfig<>();
-        Map<String, String> values = new HashMap<>();
+        DeepJobConfig<Cells> writeConfig = new DeepJobConfig<>(new ExtractorConfig<>(Cells.class));
+        Map<String, Serializable> values = new HashMap<>();
         values.put(ExtractorConstants.HOST, Constants.DEFAULT_CASSANDRA_HOST);
-        values.put(ExtractorConstants.RPCPORT, String.valueOf(CassandraServer.CASSANDRA_THRIFT_PORT));
+        values.put(ExtractorConstants.RPCPORT, CassandraServer.CASSANDRA_THRIFT_PORT);
         values.put(ExtractorConstants.KEYSPACE, OUTPUT_KEYSPACE_NAME);
         values.put(ExtractorConstants.COLUMN_FAMILY, "page");
-        values.put(ExtractorConstants.CQLPORT, String.valueOf(CassandraServer.CASSANDRA_CQL_PORT));
-        values.put(ExtractorConstants.CREATE_ON_WRITE, "true");
+        values.put(ExtractorConstants.CQLPORT, CassandraServer.CASSANDRA_CQL_PORT);
+        values.put(ExtractorConstants.CREATE_ON_WRITE, true);
 
         writeConfig.setValues(values);
-        writeConfig.setExtractorImplClass(CassandraCellExtractor.class);
+        writeConfig.getExtractorConfiguration().setExtractorImplClass(CassandraCellExtractor.class);
 
         JavaPairRDD<String, Double> pairRDD = rdd.mapToPair(new DomainCounterDoublePairFunction());
 
@@ -287,7 +280,7 @@ public final class CassandraJavaRDDTest extends AbstractDeepSparkContextTest {
             context.saveRDD(outRDD.rdd(), writeConfig);
 
             fail();
-        } catch (DeepNoSuchFieldException e) {
+        } catch (Exception e) {
             // OK
             logger.info("Correctly catched DeepNoSuchFieldException");
         }
@@ -311,37 +304,36 @@ public final class CassandraJavaRDDTest extends AbstractDeepSparkContextTest {
 
         for (Row r : rs) {
             switch (r.getString("domain")) {
-                case "wickedin.es":
-                    assertEquals(r.getInt("count"), 2);
-                    break;
-                case "11870.com":
-                    assertEquals(r.getInt("count"), 3);
-                    break;
-                case "alicanteconfidencial.blogspot.com.es":
-                    assertEquals(r.getInt("count"), 3);
-                    break;
-                case "about.wickedin.es":
-                    assertEquals(r.getInt("count"), 1);
-                    break;
-                case "actualidades.es":
-                    assertEquals(r.getInt("count"), 3);
-                    break;
-                case "ahorromovil.wordpress.com":
-                    assertEquals(r.getInt("count"), 3);
-                    break;
-                case "airscoop-espana.blogspot.com.es":
-                    assertEquals(r.getInt("count"), 3);
-                    break;
-                case "america.infobae.com":
-                    assertEquals(r.getInt("count"), 1);
-                    break;
-                default:
-                    fail();
+            case "wickedin.es":
+                assertEquals(r.getInt("count"), 2);
+                break;
+            case "11870.com":
+                assertEquals(r.getInt("count"), 3);
+                break;
+            case "alicanteconfidencial.blogspot.com.es":
+                assertEquals(r.getInt("count"), 3);
+                break;
+            case "about.wickedin.es":
+                assertEquals(r.getInt("count"), 1);
+                break;
+            case "actualidades.es":
+                assertEquals(r.getInt("count"), 3);
+                break;
+            case "ahorromovil.wordpress.com":
+                assertEquals(r.getInt("count"), 3);
+                break;
+            case "airscoop-espana.blogspot.com.es":
+                assertEquals(r.getInt("count"), 3);
+                break;
+            case "america.infobae.com":
+                assertEquals(r.getInt("count"), 1);
+                break;
+            default:
+                fail();
             }
         }
         session.close();
     }
-
 
 }
 
@@ -352,7 +344,7 @@ class WrongSensors2CellsFunction implements Function<Tuple2<String, Double>, Cel
         Cell sensorTimeUUID = CassandraCell.create("time_taken", UUIDGen.getTimeUUID());
         Cell sensorDataCell = CassandraCell.create("value", t._2());
 
-        return new Cells("defaultTable",sensorNameCell, sensorTimeUUID, sensorDataCell);
+        return new Cells("defaultTable", sensorNameCell, sensorTimeUUID, sensorDataCell);
     }
 }
 
@@ -363,14 +355,15 @@ class Sensors2CellsFunction implements Function<Tuple2<String, Double>, Cells> {
         Cell sensorTimeUUID = CassandraCell.create("time_taken", UUIDGen.getTimeUUID(), true, false);
         Cell sensorDataCell = CassandraCell.create("value", t._2());
 
-        return new Cells("defaultTable",sensorNameCell, sensorTimeUUID, sensorDataCell);
+        return new Cells("defaultTable", sensorNameCell, sensorTimeUUID, sensorDataCell);
     }
 }
 
 class Tuple2CellsFunction implements Function<Tuple2<String, Integer>, Cells> {
     @Override
     public Cells call(Tuple2<String, Integer> t) throws Exception {
-        return new Cells("defaultTable", CassandraCell.create("domain", t._1(), true, false), CassandraCell.create("count", t._2()));
+        return new Cells("defaultTable", CassandraCell.create("domain", t._1(), true, false), CassandraCell.create(
+                "count", t._2()));
     }
 }
 

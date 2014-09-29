@@ -16,11 +16,13 @@
 
 package com.stratio.deep.config;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
-import com.stratio.deep.commons.config.ExtractorConfig;
-import com.stratio.deep.commons.entity.Cell;
-import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
-import com.stratio.deep.commons.utils.Utils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.mapred.JobConf;
 import org.elasticsearch.hadoop.mr.EsInputFormat;
@@ -28,15 +30,16 @@ import org.elasticsearch.hadoop.mr.EsOutputFormat;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
-import java.util.*;
-
+import com.stratio.deep.commons.config.DeepJobConfig;
+import com.stratio.deep.commons.entity.Cell;
+import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
+import com.stratio.deep.commons.utils.Utils;
 
 /**
  * @param <T>
  */
 public abstract class GenericDeepJobConfigES<T> implements IESDeepJobConfig<T> {
     private static final long serialVersionUID = -7179376653643603038L;
-
 
     /**
      * configuration to be broadcasted to every spark node
@@ -46,8 +49,7 @@ public abstract class GenericDeepJobConfigES<T> implements IESDeepJobConfig<T> {
     /**
      * A list of elasticsearch host to connect
      */
-    private List<String> hostList = new ArrayList<>();
-
+    private final List<String> hostList = new ArrayList<>();
 
     /**
      * username
@@ -60,8 +62,6 @@ public abstract class GenericDeepJobConfigES<T> implements IESDeepJobConfig<T> {
 
     private String password;
 
-
-
     /**
      * Collection to get or insert data
      */
@@ -71,8 +71,6 @@ public abstract class GenericDeepJobConfigES<T> implements IESDeepJobConfig<T> {
      * Database to connect
      */
     private String database;
-
-
 
     /**
      * Entity class to map JSONObject
@@ -86,14 +84,11 @@ public abstract class GenericDeepJobConfigES<T> implements IESDeepJobConfig<T> {
 
     private String[] inputColumns;
 
-
     private JSONObject fields;
     /**
-     * OPTIONAL
-     * filter query
+     * OPTIONAL filter query
      */
     private String query;
-
 
     private Map<String, Object> customConfiguration;
 
@@ -104,9 +99,8 @@ public abstract class GenericDeepJobConfigES<T> implements IESDeepJobConfig<T> {
 
     }
 
-
-    public IESDeepJobConfig<T> customConfiguration (Map<String, Object> customConfiguration){
-        this.customConfiguration=customConfiguration;
+    public IESDeepJobConfig<T> customConfiguration(Map<String, Object> customConfiguration) {
+        this.customConfiguration = customConfiguration;
         return this;
     }
 
@@ -132,7 +126,7 @@ public abstract class GenericDeepJobConfigES<T> implements IESDeepJobConfig<T> {
 
     @Override
     public String getHost() {
-        if (hostList.isEmpty()){
+        if (hostList.isEmpty()) {
             return null;
         }
         return hostList.get(0);
@@ -140,7 +134,7 @@ public abstract class GenericDeepJobConfigES<T> implements IESDeepJobConfig<T> {
 
     @Override
     public String[] getInputColumns() {
-        return (String[])fields.keySet().toArray(new String[fields.keySet().size()]);
+        return (String[]) fields.keySet().toArray(new String[fields.keySet().size()]);
     }
 
     @Override
@@ -165,45 +159,42 @@ public abstract class GenericDeepJobConfigES<T> implements IESDeepJobConfig<T> {
         configHadoop.setOutputFormat(EsOutputFormat.class);
         configHadoop.set("es.resource", database);
         configHadoop.set("es.field.read.empty.as.null", "true");
-        configHadoop.set("index.mapper.dynamic","false");
+        configHadoop.set("index.mapper.dynamic", "false");
 
-        if(query!=null){
-//            "?q=message:first"
-//            es.query = { "query" : { "term" : { "user" : "costinl" } } }
-//            "query": { "match_all": {} }
+        if (query != null) {
+            // "?q=message:first"
+            // es.query = { "query" : { "term" : { "user" : "costinl" } } }
+            // "query": { "match_all": {} }
             configHadoop.set("es.query", query);
         }
 
-        if (fields != null) {
-            //String query = { "query" : { "match_all" : {  } } }
-            configHadoop.set("es.query", fields.toString());
-        }
+        // if (fields != null) {
+        // //String query = { "query" : { "match_all" : { } } }
+        // configHadoop.set("es.query", fields.toString());
+        // }
 
         configHadoop.set("es.nodes", Utils.splitHosts(hostList));
         configHadoop.set("es.input.json", "yes");
 
+        // index (default)
+        // new data is added while existing data (based on its id) is replaced (reindexed).
+        // create
+        // adds new data - if the data already exists (based on its id), an exception is thrown.
+        //
+        // update
+        // updates existing data (based on its id). If no data is found, an exception is thrown.
+        //
+        // upsert
+        // known as merge or insert if the data does not exist, updates if the data exists (based on its id).
 
-        if(false){
-//              index (default)
-//                new data is added while existing data (based on its id) is replaced (reindexed).
-//              create
-//                adds new data - if the data already exists (based on its id), an exception is thrown.
-//
-//              update
-//                updates existing data (based on its id). If no data is found, an exception is thrown.
-//
-//              upsert
-//                known as merge or insert if the data does not exist, updates if the data exists (based on its id).
+        // configHadoop.set("es.write.operation","");
 
-//            configHadoop.set("es.write.operation","");
-        }
-
-        if (customConfiguration !=null ){
-            Set<Map.Entry<String, Object>> set = customConfiguration. entrySet();
-            Iterator<Map.Entry<String, Object>>  iterator = set.iterator();
-            while(iterator.hasNext()){
+        if (customConfiguration != null) {
+            Set<Map.Entry<String, Object>> set = customConfiguration.entrySet();
+            Iterator<Map.Entry<String, Object>> iterator = set.iterator();
+            while (iterator.hasNext()) {
                 Map.Entry<String, Object> entry = iterator.next();
-                configHadoop.set(entry.getKey(),entry.getValue().toString());
+                configHadoop.set(entry.getKey(), entry.getValue().toString());
             }
 
         }
@@ -229,7 +220,7 @@ public abstract class GenericDeepJobConfigES<T> implements IESDeepJobConfig<T> {
     @Override
     public IESDeepJobConfig<T> inputColumns(String... columns) {
         JSONObject jsonFields = fields != null ? fields : new JSONObject();
-        //jsonFields.put("query", "match_all");
+        // jsonFields.put("query", "match_all");
         JSONArray jsonArray = new JSONArray();
         for (String column : columns) {
             jsonArray.add(column);
@@ -237,19 +228,19 @@ public abstract class GenericDeepJobConfigES<T> implements IESDeepJobConfig<T> {
         jsonFields.put("fields", jsonArray);
 
         fields = jsonFields;
-        System.out.printf(" -- "+fields.toJSONString());
+        System.out.printf(" -- " + fields.toJSONString());
         return this;
     }
 
     @Override
     public IESDeepJobConfig<T> password(String password) {
-        this.password=password;
+        this.password = password;
         return this;
     }
 
     @Override
     public IESDeepJobConfig<T> username(String username) {
-        this.username=username;
+        this.username = username;
         return this;
     }
 
@@ -258,10 +249,9 @@ public abstract class GenericDeepJobConfigES<T> implements IESDeepJobConfig<T> {
         return 0;
     }
 
-
     @Override
     public IESDeepJobConfig<T> collection(String collection) {
-        this.collection=collection;
+        this.collection = collection;
         return this;
     }
 
@@ -277,7 +267,6 @@ public abstract class GenericDeepJobConfigES<T> implements IESDeepJobConfig<T> {
         return this;
     }
 
-
     /**
      * {@inheritDoc}
      */
@@ -289,10 +278,9 @@ public abstract class GenericDeepJobConfigES<T> implements IESDeepJobConfig<T> {
         return configHadoop;
     }
 
-
     @Override
     public IESDeepJobConfig<T> filterQuery(String query) {
-        this.query=query;
+        this.query = query;
         return this;
     }
 
@@ -311,78 +299,32 @@ public abstract class GenericDeepJobConfigES<T> implements IESDeepJobConfig<T> {
         return hostList;
     }
 
-
-
     @Override
-    public IESDeepJobConfig<T> initialize(ExtractorConfig deepJobConfig) {
+    public IESDeepJobConfig<T> initialize(DeepJobConfig extractorConfig) {
 
-        //TODO: Add filters
+        // TODO: Add filters & inputColumns
 
-        Map<String, String> values = deepJobConfig.getValues();
+        Map<String, Serializable> values = extractorConfig.getValues();
 
-        if(values.get(ExtractorConstants.USERNAME)!=null){
-            username(values.get(ExtractorConstants.USERNAME));
+        if (values.get(ExtractorConstants.USERNAME) != null) {
+            username(extractorConfig.getString(ExtractorConstants.USERNAME));
         }
 
-        if(values.get(ExtractorConstants.PASSWORD)!=null){
-            password(values.get(ExtractorConstants.PASSWORD));
+        if (values.get(ExtractorConstants.PASSWORD) != null) {
+            password(extractorConfig.getString(ExtractorConstants.PASSWORD));
         }
 
-        if(values.get(ExtractorConstants.HOST)!=null){
-            host(values.get(ExtractorConstants.HOST));
+        if (values.get(ExtractorConstants.HOST) != null) {
+            host(extractorConfig.getString(ExtractorConstants.HOST));
         }
-        if(values.get(ExtractorConstants.DATABASE)!=null){
-            database(values.get(ExtractorConstants.DATABASE));
-       }
-        //       if(values.get(ExtractorConstants.COLLECTION)!=null){
-        //        database(values.get(ExtractorConstants.COLLECTION));
-        //      }
-        //if(values.get(ExtractorConstants.INPUT_COLUMNS)!=null){
-        //        inputColumns(getStringArray(values.get(ExtractorConstants.INPUT_COLUMNS)));
-        //}
+        if (values.get(ExtractorConstants.INDEX) != null && (values.get(ExtractorConstants.TYPE) != null)) {
+            database(extractorConfig.getString(ExtractorConstants.INDEX).concat("/")
+                    .concat(extractorConfig.getString(ExtractorConstants.TYPE)));
+        }
 
-//        if(values.get(TABLE)!=null){
-//            table(values.get(TABLE));
-//        }
-//        if(values.get(KEYSPACE)!=null){
-//            keyspace(values.get(KEYSPACE));
-//        }
-//        if(values.get(COLUMN_FAMILY)!=null){
-//            columnFamily(values.get(COLUMN_FAMILY));
-//        }
-//
-//        if(values.get(CREATE_ON_WRITE)!=null){
-//            createTableOnWrite(getBooleanValue(values.get(CREATE_ON_WRITE)));
-//        }
-//
-//        if(values.get(PAGE_SIZE)!=null){
-//            pageSize(getIntegerValue(values.get(PAGE_SIZE)));
-//        }
-//
-//        if(values.get(READ_CONSISTENCY_LEVEL)!=null){
-//            readConsistencyLevel(values.get(READ_CONSISTENCY_LEVEL));
-//        }
-//
-//        if(values.get(WRITE_CONSISTENCY_LEVEL)!=null){
-//            writeConsistencyLevel(values.get(WRITE_CONSISTENCY_LEVEL));
-//        }
-//
-//
-//        if(values.get(INPUT_COLUMNS)!=null){
-//            inputColumns(getStringArray(values.get(INPUT_COLUMNS)));
-//        }
-//
-//
-//        if(values.get(BISECT_FACTOR)!=null){
-//            bisectFactor(getIntegerValue(values.get(BISECT_FACTOR)));
-//        }
         this.initialize();
 
         return this;
-    }
-
-    private String[] getStringArray(String value){
-        return value!=null?value.split(","):new String[0];
     }
 
 }

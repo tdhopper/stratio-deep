@@ -16,80 +16,65 @@
 
 package com.stratio.deep.examples.java.es;
 
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
 
-import com.stratio.deep.commons.config.ExtractorConfig;
-import com.stratio.deep.core.context.DeepSparkContext;
-import com.stratio.deep.commons.entity.Cells;
-import com.stratio.deep.extractor.ESCellExtractor;
-import com.stratio.deep.commons.extractor.server.ExtractorServer;
-import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
-import com.stratio.deep.utils.ContextProperties;
 import org.apache.log4j.Logger;
 import org.apache.spark.rdd.RDD;
 
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
+import com.stratio.deep.commons.config.DeepJobConfig;
+import com.stratio.deep.commons.config.ExtractorConfig;
+import com.stratio.deep.commons.entity.Cells;
+import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
+import com.stratio.deep.core.context.DeepSparkContext;
+import com.stratio.deep.extractor.ESCellExtractor;
+import com.stratio.deep.utils.ContextProperties;
 
 /**
- * Example class to read a collection from mongoDB
+ * Example class to read a collection from ES
  */
 public final class ReadingCellFromES {
     private static final Logger LOG = Logger.getLogger(ReadingCellFromES.class);
     private static Long counts;
+
     private ReadingCellFromES() {
     }
-
 
     public static void main(String[] args) {
         doMain(args);
     }
 
-
     public static void doMain(String[] args) {
-        String job      = "java:ReadingCellWithES";
-        String host     = "localhost:9200";
+        String job = "java:ReadingCellWithES";
+        String host = "localhost:9200";
         String database = "entity/output";
-        String index    = "book";
-        String type     = "test";
-
-        //Call async the Extractor netty Server
-        ExecutorService es = Executors.newFixedThreadPool(1);
-        final Future future = es.submit(new Callable() {
-            public Object call() throws Exception {
-                ExtractorServer.main(null);
-                return null;
-            }
-        });
+        String index = "book";
+        String type = "test";
 
         // Creating the Deep Context
         ContextProperties p = new ContextProperties(args);
         DeepSparkContext deepContext = new DeepSparkContext(p.getCluster(), job, p.getSparkHome(), p.getJars());
 
-
         // Creating a configuration for the Extractor and initialize it
-        ExtractorConfig<Cells> config = new ExtractorConfig();
+        DeepJobConfig<Cells> config = new DeepJobConfig<>(new ExtractorConfig(Cells.class));
 
-        Map<String, String> values = new HashMap<>();
+        Map<String, Serializable> values = new HashMap<>();
 
-        values.put(ExtractorConstants.DATABASE,    database);
-        values.put(ExtractorConstants.HOST,        host );
-
+        values.put(ExtractorConstants.DATABASE, database);
+        values.put(ExtractorConstants.HOST, host);
 
         config.setExtractorImplClass(ESCellExtractor.class);
         config.setValues(values);
 
         // Creating the RDD
-        RDD<Cells> rdd =  deepContext.createRDD(config);
+        RDD<Cells> rdd = deepContext.createRDD(config);
 
         counts = rdd.count();
 
         LOG.info("--------------------------------- Num of rows: " + counts);
         LOG.info("--------------------------------- Num of rows: " + rdd.first());
-        ExtractorServer.close();
+
         deepContext.stop();
-}}
+    }
+}

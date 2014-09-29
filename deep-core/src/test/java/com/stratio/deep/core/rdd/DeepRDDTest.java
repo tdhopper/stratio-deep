@@ -154,36 +154,7 @@ public void testCompute() throws Exception {
     }
 
 
-    /**
-* 
-* Method: getConfig() 
-* 
-*/ 
-@Test
-public void testGetConfig() throws Exception { 
-//TODO: Test goes here... 
-} 
 
-
-/** 
-* 
-* Method: initExtractorClient() 
-* 
-*/ 
-@Test
-public void testInitExtractorClient() throws Exception { 
-//TODO: Test goes here... 
-/* 
-try { 
-   Method method = DeepRDD.getClass().getMethod("initExtractorClient"); 
-   method.setAccessible(true); 
-   method.invoke(<Object>, <Parameters>); 
-} catch(NoSuchMethodException e) { 
-} catch(IllegalAccessException e) { 
-} catch(InvocationTargetException e) { 
-} 
-*/ 
-}
     private DeepRDD createDeepRDD() throws Exception {
 
 

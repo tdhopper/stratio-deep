@@ -16,40 +16,40 @@
 
 package com.stratio.deep.cassandra.rdd;
 
+import static com.stratio.deep.commons.utils.Utils.quote;
+import static org.testng.Assert.assertNotNull;
+
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.charset.CharacterCodingException;
 
-import com.stratio.deep.cassandra.config.ICassandraDeepJobConfig;
-import com.stratio.deep.cassandra.context.AbstractDeepSparkContextTest;
-import com.stratio.deep.commons.config.ExtractorConfig;
 import org.apache.cassandra.exceptions.ConfigurationException;
 import org.apache.log4j.Logger;
 import org.apache.spark.Partition;
 import org.apache.spark.rdd.RDD;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
+
 import scala.collection.Seq;
 
-import static com.stratio.deep.commons.utils.Utils.quote;
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertNotNull;
+import com.stratio.deep.cassandra.context.AbstractDeepSparkContextTest;
+import com.stratio.deep.commons.config.DeepJobConfig;
 
 /**
  * Abstract class defining the common test structure that all concrete subclasses should respect.
- *
+ * 
  * @param <W>
  */
 public abstract class CassandraRDDTest<W> extends AbstractDeepSparkContextTest {
-    private Logger logger = Logger.getLogger(getClass());
+    private final Logger logger = Logger.getLogger(getClass());
 
     protected RDD<W> rdd;
-    private ExtractorConfig<W> rddConfig;
-    private ExtractorConfig<W> writeConfig;
+    private DeepJobConfig<W> rddConfig;
+    private DeepJobConfig<W> writeConfig;
 
     protected int testBisectFactor = 8;
 
-	protected static final int DEFAULT_PAGE_SIZE = 100;
+    protected static final int DEFAULT_PAGE_SIZE = 100;
 
     protected abstract void checkComputedData(W[] entities);
 
@@ -59,19 +59,19 @@ public abstract class CassandraRDDTest<W> extends AbstractDeepSparkContextTest {
         return this.rdd;
     }
 
-    protected ExtractorConfig<W> getReadConfig() {
+    protected DeepJobConfig<W> getReadConfig() {
         return rddConfig;
     }
 
-    protected ExtractorConfig<W> getWriteConfig() {
+    protected DeepJobConfig<W> getWriteConfig() {
         return writeConfig;
     }
 
     protected abstract RDD<W> initRDD();
 
-    protected abstract ExtractorConfig<W> initReadConfig();
+    protected abstract DeepJobConfig<W> initReadConfig();
 
-    protected abstract ExtractorConfig<W> initWriteConfig();
+    protected abstract DeepJobConfig<W> initWriteConfig();
 
     @BeforeClass
     protected void initServerAndRDD() throws IOException, URISyntaxException, ConfigurationException,
@@ -81,7 +81,6 @@ public abstract class CassandraRDDTest<W> extends AbstractDeepSparkContextTest {
         writeConfig = initWriteConfig();
         rdd = initRDD();
     }
-
 
     @SuppressWarnings("unchecked")
     @Test(dependsOnMethods = "testGetPreferredLocations")
@@ -103,7 +102,7 @@ public abstract class CassandraRDDTest<W> extends AbstractDeepSparkContextTest {
         Partition[] partitions = getRDD().partitions();
 
         assertNotNull(partitions);
-//        assertEquals(partitions.length, getReadConfig().getBisectFactor() * (8 + 1));
+        // assertEquals(partitions.length, getReadConfig().getBisectFactor() * (8 + 1));
     }
 
     @Test(dependsOnMethods = "testGetPartitions")
@@ -120,7 +119,6 @@ public abstract class CassandraRDDTest<W> extends AbstractDeepSparkContextTest {
     public void testRDDInstantiation() {
         logger.info("testRDDInstantiation()");
         assertNotNull(getRDD());
-
 
     }
 

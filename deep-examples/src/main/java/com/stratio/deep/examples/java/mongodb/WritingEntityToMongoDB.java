@@ -16,21 +16,23 @@
 
 package com.stratio.deep.examples.java.mongodb;
 
-
-import com.stratio.deep.commons.config.ExtractorConfig;
-import com.stratio.deep.core.context.DeepSparkContext;
-import com.stratio.deep.mongodb.extractor.MongoEntityExtractor;
-import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
-import com.stratio.deep.core.entity.MessageTestEntity;
-import com.stratio.deep.utils.ContextProperties;
-import org.apache.log4j.Logger;
-import org.apache.spark.rdd.RDD;
-import scala.Tuple2;
+import static com.stratio.deep.commons.extractor.server.ExtractorServer.initExtractorServer;
+import static com.stratio.deep.commons.extractor.server.ExtractorServer.stopExtractorServer;
 
 import java.util.List;
 
-import static com.stratio.deep.commons.extractor.server.ExtractorServer.initExtractorServer;
-import static com.stratio.deep.commons.extractor.server.ExtractorServer.stopExtractorServer;
+import org.apache.log4j.Logger;
+import org.apache.spark.rdd.RDD;
+
+import scala.Tuple2;
+
+import com.stratio.deep.commons.config.DeepJobConfig;
+import com.stratio.deep.commons.config.ExtractorConfig;
+import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
+import com.stratio.deep.core.context.DeepSparkContext;
+import com.stratio.deep.core.entity.MessageTestEntity;
+import com.stratio.deep.mongodb.extractor.MongoEntityExtractor;
+import com.stratio.deep.utils.ContextProperties;
 
 /**
  * Example class to write an entity to mongoDB
@@ -44,8 +46,9 @@ public final class WritingEntityToMongoDB {
 
     /**
      * Application entry point.
-     *
-     * @param args the arguments passed to the application.
+     * 
+     * @param args
+     *            the arguments passed to the application.
      */
     public static void main(String[] args) {
         doMain(args);
@@ -66,22 +69,22 @@ public final class WritingEntityToMongoDB {
 
         // Creating the Deep Context where args are Spark Master and Job Name
         ContextProperties p = new ContextProperties(args);
-	    DeepSparkContext deepContext = new DeepSparkContext(p.getCluster(), job, p.getSparkHome(),
+        DeepSparkContext deepContext = new DeepSparkContext(p.getCluster(), job, p.getSparkHome(),
                 p.getJars());
 
-
-        ExtractorConfig<MessageTestEntity> inputConfigEntity = new ExtractorConfig(MessageTestEntity.class);
-        inputConfigEntity.putValue(ExtractorConstants.HOST, host).putValue(ExtractorConstants.DATABASE, database).putValue(ExtractorConstants.COLLECTION, inputCollection);
+        DeepJobConfig<MessageTestEntity> inputConfigEntity = new DeepJobConfig<>(new ExtractorConfig<>(
+                MessageTestEntity.class));
+        inputConfigEntity.putValue(ExtractorConstants.HOST, host).putValue(ExtractorConstants.DATABASE, database)
+                .putValue(ExtractorConstants.COLLECTION, inputCollection);
         inputConfigEntity.setExtractorImplClass(MongoEntityExtractor.class);
 
         RDD<MessageTestEntity> inputRDDEntity = deepContext.createRDD(inputConfigEntity);
 
-
-
-        ExtractorConfig<MessageTestEntity> outputConfigEntity = new ExtractorConfig(MessageTestEntity.class);
-        outputConfigEntity.putValue(ExtractorConstants.HOST, host).putValue(ExtractorConstants.DATABASE, database).putValue(ExtractorConstants.COLLECTION, outputCollection);
+        DeepJobConfig<MessageTestEntity> outputConfigEntity = new DeepJobConfig<>(new ExtractorConfig<>(
+                MessageTestEntity.class));
+        outputConfigEntity.putValue(ExtractorConstants.HOST, host).putValue(ExtractorConstants.DATABASE, database)
+                .putValue(ExtractorConstants.COLLECTION, outputCollection);
         outputConfigEntity.setExtractorImplClass(MongoEntityExtractor.class);
-
 
         deepContext.saveRDD(inputRDDEntity, outputConfigEntity);
 
@@ -89,6 +92,4 @@ public final class WritingEntityToMongoDB {
 
         deepContext.stop();
     }
-
-
 }
