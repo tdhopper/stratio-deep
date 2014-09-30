@@ -5,14 +5,13 @@ import java.io.Serializable;
 import org.apache.spark.Partition;
 
 import com.stratio.deep.commons.config.DeepJobConfig;
-import com.stratio.deep.commons.config.ExtractorConfig;
 
 /**
  * Created by rcrespo on 4/08/14.
  */
 public interface IExtractor<T> extends Serializable {
 
-    Partition[] getPartitions(DeepJobConfig<T> config);
+    <W extends DeepJobConfig<T>> Partition[] getPartitions(W config);
 
     boolean hasNext();
 
@@ -20,11 +19,11 @@ public interface IExtractor<T> extends Serializable {
 
     void close();
 
-    void initIterator(Partition dp, DeepJobConfig<T> config);
+    <W extends DeepJobConfig<T>> void initIterator(Partition dp, W config);
 
-    IExtractor<T> getExtractorInstance(DeepJobConfig<T> config);
+    <W extends DeepJobConfig<T>> IExtractor<T> getExtractorInstance(W config);
 
     void saveRDD(T t);
 
-    void initSave(DeepJobConfig<T> config, T first);
+    <W extends DeepJobConfig<T>> void initSave(W config, T first);
 }

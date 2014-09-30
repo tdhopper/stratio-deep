@@ -24,7 +24,6 @@ import java.util.concurrent.LinkedBlockingQueue;
 import org.apache.spark.Partition;
 
 import com.stratio.deep.commons.config.DeepJobConfig;
-import com.stratio.deep.commons.config.ExtractorConfig;
 import com.stratio.deep.commons.extractor.actions.CloseAction;
 import com.stratio.deep.commons.extractor.actions.ExtractorInstanceAction;
 import com.stratio.deep.commons.extractor.actions.GetPartitionsAction;
@@ -80,7 +79,7 @@ public class ExtractorClientHandler<T> extends SimpleChannelInboundHandler<Respo
      * @see com.stratio.deep.rdd.IDeepRDD#getPartitions(org.apache.spark.broadcast.Broadcast, int)
      */
     @Override
-    public Partition[] getPartitions(DeepJobConfig<T> config) {
+    public <W extends DeepJobConfig<T>> Partition[] getPartitions(W config) {
 
         GetPartitionsAction<T> getPartitionsAction = new GetPartitionsAction<>(config);
 
@@ -177,7 +176,7 @@ public class ExtractorClientHandler<T> extends SimpleChannelInboundHandler<Respo
     }
 
     @Override
-    public void initIterator(Partition dp, DeepJobConfig<T> config) {
+    public <W extends DeepJobConfig<T>> void initIterator(Partition dp, W config) {
         InitIteratorAction<T> initIteratorAction = new InitIteratorAction<>(dp, config);
 
         channel.writeAndFlush(initIteratorAction);
@@ -200,7 +199,7 @@ public class ExtractorClientHandler<T> extends SimpleChannelInboundHandler<Respo
     }
 
     @Override
-    public IExtractor<T> getExtractorInstance(DeepJobConfig<T> config) {
+    public <W extends DeepJobConfig<T>> IExtractor<T> getExtractorInstance(W config) {
         ExtractorInstanceAction<T> instanceAction = new ExtractorInstanceAction<>(config);
 
         channel.writeAndFlush(instanceAction);
@@ -248,7 +247,7 @@ public class ExtractorClientHandler<T> extends SimpleChannelInboundHandler<Respo
     }
 
     @Override
-    public void initSave(DeepJobConfig<T> config, T first) {
+    public <W extends DeepJobConfig<T>> void initSave(W config, T first) {
         InitSaveAction<T> initSaveAction = new InitSaveAction<>(config, first);
 
         channel.writeAndFlush(initSaveAction);

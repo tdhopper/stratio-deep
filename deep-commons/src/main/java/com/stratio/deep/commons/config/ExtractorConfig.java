@@ -26,7 +26,15 @@ import com.stratio.deep.commons.utils.Pair;
  */
 public class ExtractorConfig<T> implements Serializable {
 
-    private static final long serialVersionUID = 6711175817240765248L;
+    private static final long serialVersionUID = -741177816966076337L;
+
+    private String host;
+
+    private Integer port;
+
+    private String username;
+
+    private String password;
 
     private Map<String, Serializable> values = new HashMap<>();
 
@@ -45,6 +53,42 @@ public class ExtractorConfig<T> implements Serializable {
         return values;
     }
 
+    public String getHost() {
+        return host;
+    }
+
+    public void setHost(String host) {
+        this.host = host;
+    }
+
+    public Integer getPort() {
+        return port;
+    }
+
+    public void setPort(Integer port) {
+        this.port = port;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public void setEntityClass(Class<T> entityClass) {
+        this.entityClass = entityClass;
+    }
+
     public void setValues(Map<String, Serializable> values) {
         this.values = values;
     }
@@ -59,16 +103,6 @@ public class ExtractorConfig<T> implements Serializable {
 
     public Class<T> getEntityClass() {
         return entityClass;
-    }
-
-    public ExtractorConfig<T> putValue(String key, Serializable value) {
-        values.put(key, value);
-        return this;
-    }
-
-    public ExtractorConfig<T> putValue(String key, String value) {
-        values.put(key, value);
-        return this;
     }
 
     public String getExtractorImplClassName() {
@@ -133,6 +167,11 @@ public class ExtractorConfig<T> implements Serializable {
         sb.append(", entityClass=").append(entityClass);
         sb.append('}');
         return sb.toString();
+    }
+
+    public ExtractorConfig<T> putValue(String key, Serializable value) {
+        values.put(key, value);
+        return this;
     }
 
     /**
