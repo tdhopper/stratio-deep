@@ -35,15 +35,15 @@ public class DeepJobConfig<T> extends ExtractorConfig<T> {
 
     private static final long serialVersionUID = 442160874628247418L;
 
-    private Map<String, Cell> columnDefinitions;
+    protected Map<String, Cell> columnDefinitions;
 
-    private int pageSize;
+    protected int pageSize;
 
-    private String[] inputColumns;
+    protected String[] inputColumns;
 
-    private String catalogName;
+    protected String catalogName;
 
-    private String tableName;
+    protected String tableName;
 
     public Map<String, Cell> getColumnDefinitions() {
         return columnDefinitions;

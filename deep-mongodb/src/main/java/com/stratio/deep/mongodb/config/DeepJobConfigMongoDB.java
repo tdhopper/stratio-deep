@@ -70,17 +70,6 @@ public class DeepJobConfigMongoDB<T> extends DeepJobConfig<T> implements IMongoD
     private final List<String> hostList = new ArrayList<>();
 
     /**
-     * MongoDB username
-     */
-    private String username;
-
-    /**
-     * MongoDB password
-     */
-
-    private String password;
-
-    /**
      * Indicates the replica set's name
      */
     private String replicaSet;
@@ -101,17 +90,6 @@ public class DeepJobConfigMongoDB<T> extends DeepJobConfig<T> implements IMongoD
      */
     private String readPreference;
 
-    /**
-     * Entity class to map BSONObject
-     */
-    protected Class<T> entityClass;
-
-    /**
-     * VIP, this MUST be transient!
-     */
-    private transient Map<String, Cell> columnDefinitionMap;
-
-    private String[] inputColumns;
 
     /**
      * OPTIONAL filter query
@@ -128,7 +106,6 @@ public class DeepJobConfigMongoDB<T> extends DeepJobConfig<T> implements IMongoD
      */
     private String sort;
 
-    private final Class<? extends InputFormat<?, ?>> inputFormat = MongoInputFormat.class;
 
     /**
      * Shard key
@@ -143,14 +120,13 @@ public class DeepJobConfigMongoDB<T> extends DeepJobConfig<T> implements IMongoD
 
     private Integer splitSize = 8;
 
-    private Map<String, Object> customConfiguration;
+    private Map<String, Serializable> customConfiguration;
 
     /**
      * Default constructor
      */
     public DeepJobConfigMongoDB(Class<T> entityClass) {
-        super();
-        this.entityClass = entityClass;
+        super(entityClass);
     }
 
     /**
@@ -219,7 +195,7 @@ public class DeepJobConfigMongoDB<T> extends DeepJobConfig<T> implements IMongoD
      * {@inheritDoc}
      */
     @Override
-    public IMongoDeepJobConfig<T> host(String host) {
+    public DeepJobConfigMongoDB<T> host(String host) {
         this.hostList.add(host);
         return this;
     }
@@ -228,12 +204,12 @@ public class DeepJobConfigMongoDB<T> extends DeepJobConfig<T> implements IMongoD
      * {@inheritDoc}
      */
     @Override
-    public IMongoDeepJobConfig<T> host(List<String> host) {
+    public DeepJobConfigMongoDB<T> host(List<String> host) {
         this.hostList.addAll(host);
         return this;
     }
 
-    public IMongoDeepJobConfig<T> host(String[] hosts) {
+    public DeepJobConfigMongoDB<T> host(String[] hosts) {
         this.hostList.addAll(Arrays.asList(hosts));
         return this;
     }
@@ -242,7 +218,7 @@ public class DeepJobConfigMongoDB<T> extends DeepJobConfig<T> implements IMongoD
      * {@inheritDoc}
      */
     @Override
-    public IMongoDeepJobConfig<T> filterQuery(String query) {
+    public DeepJobConfigMongoDB<T> filterQuery(String query) {
         this.query = query;
         return this;
     }
@@ -464,10 +440,10 @@ public class DeepJobConfigMongoDB<T> extends DeepJobConfig<T> implements IMongoD
         }
 
         if (customConfiguration != null) {
-            Set<Map.Entry<String, Object>> set = customConfiguration.entrySet();
-            Iterator<Map.Entry<String, Object>> iterator = set.iterator();
+            Set<Map.Entry<String, Serializable>> set = customConfiguration.entrySet();
+            Iterator<Map.Entry<String, Serializable>> iterator = set.iterator();
             while (iterator.hasNext()) {
-                Map.Entry<String, Object> entry = iterator.next();
+                Map.Entry<String, Serializable> entry = iterator.next();
                 configHadoop.set(entry.getKey(), entry.getValue().toString());
             }
         }
@@ -494,7 +470,7 @@ public class DeepJobConfigMongoDB<T> extends DeepJobConfig<T> implements IMongoD
      * {@inheritDoc}
      */
     @Override
-    public IMongoDeepJobConfig<T> inputColumns(String... columns) {
+    public DeepJobConfigMongoDB<T> inputColumns(String... columns) {
         BSONObject bsonFields = fields != null ? fields : new BasicBSONObject();
         boolean isIdPresent = false;
         for (String column : columns) {
@@ -522,7 +498,7 @@ public class DeepJobConfigMongoDB<T> extends DeepJobConfig<T> implements IMongoD
         return configHadoop;
     }
 
-    @Override
+//    @Override
     public IMongoDeepJobConfig<T> initialize(DeepJobConfig extractorConfig) {
         Map<String, Serializable> values = extractorConfig.getValues();
 

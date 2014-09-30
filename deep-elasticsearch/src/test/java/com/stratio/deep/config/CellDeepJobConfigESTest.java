@@ -29,7 +29,7 @@ public class CellDeepJobConfigESTest {
 
     @Test
     public void createTest() {
-        GenericDeepJobConfigES<Cells> cellDeepJobConfigES = new CellDeepJobConfigES();
+        DeepJobConfigES<Cells> cellDeepJobConfigES = new CellDeepJobConfigES();
         assertNotNull(cellDeepJobConfigES);
         assertEquals(cellDeepJobConfigES.getEntityClass(), Cells.class);
     }

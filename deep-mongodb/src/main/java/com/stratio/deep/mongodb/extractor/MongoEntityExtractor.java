@@ -16,9 +16,9 @@
 
 package com.stratio.deep.mongodb.extractor;
 
-import com.stratio.deep.commons.config.IDeepJobConfig;
+import com.stratio.deep.commons.config.DeepJobConfig;
 import com.stratio.deep.commons.exception.DeepTransformException;
-import com.stratio.deep.mongodb.config.EntityDeepJobConfigMongoDB;
+import com.stratio.deep.mongodb.config.DeepJobConfigMongoDB;
 import com.stratio.deep.mongodb.utils.UtilMongoDB;
 import org.bson.BSONObject;
 import org.slf4j.Logger;
@@ -39,22 +39,20 @@ public final class MongoEntityExtractor<T> extends MongoExtractor<T> {
 
     public MongoEntityExtractor(Class<T> t) {
         super();
-        this.deepJobConfig = new EntityDeepJobConfigMongoDB(t);
+        this.deepJobConfig = new DeepJobConfigMongoDB(t);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+
     @Override
-    public T transformElement(Tuple2<Object, BSONObject> tuple, IDeepJobConfig<T, ? extends IDeepJobConfig> config) {
+    public <W extends DeepJobConfig<T>> T transformElement(Tuple2<Object, BSONObject> tuple,
+            W deepJobConfig) {
 
         try {
-            return UtilMongoDB.getObjectFromBson(config.getEntityClass(), tuple._2());
+            return UtilMongoDB.getObjectFromBson(deepJobConfig.getEntityClass(), tuple._2());
         } catch (Exception e) {
             LOG.error("Cannot convert BSON: ", e);
             throw new DeepTransformException("Could not transform from Bson to Entity " + e.getMessage());
         }
-
     }
 
     @Override
