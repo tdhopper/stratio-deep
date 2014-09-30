@@ -45,6 +45,7 @@ import scala.Tuple2;
 import com.stratio.deep.commons.config.DeepJobConfig;
 import com.stratio.deep.commons.config.ExtractorConfig;
 import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
+import com.stratio.deep.commons.rdd.IExtractor;
 import com.stratio.deep.core.context.DeepSparkContext;
 import com.stratio.deep.core.entity.BookEntity;
 import com.stratio.deep.core.entity.CantoEntity;
@@ -84,7 +85,8 @@ public class ESEntityRDDTest extends ExtractorTest implements Serializable {
         DeepJobConfig<BookEntity> inputConfigEntity = new DeepJobConfig<>(new ExtractorConfig(BookEntity.class));
         inputConfigEntity.putValue(ExtractorConstants.HOST, hostConcat).putValue(ExtractorConstants.DATABASE,
                 "book/input");
-        inputConfigEntity.getExtractorConfiguration().setExtractorImplClass(ESEntityExtractor.class);
+        inputConfigEntity.getExtractorConfiguration().setExtractorImplClass(
+                (Class<? extends IExtractor<BookEntity>>) ESEntityExtractor.class);
 
         RDD<BookEntity> inputRDDEntity = context.createRDD(inputConfigEntity);
 
@@ -155,10 +157,11 @@ public class ESEntityRDDTest extends ExtractorTest implements Serializable {
             }
         });
 
-        DeepJobConfig<WordCount> outputConfigEntity = new DeepJobConfig<>(new ExtractorConfig(WordCount.class));
+        DeepJobConfig<WordCount> outputConfigEntity = new DeepJobConfig<>(new ExtractorConfig<>(WordCount.class));
         outputConfigEntity.putValue(ExtractorConstants.HOST, hostConcat).putValue(ExtractorConstants.DATABASE,
                 "book/words");
-        outputConfigEntity.getExtractorConfiguration().setExtractorImplClass(ESEntityExtractor.class);
+        outputConfigEntity.getExtractorConfiguration().setExtractorImplClass(
+                (Class<? extends IExtractor<WordCount>>) ESEntityExtractor.class);
 
         context.saveRDD(outputRDD.rdd(), outputConfigEntity);
 

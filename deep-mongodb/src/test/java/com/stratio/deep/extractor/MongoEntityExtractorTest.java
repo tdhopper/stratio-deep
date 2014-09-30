@@ -16,6 +16,11 @@
 
 package com.stratio.deep.extractor;
 
+import static com.stratio.deep.extractor.MongoJavaRDDTest.HOST;
+import static com.stratio.deep.extractor.MongoJavaRDDTest.PORT;
+import static com.stratio.deep.extractor.MongoJavaRDDTest.WORD_COUNT_SPECTED;
+import static org.testng.Assert.assertEquals;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -39,6 +44,7 @@ import com.mongodb.DBObject;
 import com.stratio.deep.commons.config.DeepJobConfig;
 import com.stratio.deep.commons.config.ExtractorConfig;
 import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
+import com.stratio.deep.commons.rdd.IExtractor;
 import com.stratio.deep.core.context.DeepSparkContext;
 import com.stratio.deep.core.entity.BookEntity;
 import com.stratio.deep.core.entity.CantoEntity;
@@ -69,7 +75,7 @@ public class MongoEntityExtractorTest extends ExtractorTest {
         DeepJobConfig<BookEntity> inputConfigEntity = new DeepJobConfig<>(new ExtractorConfig(BookEntity.class));
         inputConfigEntity.putValue(ExtractorConstants.HOST, hostConcat).putValue(ExtractorConstants.DATABASE, "book")
                 .putValue(ExtractorConstants.COLLECTION, "input");
-        inputConfigEntity.setExtractorImplClass(MongoEntityExtractor.class);
+        inputConfigEntity.setExtractorImplClass((Class<? extends IExtractor<BookEntity>>) MongoEntityExtractor.class);
 
         RDD<BookEntity> inputRDDEntity = context.createRDD(inputConfigEntity);
 
@@ -134,7 +140,7 @@ public class MongoEntityExtractorTest extends ExtractorTest {
         DeepJobConfig<WordCount> outputConfigEntity = new DeepJobConfig<>(new ExtractorConfig<>(WordCount.class));
         outputConfigEntity.putValue(ExtractorConstants.HOST, hostConcat).putValue(ExtractorConstants.DATABASE, "book")
                 .putValue(ExtractorConstants.COLLECTION, "output");
-        outputConfigEntity.setExtractorImplClass(MongoEntityExtractor.class);
+        outputConfigEntity.setExtractorImplClass((Class<? extends IExtractor<WordCount>>) MongoEntityExtractor.class);
 
         context.saveRDD(outputRDD.rdd(), outputConfigEntity);
 

@@ -29,6 +29,7 @@ import scala.Tuple2;
 import com.stratio.deep.commons.config.DeepJobConfig;
 import com.stratio.deep.commons.config.ExtractorConfig;
 import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
+import com.stratio.deep.commons.rdd.IExtractor;
 import com.stratio.deep.core.context.DeepSparkContext;
 import com.stratio.deep.extractor.ESEntityExtractor;
 import com.stratio.deep.testentity.WordCount;
@@ -69,7 +70,7 @@ public final class ReadingEntityFromES {
         values.put(ExtractorConstants.DATABASE, database);
         values.put(ExtractorConstants.HOST, host);
 
-        config.setExtractorImplClass(ESEntityExtractor.class);
+        config.setExtractorImplClass((Class<? extends IExtractor<WordCount>>) ESEntityExtractor.class);
         config.setEntityClass(WordCount.class);
 
         config.setValues(values);

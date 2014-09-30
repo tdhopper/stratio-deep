@@ -17,9 +17,9 @@
 package com.stratio.deep.rdd
 
 import java.util
-import com.datastax.driver.core.{Cluster, ResultSet, Row, Session}
+import com.datastax.driver.core.{ Cluster, ResultSet, Row, Session }
 import com.stratio.deep.cassandra.embedded.CassandraServer
-import com.stratio.deep.cassandra.config.{CassandraConfigFactory, ICassandraDeepJobConfig}
+import com.stratio.deep.cassandra.config.{ CassandraConfigFactory, ICassandraDeepJobConfig }
 import com.stratio.deep.cassandra.context.AbstractDeepSparkContextTest
 import com.stratio.deep.cassandra.extractor.CassandraEntityExtractor
 import com.stratio.deep.cassandra.testentity.TestEntity
@@ -32,7 +32,7 @@ import com.stratio.deep.commons.utils.Utils
 import org.apache.spark.Partition
 import org.apache.spark.rdd.RDD
 import org.testng.Assert._
-import org.testng.annotations.{BeforeClass, Test}
+import org.testng.annotations.{ BeforeClass, Test }
 import com.stratio.deep.commons.config.DeepJobConfig
 
 /**
@@ -45,14 +45,14 @@ class ScalaCassandraEntityRDDTest extends AbstractDeepSparkContextTest {
   private var writeConfig: DeepJobConfig[DeepScalaPageEntity] = _
   private val OUTPUT_COLUMN_FAMILY: String = "out_scalatest_page"
 
-//  @BeforeClass
+  //  @BeforeClass
   protected def initServerAndRDD {
     rddConfig = initReadConfig
     writeConfig = initWriteConfig
     rdd = initRDD
   }
 
-//  @Test(dependsOnMethods = Array("testGetPreferredLocations"))
+  //  @Test(dependsOnMethods = Array("testGetPreferredLocations"))
   def testCompute {
     val obj: AnyRef = rdd.collect
     assertNotNull(obj)
@@ -60,38 +60,37 @@ class ScalaCassandraEntityRDDTest extends AbstractDeepSparkContextTest {
     checkComputedData(entities)
   }
 
-//  @Test(dependsOnMethods = Array("testRDDInstantiation"))
+  //  @Test(dependsOnMethods = Array("testRDDInstantiation"))
   def testGetPartitions {
     val partitions: Array[Partition] = rdd.partitions
     assertNotNull(partitions)
     assertEquals(partitions.length, 8 + 1)
   }
 
-//  @Test(dependsOnMethods = Array("testGetPartitions"))
+  //  @Test(dependsOnMethods = Array("testGetPartitions"))
   def testGetPreferredLocations {
-//    val partitions: Array[Partition] = rdd.partitions
-//    val locations: Seq[String] = rdd.getPreferredLocations(partitions(0))
+    //    val partitions: Array[Partition] = rdd.partitions
+    //    val locations: Seq[String] = rdd.getPreferredLocations(partitions(0))
     assertNull(null)
   }
 
-//  @Test
+  //  @Test
   def testRDDInstantiation {
     assertNotNull(rdd)
   }
 
-//  @Test
+  //  @Test
   def testCql3SaveToCassandra(): Unit = {
 
   }
 
-//  @Test
+  //  @Test
   def testSimpleSaveToCassandra(): Unit = {
 
     try {
       AbstractDeepSparkContextTest.executeCustomCQL("DROP TABLE " +
         Utils.quote(AbstractDeepSparkContextTest.OUTPUT_KEYSPACE_NAME) + "." + Utils.quote(OUTPUT_COLUMN_FAMILY))
-    }
-    catch {
+    } catch {
       case e: Exception =>
 
     };
@@ -104,16 +103,16 @@ class ScalaCassandraEntityRDDTest extends AbstractDeepSparkContextTest {
 
     val rddConfig: DeepJobConfig[DeepScalaPageEntity] = new DeepJobConfig[DeepScalaPageEntity](new ExtractorConfig(classOf[DeepScalaPageEntity]))
     val values: java.util.Map[String, String] = new util.HashMap[String, String]
-//    values.put(ExtractorConstants.HOST, Constants.DEFAULT_CASSANDRA_HOST)
-//    values.put(ExtractorConstants.RPCPORT, CassandraServer.CASSANDRA_THRIFT_PORT)
-//    values.put(ExtractorConstants.KEYSPACE, AbstractDeepSparkContextTest.OUTPUT_KEYSPACE_NAME)
-//    values.put(ExtractorConstants.COLUMN_FAMILY, OUTPUT_COLUMN_FAMILY)
-//    values.put(ExtractorConstants.CQLPORT, CassandraServer.CASSANDRA_CQL_PORT)
-//    values.put(ExtractorConstants.CREATE_ON_WRITE, true)
+    //    values.put(ExtractorConstants.HOST, Constants.DEFAULT_CASSANDRA_HOST)
+    //    values.put(ExtractorConstants.RPCPORT, CassandraServer.CASSANDRA_THRIFT_PORT)
+    //    values.put(ExtractorConstants.KEYSPACE, AbstractDeepSparkContextTest.OUTPUT_KEYSPACE_NAME)
+    //    values.put(ExtractorConstants.COLUMN_FAMILY, OUTPUT_COLUMN_FAMILY)
+    //    values.put(ExtractorConstants.CQLPORT, CassandraServer.CASSANDRA_CQL_PORT)
+    //    values.put(ExtractorConstants.CREATE_ON_WRITE, true)
 
-//    rddConfig.setValues(values)
+    //    rddConfig.setValues(values)
 
-    rddConfig.getExtractorConfiguration().setExtractorImplClass(classOf[CassandraEntityExtractor[_ <: IDeepType]])
+    rddConfig.getExtractorConfiguration().setExtractorImplClass(classOf[CassandraEntityExtractor[DeepScalaPageEntity]])
     return rddConfig
   }
 
@@ -127,13 +126,13 @@ class ScalaCassandraEntityRDDTest extends AbstractDeepSparkContextTest {
     values.put(ExtractorConstants.COLUMN_FAMILY, AbstractDeepSparkContextTest.COLUMN_FAMILY)
     values.put(ExtractorConstants.CQLPORT, String.valueOf(CassandraServer.CASSANDRA_CQL_PORT))
 
-//    rddConfig.setValues(values)
+    //    rddConfig.setValues(values)
 
-    rddConfig.getExtractorConfiguration().setExtractorImplClass(classOf[CassandraEntityExtractor[_ <: IDeepType]])
+    rddConfig.getExtractorConfiguration().setExtractorImplClass(classOf[CassandraEntityExtractor[DeepScalaPageEntity]])
     return rddConfig
 
   }
-                                    
+
   private def initRDD(): RDD[DeepScalaPageEntity] = {
 
     super.getContext.createRDD(rddConfig).asInstanceOf[RDD[DeepScalaPageEntity]]
@@ -149,7 +148,7 @@ class ScalaCassandraEntityRDDTest extends AbstractDeepSparkContextTest {
     assertEquals(rs.one.getLong(0), AbstractDeepSparkContextTest.entityTestDataSize)
     command = "select * from " +
       Utils.quote(AbstractDeepSparkContextTest.OUTPUT_KEYSPACE_NAME) + "." +
-        Utils.quote(AbstractDeepSparkContextTest.OUTPUT_COLUMN_FAMILY) + " WHERE \"id\" = 'e71aa3103bb4a63b9e7d3aa081c1dc5ddef85fa7';"
+      Utils.quote(AbstractDeepSparkContextTest.OUTPUT_COLUMN_FAMILY) + " WHERE \"id\" = 'e71aa3103bb4a63b9e7d3aa081c1dc5ddef85fa7';"
     rs = session.execute(command)
     val row: Row = rs.one
     assertEquals(row.getString("domain_name"), "11870.com")

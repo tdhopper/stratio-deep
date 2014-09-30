@@ -17,7 +17,6 @@ package com.stratio.deep.commons.extractor.server;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 
-import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
 import org.apache.log4j.Logger;
@@ -147,15 +146,12 @@ public class ExtractorServerHandler<T> extends SimpleChannelInboundHandler<Actio
     @SuppressWarnings("unchecked")
     private void initExtractor(DeepJobConfig<T> config) {
 
-        Class<T> rdd = config.getExtractorConfiguration().getExtractorImplClass();
+        Class<? extends IExtractor<T>> extractorClass = config.getExtractorConfiguration().getExtractorImplClass();
         try {
-            Constructor<T> c = null;
             if (config.getEntityClass().isAssignableFrom(Cells.class)) {
-                c = rdd.getConstructor();
-                this.extractor = (IExtractor<T>) c.newInstance();
+                this.extractor = extractorClass.newInstance();
             } else {
-                c = rdd.getConstructor(Class.class);
-                this.extractor = (IExtractor<T>) c.newInstance(config.getEntityClass());
+                this.extractor = extractorClass.getConstructor(Class.class).newInstance(config.getEntityClass());
             }
 
         } catch (InstantiationException | IllegalAccessException | IllegalArgumentException

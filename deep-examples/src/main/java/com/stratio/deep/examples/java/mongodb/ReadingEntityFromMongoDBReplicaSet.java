@@ -25,6 +25,7 @@ import org.apache.spark.rdd.RDD;
 import com.stratio.deep.commons.config.DeepJobConfig;
 import com.stratio.deep.commons.config.ExtractorConfig;
 import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
+import com.stratio.deep.commons.rdd.IExtractor;
 import com.stratio.deep.core.context.DeepSparkContext;
 import com.stratio.deep.core.entity.MessageTestEntity;
 import com.stratio.deep.mongodb.extractor.MongoEntityExtractor;
@@ -87,7 +88,7 @@ public final class ReadingEntityFromMongoDBReplicaSet {
                 .putValue(ExtractorConstants.COLLECTION, inputCollection)
                 .putValue(ExtractorConstants.REPLICA_SET, replicaSet)
                 .putValue(ExtractorConstants.READ_PREFERENCE, readPreference)
-                .setExtractorImplClass(MongoEntityExtractor.class);
+                .setExtractorImplClass((Class<? extends IExtractor<MessageTestEntity>>) MongoEntityExtractor.class);
 
         // MongoJavaRDD
         RDD<MessageTestEntity> inputRDDEntity = deepContext.createRDD(inputConfigEntity);

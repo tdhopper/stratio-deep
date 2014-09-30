@@ -37,6 +37,7 @@ import scala.Tuple2;
 import com.stratio.deep.commons.config.DeepJobConfig;
 import com.stratio.deep.commons.config.ExtractorConfig;
 import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
+import com.stratio.deep.commons.rdd.IExtractor;
 import com.stratio.deep.core.context.DeepSparkContext;
 import com.stratio.deep.extractor.ESEntityExtractor;
 import com.stratio.deep.testentity.BookEntity;
@@ -85,7 +86,7 @@ public final class WritingEntityToES {
         values.put(ExtractorConstants.DATABASE, database);
         values.put(ExtractorConstants.HOST, host);
 
-        config.setExtractorImplClass(ESEntityExtractor.class);
+        config.setExtractorImplClass((Class<? extends IExtractor<BookEntity>>) ESEntityExtractor.class);
         config.setEntityClass(BookEntity.class);
 
         config.setValues(values);
@@ -137,7 +138,7 @@ public final class WritingEntityToES {
 
         DeepJobConfig<WordCount> outputConfigEntity = new DeepJobConfig(new ExtractorConfig(WordCount.class));
         outputConfigEntity.putValue(ExtractorConstants.HOST, host).putValue(ExtractorConstants.DATABASE, database2);
-        outputConfigEntity.setExtractorImplClass(ESEntityExtractor.class);
+        outputConfigEntity.setExtractorImplClass((Class<? extends IExtractor<WordCount>>) ESEntityExtractor.class);
 
         deepContext.saveRDD(outputRDD.rdd(), outputConfigEntity);
 

@@ -18,6 +18,7 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.stratio.deep.commons.rdd.IExtractor;
 import com.stratio.deep.commons.utils.Pair;
 
 /**
@@ -29,11 +30,11 @@ public class ExtractorConfig<T> implements Serializable {
 
     private Map<String, Serializable> values = new HashMap<>();
 
-    private Class extractorImplClass;
+    private Class<? extends IExtractor<T>> extractorImplClass;
 
     private String extractorImplClassName;
 
-    protected Class entityClass;
+    protected Class<T> entityClass;
 
     public ExtractorConfig(Class<T> t) {
         super();
@@ -48,15 +49,15 @@ public class ExtractorConfig<T> implements Serializable {
         this.values = values;
     }
 
-    public Class getExtractorImplClass() {
+    public Class<? extends IExtractor<T>> getExtractorImplClass() {
         return extractorImplClass;
     }
 
-    public void setExtractorImplClass(Class extractorImplClass) {
+    public void setExtractorImplClass(Class<? extends IExtractor<T>> extractorImplClass) {
         this.extractorImplClass = extractorImplClass;
     }
 
-    public Class getEntityClass() {
+    public Class<T> getEntityClass() {
         return entityClass;
     }
 
@@ -143,11 +144,11 @@ public class ExtractorConfig<T> implements Serializable {
      *            the return type
      * @return the cell value casted to the specified class
      */
-    public <T> T getValue(Class<T> clazz, String key) {
+    public <S> S getValue(Class<S> clazz, String key) {
         if (values.get(key) == null) {
             return null;
         } else {
-            return (T) values.get(key);
+            return (S) values.get(key);
         }
     }
 }

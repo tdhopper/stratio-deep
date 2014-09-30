@@ -36,6 +36,7 @@ import com.stratio.deep.commons.config.DeepJobConfig;
 import com.stratio.deep.commons.config.ExtractorConfig;
 import com.stratio.deep.commons.extractor.server.ExtractorServer;
 import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
+import com.stratio.deep.commons.rdd.IExtractor;
 import com.stratio.deep.core.context.DeepSparkContext;
 import com.stratio.deep.testentity.DomainEntity;
 import com.stratio.deep.utils.ContextProperties;
@@ -86,7 +87,7 @@ public final class WritingEntityToCassandra {
         // --- INPUT RDD
         DeepJobConfig<DomainEntity> inputConfig = new DeepJobConfig<>(new ExtractorConfig(DomainEntity.class));
 
-        inputConfig.setExtractorImplClass(CassandraEntityExtractor.class);
+        inputConfig.setExtractorImplClass((Class<? extends IExtractor<DomainEntity>>) CassandraEntityExtractor.class);
         // inputConfig.setEntityClass(TweetEntity.class);
 
         Map<String, Serializable> values = new HashMap<>();

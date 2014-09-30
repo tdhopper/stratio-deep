@@ -21,6 +21,7 @@ import java.util.Map;
 import org.apache.hadoop.conf.Configuration;
 
 import com.stratio.deep.commons.entity.Cell;
+import com.stratio.deep.commons.rdd.IExtractor;
 import com.stratio.deep.commons.utils.Pair;
 
 /**
@@ -260,11 +261,11 @@ public class DeepJobConfig<T> implements Serializable {
      * 
      * @return the entity class object associated to this configuration object.
      */
-    public Class getEntityClass() {
+    public Class<T> getEntityClass() {
         return this.getExtractorConfiguration().getEntityClass();
     }
 
-    public void setEntityClass(Class entityClass) {
+    public void setEntityClass(Class<T> entityClass) {
         this.extractorConfiguration.entityClass = entityClass;
     }
 
@@ -335,11 +336,11 @@ public class DeepJobConfig<T> implements Serializable {
      *            the return type
      * @return the cell value casted to the specified class
      */
-    public <T> T getValue(Class<T> clazz, String key) {
+    public <S> S getValue(Class<S> clazz, String key) {
         if (values.get(key) == null) {
             return null;
         } else {
-            return (T) values.get(key);
+            return (S) values.get(key);
         }
     }
 
@@ -348,11 +349,11 @@ public class DeepJobConfig<T> implements Serializable {
         return this;
     }
 
-    public Class getExtractorImplClass() {
+    public Class<? extends IExtractor<T>> getExtractorImplClass() {
         return this.getExtractorConfiguration().getExtractorImplClass();
     }
 
-    public void setExtractorImplClass(Class extractorImplClass) {
+    public void setExtractorImplClass(Class<? extends IExtractor<T>> extractorImplClass) {
         this.getExtractorConfiguration().setExtractorImplClass(extractorImplClass);
     }
 
