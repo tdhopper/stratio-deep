@@ -80,7 +80,7 @@ public abstract class GenericHadoopExtractor<T, K, V, KOut, VOut> implements IEx
     @Override
     public <W extends DeepJobConfig<T>> Partition[] getPartitions(W deepJobConfig) {
 
-        int id = (Integer) deepJobConfig.getValues().get(Constants.SPARK_RDD_ID);
+        int id = deepJobConfig.getInteger(Constants.SPARK_RDD_ID);
         jobId = new JobID(jobTrackerId, id);
 
         HadoopDeepJobConfig<T> hadoopDeepJobConfig = (HadoopDeepJobConfig<T>) deepJobConfig;
@@ -157,7 +157,7 @@ public abstract class GenericHadoopExtractor<T, K, V, KOut, VOut> implements IEx
 
         HadoopDeepJobConfig<T> hadoopDeepJobConfig = (HadoopDeepJobConfig<T>) deepJobConfig;
 
-        int id = (Integer) deepJobConfig.getValues().get(Constants.SPARK_RDD_ID);
+        int id = deepJobConfig.getInteger(Constants.SPARK_RDD_ID);
         NewHadoopPartition split = (NewHadoopPartition) dp;
 
         TaskAttemptID attemptId = DeepSparkHadoopMapReduceUtil.newTaskAttemptID(jobTrackerId, id, true, split.index(),
@@ -199,9 +199,8 @@ public abstract class GenericHadoopExtractor<T, K, V, KOut, VOut> implements IEx
     public <W extends DeepJobConfig<T>> void initSave(W deepJobConfig, T first) {
 
         HadoopDeepJobConfig<T> hadoopDeepJobConfig = (HadoopDeepJobConfig<T>) deepJobConfig;
-        int id = (Integer) deepJobConfig.getValues().get(Constants.SPARK_RDD_ID);
-
-        int partitionIndex = (Integer) deepJobConfig.getValues().get(Constants.SPARK_PARTITION_ID);
+        int id = deepJobConfig.getInteger(Constants.SPARK_RDD_ID);
+        int partitionIndex = deepJobConfig.getInteger(Constants.SPARK_PARTITION_ID);
 
         TaskAttemptID attemptId = DeepSparkHadoopMapReduceUtil.newTaskAttemptID(jobTrackerId, id, true, partitionIndex,
                 0);

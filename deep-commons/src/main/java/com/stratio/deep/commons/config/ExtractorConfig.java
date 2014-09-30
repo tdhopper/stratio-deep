@@ -131,7 +131,6 @@ public class ExtractorConfig<T> implements Serializable {
         } catch (ClassCastException e) {
             return new String[] { getString(key) };
         }
-
     }
 
     public Double getDouble(String key) {

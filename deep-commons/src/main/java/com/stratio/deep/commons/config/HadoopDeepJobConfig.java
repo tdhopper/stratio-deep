@@ -29,8 +29,8 @@ public class HadoopDeepJobConfig<T> extends DeepJobConfig<T> {
     /**
      * @param t
      */
-    public HadoopDeepJobConfig(Class<T> t) {
-        super(t);
+    public HadoopDeepJobConfig(ExtractorConfig<T> extractorConfig) {
+        super(extractorConfig);
     }
 
     private Configuration hadoopConfiguration;

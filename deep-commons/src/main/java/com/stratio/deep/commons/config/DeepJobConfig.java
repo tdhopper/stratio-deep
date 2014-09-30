@@ -14,9 +14,13 @@
 
 package com.stratio.deep.commons.config;
 
+import java.io.Serializable;
+import java.util.HashMap;
 import java.util.Map;
 
 import com.stratio.deep.commons.entity.Cell;
+import com.stratio.deep.commons.rdd.IExtractor;
+import com.stratio.deep.commons.utils.Pair;
 
 /**
  * Defines the public methods that each Stratio Deep configuration object should implement.
@@ -24,72 +28,86 @@ import com.stratio.deep.commons.entity.Cell;
  * @param <T>
  *            the generic type associated to this configuration object.
  */
-public class DeepJobConfig<T> extends ExtractorConfig<T> {
+public class DeepJobConfig<T> implements IDeepJobConfig<T>, Serializable {
+
+    private static final long serialVersionUID = 442160874628247418L;
 
     /**
      * @param t
      */
-    public DeepJobConfig(Class<T> t) {
-        super(t);
+    public DeepJobConfig(ExtractorConfig<T> extractorConfig) {
+        this.extractorConfig = extractorConfig;
     }
 
-    private static final long serialVersionUID = 442160874628247418L;
+    protected Map<String, Cell> columnDefinitions;
 
-    private Map<String, Cell> columnDefinitions;
+    protected int pageSize;
 
-    private int pageSize;
+    protected String[] inputColumns;
 
-    private String[] inputColumns;
+    protected String catalogName;
 
-    private String catalogName;
+    protected String tableName;
 
-    private String tableName;
+    protected Map<String, Serializable> values = new HashMap<>();
 
+    protected ExtractorConfig<T> extractorConfig;
+
+    @Override
     public Map<String, Cell> getColumnDefinitions() {
         return columnDefinitions;
     }
 
+    @Override
     public void setColumnDefinitions(Map<String, Cell> columnDefinitions) {
         this.columnDefinitions = columnDefinitions;
     }
 
+    @Override
     public void setPageSize(int pageSize) {
         this.pageSize = pageSize;
     }
 
+    @Override
     public void setInputColumns(String[] inputColumns) {
         this.inputColumns = inputColumns;
     }
 
+    @Override
     public void setCatalogName(String catalogName) {
         this.catalogName = catalogName;
     }
 
+    @Override
     public void setTableName(String tableName) {
         this.tableName = tableName;
     }
 
-    public DeepJobConfig host(String host) {
+    @Override
+    public DeepJobConfig<T> host(String host) {
 
-        this.setHost(host);
+        extractorConfig.setHost(host);
         return this;
     }
 
-    public DeepJobConfig port(Integer port) {
+    @Override
+    public DeepJobConfig<T> port(Integer port) {
 
-        this.setPort(port);
+        extractorConfig.setPort(port);
         return this;
     }
 
-    public DeepJobConfig username(String username) {
+    @Override
+    public DeepJobConfig<T> username(String username) {
 
-        this.setUsername(username);
+        extractorConfig.setUsername(username);
         return this;
     }
 
-    public DeepJobConfig password(String password) {
+    @Override
+    public DeepJobConfig<T> password(String password) {
 
-        this.setPassword(password);
+        extractorConfig.setPassword(password);
         return this;
     }
 
@@ -99,6 +117,7 @@ public class DeepJobConfig<T> extends ExtractorConfig<T> {
      * 
      * @return the map of column names and the corresponding Cell object containing its metadata.
      */
+    @Override
     public Map<String, Cell> columnDefinitions() {
         return this.columnDefinitions;
     }
@@ -111,6 +130,7 @@ public class DeepJobConfig<T> extends ExtractorConfig<T> {
      *            the number of rows per page
      * @return this configuration object.
      */
+    @Override
     public DeepJobConfig<T> pageSize(int pageSize) {
         this.pageSize = pageSize;
         return this;
@@ -123,6 +143,7 @@ public class DeepJobConfig<T> extends ExtractorConfig<T> {
      * 
      * @return the array of column names that will be retrieved from the data store.
      */
+    @Override
     public String[] getInputColumns() {
         return this.inputColumns;
     }
@@ -132,6 +153,7 @@ public class DeepJobConfig<T> extends ExtractorConfig<T> {
      * 
      * @return table name
      */
+    @Override
     public String getTableName() {
         return this.tableName;
     }
@@ -141,6 +163,7 @@ public class DeepJobConfig<T> extends ExtractorConfig<T> {
      * 
      * @return catalog name
      */
+    @Override
     public String getCatalogName() {
         return this.tableName;
     }
@@ -153,6 +176,7 @@ public class DeepJobConfig<T> extends ExtractorConfig<T> {
      *            list of columns we want to retrieve from the datastore.
      * @return this object.
      */
+    @Override
     public DeepJobConfig<T> inputColumns(String... columns) {
 
         this.inputColumns = columns;
@@ -166,6 +190,7 @@ public class DeepJobConfig<T> extends ExtractorConfig<T> {
      *            Name of the table
      * @return this object
      */
+    @Override
     public DeepJobConfig<T> tableName(String tableName) {
         this.tableName = tableName;
         return this;
@@ -178,6 +203,7 @@ public class DeepJobConfig<T> extends ExtractorConfig<T> {
      *            Name of the catalog
      * @return this object
      */
+    @Override
     public DeepJobConfig<T> catalogName(String catalogName) {
         this.catalogName = catalogName;
         return this;
@@ -188,6 +214,7 @@ public class DeepJobConfig<T> extends ExtractorConfig<T> {
      * 
      * @return the page size
      */
+    @Override
     public int getPageSize() {
         return this.pageSize;
     }
@@ -195,5 +222,98 @@ public class DeepJobConfig<T> extends ExtractorConfig<T> {
     public <W extends DeepJobConfig<T>> W initialize() {
 
         return (W) this;
+    }
+
+    @Override
+    public String getString(String key) {
+        return getValue(String.class, key);
+    }
+
+    @Override
+    public Integer getInteger(String key) {
+        return getValue(Integer.class, key);
+    }
+
+    @Override
+    public Boolean getBoolean(String key) {
+        return getValue(Boolean.class, key);
+    }
+
+    @Override
+    public String[] getStringArray(String key) {
+        try {
+            return getValue(String[].class, key);
+        } catch (ClassCastException e) {
+            return new String[] { getString(key) };
+        }
+    }
+
+    @Override
+    public Double getDouble(String key) {
+        return getValue(Double.class, key);
+    }
+
+    @Override
+    public Float getFloat(String key) {
+        return getValue(Float.class, key);
+    }
+
+    @Override
+    public Long getLong(String key) {
+        return getValue(Long.class, key);
+    }
+
+    @Override
+    public Short getShort(String key) {
+        return getValue(Short.class, key);
+    }
+
+    @Override
+    public Byte[] getByteArray(String key) {
+        return getValue(Byte[].class, key);
+    }
+
+    @Override
+    public <K, V> Pair<K, V> getPair(String key, Class<K> keyClass, Class<V> valueClass) {
+        return getValue(Pair.class, key);
+    }
+
+    @Override
+    public DeepJobConfig<T> putValue(String key, Serializable value) {
+        values.put(key, value);
+        return this;
+    }
+
+    @Override
+    public Class<? extends IExtractor> getExtractorImplClass() {
+        return extractorConfig.getExtractorImplClass();
+    }
+
+    @Override
+    public String getExtractorImplClassName() {
+        return extractorConfig.getExtractorImplClassName();
+    }
+
+    @Override
+    public Class<T> getEntityClass() {
+        return extractorConfig.getEntityClass();
+    }
+
+    /**
+     * Returns the cell value casted to the specified class.
+     * 
+     * @param clazz
+     *            the expected class
+     * @param <T>
+     *            the return type
+     * @return the cell value casted to the specified class
+     */
+    @Override
+    public <S> S getValue(Class<S> clazz, String key) {
+        if (values.get(key) == null) {
+            return null;
+        } else {
+            return (S) values.get(key);
+        }
     }
 }
