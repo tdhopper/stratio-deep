@@ -16,11 +16,11 @@
 
 package com.stratio.deep.examples.scala
 
-import com.stratio.deep.config._
-import com.stratio.deep.context.{MongoDeepSparkContext, DeepSparkContext}
-import com.stratio.deep.rdd.mongodb.MongoEntityRDD
-import com.stratio.deep.testentity.{BookEntity, WordCount}
-import com.stratio.deep.testutils.ContextProperties
+import com.stratio.deep.core.context.DeepSparkContext
+import com.stratio.deep.core.entity.WordCount
+import com.stratio.deep.examples.java.extractorAPI.mongodb.utils.ContextProperties
+import com.stratio.deep.mongodb.config.{MongoConfigFactory, IMongoDeepJobConfig}
+import com.stratio.deep.testentity.BookEntity
 import org.apache.spark.rdd.RDD
 import org.apache.spark.SparkContext._
 
@@ -43,26 +43,26 @@ final object GroupingEntityWithMongoDB {
 
     val p: ContextProperties = new ContextProperties(args)
 
-    val deepContext = new MongoDeepSparkContext(p.getCluster, job, p.getSparkHome, p.getJars)
+    val deepContext = new DeepSparkContext(p.getCluster, job, p.getSparkHome, p.getJars)
 
     val inputConfigEntity: IMongoDeepJobConfig[BookEntity] = MongoConfigFactory.createMongoDB(classOf[BookEntity]).host(host).database(database).collection(inputCollection).initialize
 
-    val inputRDDEntity: RDD[BookEntity] = deepContext.mongoRDD(inputConfigEntity)
+    val inputRDDEntity: RDD[BookEntity] = deepContext.createRDD(inputConfigEntity)
 
     val words: RDD[String] = inputRDDEntity flatMap {
       e: BookEntity => (for (canto <- e.getCantoEntities) yield canto.getText.split(" ")).flatten
     }
 
-    val wordCount : RDD[(String, Integer)] = words map { s:String => (s,1) }
+    val wordCount : RDD[(String, Long)] = words map { s:String => (s,1L) }
 
     val wordCountReduced  = wordCount reduceByKey { (a,b) =>a + b }
 
-    val outputRDD = wordCountReduced map { e:(String, Integer) => new WordCount(e._1, e._2)  }
+    val outputRDD = wordCountReduced map { e:(String, Long) => new WordCount(e._1, e._2)  }
 
     val outputConfigEntity: IMongoDeepJobConfig[WordCount] =
       MongoConfigFactory.createMongoDB(classOf[WordCount]).host(host).database(database).collection(outputCollection).initialize
 
-    MongoEntityRDD.saveEntity(outputRDD, outputConfigEntity)
+//    deepContext.saveRDD(outputRDD, outputConfigEntity)
 
     deepContext.stop
   }
