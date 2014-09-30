@@ -38,7 +38,7 @@ import org.apache.spark.rdd.NewHadoopPartition;
 import scala.Tuple2;
 
 import com.stratio.deep.commons.config.DeepJobConfig;
-import com.stratio.deep.commons.config.IDeepJobConfig;
+import com.stratio.deep.commons.config.HadoopDeepJobConfig;
 import com.stratio.deep.commons.exception.DeepGenericException;
 import com.stratio.deep.commons.rdd.IExtractor;
 import com.stratio.deep.commons.utils.Constants;
@@ -49,7 +49,7 @@ import com.stratio.deep.commons.utils.DeepSparkHadoopMapReduceUtil;
  */
 public abstract class GenericHadoopExtractor<T, K, V, KOut, VOut> implements IExtractor<T> {
 
-    protected IDeepJobConfig<T, ? extends IDeepJobConfig> deepJobConfig;
+    protected DeepJobConfig<T> deepJobConfig;
 
     protected transient RecordReader<K, V> reader;
 
@@ -78,12 +78,13 @@ public abstract class GenericHadoopExtractor<T, K, V, KOut, VOut> implements IEx
     }
 
     @Override
-    public Partition[] getPartitions(DeepJobConfig<T> deepJobConfig) {
+    public <W extends DeepJobConfig<T>> Partition[] getPartitions(W deepJobConfig) {
 
         int id = (Integer) deepJobConfig.getValues().get(Constants.SPARK_RDD_ID);
         jobId = new JobID(jobTrackerId, id);
 
-        Configuration conf = deepJobConfig.getHadoopConfiguration();
+        HadoopDeepJobConfig<T> hadoopDeepJobConfig = (HadoopDeepJobConfig<T>) deepJobConfig;
+        Configuration conf = hadoopDeepJobConfig.getHadoopConfiguration();
 
         JobContext jobContext = DeepSparkHadoopMapReduceUtil.newJobContext(conf, jobId);
 
@@ -152,7 +153,9 @@ public abstract class GenericHadoopExtractor<T, K, V, KOut, VOut> implements IEx
     }
 
     @Override
-    public void initIterator(Partition dp, DeepJobConfig<T> deepJobConfig) {
+    public <W extends DeepJobConfig<T>> void initIterator(Partition dp, W deepJobConfig) {
+
+        HadoopDeepJobConfig<T> hadoopDeepJobConfig = (HadoopDeepJobConfig<T>) deepJobConfig;
 
         int id = (Integer) deepJobConfig.getValues().get(Constants.SPARK_RDD_ID);
         NewHadoopPartition split = (NewHadoopPartition) dp;
@@ -161,7 +164,7 @@ public abstract class GenericHadoopExtractor<T, K, V, KOut, VOut> implements IEx
                 0);
 
         TaskAttemptContext hadoopAttemptContext = DeepSparkHadoopMapReduceUtil.newTaskAttemptContext(
-                deepJobConfig.getHadoopConfiguration(), attemptId);
+                hadoopDeepJobConfig.getHadoopConfiguration(), attemptId);
 
         try {
             reader = inputFormat.createRecordReader(split.serializableHadoopSplit().value(), hadoopAttemptContext);
@@ -172,10 +175,10 @@ public abstract class GenericHadoopExtractor<T, K, V, KOut, VOut> implements IEx
 
     }
 
-    public abstract T transformElement(Tuple2<K, V> tuple, IDeepJobConfig<T, ? extends IDeepJobConfig> deepJobConfig);
+    public abstract <W extends DeepJobConfig<T>> T transformElement(Tuple2<K, V> tuple, W deepJobConfig);
 
     @Override
-    public IExtractor getExtractorInstance(DeepJobConfig<T> config) {
+    public <W extends DeepJobConfig<T>> IExtractor getExtractorInstance(W config) {
         return this;
     }
 
@@ -193,7 +196,9 @@ public abstract class GenericHadoopExtractor<T, K, V, KOut, VOut> implements IEx
     }
 
     @Override
-    public void initSave(DeepJobConfig<T> deepJobConfig, T first) {
+    public <W extends DeepJobConfig<T>> void initSave(W deepJobConfig, T first) {
+
+        HadoopDeepJobConfig<T> hadoopDeepJobConfig = (HadoopDeepJobConfig<T>) deepJobConfig;
         int id = (Integer) deepJobConfig.getValues().get(Constants.SPARK_RDD_ID);
 
         int partitionIndex = (Integer) deepJobConfig.getValues().get(Constants.SPARK_PARTITION_ID);
@@ -202,7 +207,7 @@ public abstract class GenericHadoopExtractor<T, K, V, KOut, VOut> implements IEx
                 0);
 
         hadoopAttemptContext = DeepSparkHadoopMapReduceUtil.newTaskAttemptContext(
-                deepJobConfig.getHadoopConfiguration(), attemptId);
+                hadoopDeepJobConfig.getHadoopConfiguration(), attemptId);
         try {
             writer = outputFormat.getRecordWriter(hadoopAttemptContext);
         } catch (IOException | InterruptedException e) {

@@ -146,7 +146,7 @@ public class ExtractorServerHandler<T> extends SimpleChannelInboundHandler<Actio
     @SuppressWarnings("unchecked")
     private void initExtractor(DeepJobConfig<T> config) {
 
-        Class<? extends IExtractor> extractorClass = config.getExtractorConfiguration().getExtractorImplClass();
+        Class<? extends IExtractor> extractorClass = config.getExtractorImplClass();
         try {
             if (config.getEntityClass().isAssignableFrom(Cells.class)) {
                 this.extractor = extractorClass.newInstance();

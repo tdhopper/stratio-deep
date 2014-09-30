@@ -16,27 +16,26 @@
 package com.stratio.deep.core.rdd;
 
 import static com.stratio.deep.commons.utils.Constants.SPARK_RDD_ID;
+import static com.stratio.deep.commons.utils.Utils.getExtractorInstance;
+import static com.stratio.deep.core.util.ExtractorClientUtil.getExtractorClient;
+import static scala.collection.JavaConversions.asScalaIterator;
 
-import com.stratio.deep.commons.config.ExtractorConfig;
-import com.stratio.deep.core.extractor.client.ExtractorClient;
-import com.stratio.deep.commons.exception.DeepExtractorinitializationException;
-import com.stratio.deep.commons.exception.DeepIOException;
-import com.stratio.deep.commons.rdd.IExtractor;
-import com.stratio.deep.commons.config.DeepJobConfig;
+import java.io.Serializable;
+
 import org.apache.spark.InterruptibleIterator;
 import org.apache.spark.Partition;
 import org.apache.spark.SparkContext;
 import org.apache.spark.TaskContext;
 import org.apache.spark.broadcast.Broadcast;
 import org.apache.spark.rdd.RDD;
+
 import scala.collection.Iterator;
 import scala.reflect.ClassTag$;
 
-import java.io.Serializable;
-
-import static com.stratio.deep.commons.utils.Utils.getExtractorInstance;
-import static com.stratio.deep.core.util.ExtractorClientUtil.getExtractorClient;
-import static scala.collection.JavaConversions.asScalaIterator;
+import com.stratio.deep.commons.config.DeepJobConfig;
+import com.stratio.deep.commons.exception.DeepExtractorinitializationException;
+import com.stratio.deep.commons.exception.DeepIOException;
+import com.stratio.deep.commons.rdd.IExtractor;
 
 /**
  * Created by rcrespo on 11/08/14.
@@ -112,7 +111,7 @@ public class DeepRDD<T> extends RDD<T> implements Serializable {
     private void initExtractorClient() {
         try {
             if (extractorClient == null) {
-                extractorClient = getExtractorInstance(config.getValue().getExtractorConfiguration());
+                extractorClient = getExtractorInstance(config.getValue());
             }
         } catch (DeepExtractorinitializationException e) {
             extractorClient = getExtractorClient();

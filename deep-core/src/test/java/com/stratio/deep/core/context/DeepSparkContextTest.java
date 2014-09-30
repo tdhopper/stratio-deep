@@ -102,7 +102,7 @@ public class DeepSparkContextTest {
 
     private DeepJobConfig createDeepJobConfig() {
         DeepJobConfig extractorConfig = mock(DeepJobConfig.class);
-        when(extractorConfig.getExtractorConfiguration().getExtractorImplClass()).thenReturn(new Object().getClass());
+        when(extractorConfig.getExtractorImplClass()).thenReturn(new Object().getClass());
         // when(extractorConfig.getInputFormatClass()).thenReturn(null);
         return extractorConfig;
     }

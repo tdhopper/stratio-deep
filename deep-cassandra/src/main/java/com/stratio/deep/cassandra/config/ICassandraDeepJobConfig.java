@@ -16,11 +16,10 @@
 
 package com.stratio.deep.cassandra.config;
 
-import com.datastax.driver.core.Session;
-import com.stratio.deep.commons.config.IDeepJobConfig;
-
 import java.io.Serializable;
 import java.util.Map;
+
+import com.datastax.driver.core.Session;
 
 /**
  * Defines the public methods that each Stratio Deep Cassandra configuration object should implement.

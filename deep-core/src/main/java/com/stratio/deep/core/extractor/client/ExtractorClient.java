@@ -27,7 +27,6 @@ import javax.net.ssl.SSLException;
 import org.apache.spark.Partition;
 
 import com.stratio.deep.commons.config.DeepJobConfig;
-import com.stratio.deep.commons.config.ExtractorConfig;
 import com.stratio.deep.commons.exception.DeepExtractorinitializationException;
 import com.stratio.deep.commons.rdd.IExtractor;
 
@@ -90,23 +89,8 @@ public class ExtractorClient<T> implements IExtractor<T> {
     }
 
     @Override
-    public void initIterator(Partition dp, DeepJobConfig<T> config) {
-        handler.initIterator(dp, config);
-    }
-
-    @Override
-    public IExtractor<T> getExtractorInstance(DeepJobConfig<T> config) {
-        return handler.getExtractorInstance(config);
-    }
-
-    @Override
     public void saveRDD(T t) {
         handler.saveRDD(t);
-    }
-
-    @Override
-    public void initSave(DeepJobConfig<T> config, T first) {
-        handler.initSave(config, first);
     }
 
     @Override
@@ -118,11 +102,47 @@ public class ExtractorClient<T> implements IExtractor<T> {
     /*
      * (non-Javadoc)
      * 
-     * @see com.stratio.deep.rdd.IDeepRDD#getPartitions(IDeepJobConfig, int)
+     * @see com.stratio.deep.commons.rdd.IExtractor#getPartitions(com.stratio.deep.commons.config.DeepJobConfig)
      */
     @Override
-    public Partition[] getPartitions(DeepJobConfig<T> config) {
+    public <W extends DeepJobConfig<T>> Partition[] getPartitions(W config) {
+
         return this.handler.getPartitions(config);
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.stratio.deep.commons.rdd.IExtractor#initIterator(org.apache.spark.Partition,
+     * com.stratio.deep.commons.config.DeepJobConfig)
+     */
+    @Override
+    public <W extends DeepJobConfig<T>> void initIterator(Partition dp, W config) {
+
+        handler.initIterator(dp, config);
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.stratio.deep.commons.rdd.IExtractor#getExtractorInstance(com.stratio.deep.commons.config.DeepJobConfig)
+     */
+    @Override
+    public <W extends DeepJobConfig<T>> IExtractor<T> getExtractorInstance(W config) {
+
+        return handler.getExtractorInstance(config);
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.stratio.deep.commons.rdd.IExtractor#initSave(com.stratio.deep.commons.config.DeepJobConfig,
+     * java.lang.Object)
+     */
+    @Override
+    public <W extends DeepJobConfig<T>> void initSave(W config, T first) {
+
+        handler.initSave(config, first);
     }
 
 }

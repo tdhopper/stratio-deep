@@ -47,7 +47,7 @@ public class PrepareSaveFunction<T> extends AbstractFunction1<Iterator<T>, Boxed
     public BoxedUnit apply(Iterator<T> v1) {
         IExtractor<T> extractor;
         try {
-            extractor = getExtractorInstance(deepJobConfig.getExtractorConfiguration());
+            extractor = getExtractorInstance(deepJobConfig);
         } catch (DeepExtractorinitializationException e) {
             extractor = getExtractorClient();
         }

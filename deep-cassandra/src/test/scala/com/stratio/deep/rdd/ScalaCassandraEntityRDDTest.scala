@@ -101,7 +101,7 @@ class ScalaCassandraEntityRDDTest extends AbstractDeepSparkContextTest {
 
   private def initWriteConfig(): DeepJobConfig[DeepScalaPageEntity] = {
 
-    val rddConfig: DeepJobConfig[DeepScalaPageEntity] = new DeepJobConfig[DeepScalaPageEntity](new ExtractorConfig(classOf[DeepScalaPageEntity]))
+    val rddConfig: DeepJobConfig[DeepScalaPageEntity] = new DeepJobConfig[DeepScalaPageEntity](classOf[DeepScalaPageEntity])
     val values: java.util.Map[String, String] = new util.HashMap[String, String]
     //    values.put(ExtractorConstants.HOST, Constants.DEFAULT_CASSANDRA_HOST)
     //    values.put(ExtractorConstants.RPCPORT, CassandraServer.CASSANDRA_THRIFT_PORT)
@@ -112,13 +112,13 @@ class ScalaCassandraEntityRDDTest extends AbstractDeepSparkContextTest {
 
     //    rddConfig.setValues(values)
 
-    rddConfig.getExtractorConfiguration().setExtractorImplClass(classOf[CassandraEntityExtractor[DeepScalaPageEntity]])
+    rddConfig.setExtractorImplClass(classOf[CassandraEntityExtractor[DeepScalaPageEntity]])
     return rddConfig
   }
 
   private def initReadConfig(): DeepJobConfig[DeepScalaPageEntity] = {
 
-    val rddConfig: DeepJobConfig[DeepScalaPageEntity] = new DeepJobConfig[DeepScalaPageEntity](new ExtractorConfig(classOf[DeepScalaPageEntity]))
+    val rddConfig: DeepJobConfig[DeepScalaPageEntity] = new DeepJobConfig[DeepScalaPageEntity](classOf[DeepScalaPageEntity])
     val values: java.util.Map[String, String] = new util.HashMap[String, String]
     values.put(ExtractorConstants.HOST, Constants.DEFAULT_CASSANDRA_HOST)
     values.put(ExtractorConstants.RPCPORT, String.valueOf(CassandraServer.CASSANDRA_THRIFT_PORT))
@@ -128,7 +128,7 @@ class ScalaCassandraEntityRDDTest extends AbstractDeepSparkContextTest {
 
     //    rddConfig.setValues(values)
 
-    rddConfig.getExtractorConfiguration().setExtractorImplClass(classOf[CassandraEntityExtractor[DeepScalaPageEntity]])
+    rddConfig.setExtractorImplClass(classOf[CassandraEntityExtractor[DeepScalaPageEntity]])
     return rddConfig
 
   }

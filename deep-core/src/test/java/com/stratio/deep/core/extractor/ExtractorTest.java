@@ -30,7 +30,6 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import com.stratio.deep.commons.config.DeepJobConfig;
-import com.stratio.deep.commons.config.ExtractorConfig;
 import com.stratio.deep.commons.entity.Cells;
 import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
 import com.stratio.deep.commons.rdd.IExtractor;
@@ -299,7 +298,7 @@ public abstract class ExtractorTest<T> implements Serializable {
     }
 
     private DeepJobConfig<T> getExtractorConfig(Class<T> clazz) {
-        return new DeepJobConfig<>(new ExtractorConfig<>(clazz));
+        return new DeepJobConfig<>(clazz);
     }
 
     @Test
@@ -314,7 +313,7 @@ public abstract class ExtractorTest<T> implements Serializable {
                 .putValue(ExtractorConstants.PORT, String.valueOf(port))
                 .putValue(ExtractorConstants.COLLECTION, output)
                 .putValue(ExtractorConstants.CREATE_ON_WRITE, "true");
-        deepJobConfig.getExtractorConfiguration().setExtractorImplClass(extractor);
+        deepJobConfig.setExtractorImplClass(extractor);
         return deepJobConfig;
     }
 
@@ -325,7 +324,7 @@ public abstract class ExtractorTest<T> implements Serializable {
                 .putValue(ExtractorConstants.DATABASE, database)
                 .putValue(ExtractorConstants.PORT, String.valueOf(port))
                 .putValue(ExtractorConstants.COLLECTION, tableRead);
-        deepJobConfig.getExtractorConfiguration().setExtractorImplClass(extractor);
+        deepJobConfig.setExtractorImplClass(extractor);
         return deepJobConfig;
     }
 
@@ -337,7 +336,7 @@ public abstract class ExtractorTest<T> implements Serializable {
                 .putValue(ExtractorConstants.PORT, String.valueOf(port))
                 .putValue(ExtractorConstants.COLLECTION, tableRead)
                 .putValue(ExtractorConstants.INPUT_COLUMNS, inputColumns);
-        deepJobConfig.getExtractorConfiguration().setExtractorImplClass(extractor);
+        deepJobConfig.setExtractorImplClass(extractor);
         return deepJobConfig;
     }
 
@@ -351,7 +350,7 @@ public abstract class ExtractorTest<T> implements Serializable {
                 .putValue(ExtractorConstants.PORT, String.valueOf(port))
                 .putValue(ExtractorConstants.FILTER_QUERY, filter);
 
-        deepJobConfig.getExtractorConfiguration().setExtractorImplClass(extractor);
+        deepJobConfig.setExtractorImplClass(extractor);
         return deepJobConfig;
     }
 
@@ -360,7 +359,7 @@ public abstract class ExtractorTest<T> implements Serializable {
      */
 
     private boolean isEntityClassCells(DeepJobConfig<T> extractorConfig) {
-        if (extractorConfig.getExtractorConfiguration().getEntityClass().isAssignableFrom(Cells.class)) {
+        if (extractorConfig.getEntityClass().isAssignableFrom(Cells.class)) {
             return true;
         }
         return false;
