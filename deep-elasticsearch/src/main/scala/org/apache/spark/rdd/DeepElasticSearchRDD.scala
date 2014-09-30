@@ -33,9 +33,9 @@ import org.json4s.jackson.Json
 import scala.reflect.ClassTag
 
 class NewHadoopPartition(
-                          rddId: Int,
-                          val index: Int,
-                          @transient rawSplit: InputSplit with Writable)
+  rddId: Int,
+  val index: Int,
+  @transient rawSplit: InputSplit with Writable)
   extends Partition {
 
   val serializableHadoopSplit = new SerializableWritable(rawSplit)
@@ -56,7 +56,7 @@ class NewHadoopPartition(
  */
 @DeveloperApi
 abstract class DeepElasticSearchRDD[T: ClassTag](sc: SparkContext,
-                                                 @transient config: IESDeepJobConfig[T])
+  @transient config: IESDeepJobConfig[T])
   extends RDD[T](sc, Nil)
   with SparkHadoopMapReduceUtil
   with Logging {

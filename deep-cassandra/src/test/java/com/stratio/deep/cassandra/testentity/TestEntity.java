@@ -47,7 +47,7 @@ public class TestEntity extends BaseTestEntity {
     }
 
     public TestEntity(String id, String domain, String url, Integer responseTime, Integer responseCode,
-                      String notMappedField) {
+            String notMappedField) {
         super(domain);
         setId(id);
         this.url = url;
@@ -60,7 +60,6 @@ public class TestEntity extends BaseTestEntity {
     public Long getDownloadTime() {
         return downloadTime;
     }
-
 
     public String getNotMappedField() {
         return notMappedField;
@@ -101,7 +100,8 @@ public class TestEntity extends BaseTestEntity {
     @Override
     public String toString() {
         return "TestEntity [" + (getId() != null ? "id=" + getId() + ", " : "")
-                + (getDomain() != null ? "domain=" + getDomain() + ", " : "") + (url != null ? "url=" + url + ", " : "")
+                + (getDomain() != null ? "domain=" + getDomain() + ", " : "")
+                + (url != null ? "url=" + url + ", " : "")
                 + (responseTime != null ? "responseTime=" + responseTime + ", " : "")
                 + (responseCode != null ? "responseCode=" + responseCode + ", " : "")
                 + (downloadTime != null ? "downloadTime=" + downloadTime + ", " : "")

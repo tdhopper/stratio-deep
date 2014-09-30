@@ -58,7 +58,6 @@ import com.stratio.deep.commons.config.ExtractorConfig;
 import com.stratio.deep.commons.entity.Cell;
 import com.stratio.deep.commons.entity.Cells;
 import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
-import com.stratio.deep.commons.rdd.IExtractor;
 import com.stratio.deep.commons.utils.Constants;
 
 /**
@@ -89,7 +88,7 @@ public final class CassandraJavaRDDTest extends AbstractDeepSparkContextTest {
 
         rddConfig.getExtractorConfiguration().setValues(values);
         rddConfig.getExtractorConfiguration().setExtractorImplClass(
-                (Class<? extends IExtractor<TestEntity>>) CassandraEntityExtractor.class);
+                CassandraEntityExtractor.class);
 
         logger.info("Constructed configuration object: " + rddConfig);
         logger.info("Constructiong cassandraRDD");

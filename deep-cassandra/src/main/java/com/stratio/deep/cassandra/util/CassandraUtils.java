@@ -62,14 +62,14 @@ public class CassandraUtils {
     }
 
     public static <W> void doCql3SaveToCassandra(RDD<W> rdd, ICassandraDeepJobConfig<W> writeConfig,
-                                                 Function1<W, Tuple2<Cells, Cells>> transformer) {
+            Function1<W, Tuple2<Cells, Cells>> transformer) {
         if (!writeConfig.getIsWriteConfig()) {
             throw new IllegalArgumentException("Provided configuration object is not suitable for writing");
         }
         Tuple2<Map<String, ByteBuffer>, Map<String, ByteBuffer>> tuple = new Tuple2<>(null, null);
 
         RDD<Tuple2<Cells, Cells>> mappedRDD = rdd.map(transformer,
-                ClassTag$.MODULE$.<Tuple2<Cells, Cells>>apply(tuple.getClass()));
+                ClassTag$.MODULE$.<Tuple2<Cells, Cells>> apply(tuple.getClass()));
 
         ((GenericDeepJobConfig) writeConfig).createOutputTableIfNeeded(mappedRDD.first());
 
@@ -86,7 +86,8 @@ public class CassandraUtils {
             for (Tuple2<Cells, Cells> t : split) {
                 Tuple2<String[], Object[]> bindVars = Utils.prepareTuple4CqlDriver(t);
 
-                Insert insert = QueryBuilder.insertInto(quote(writeConfig.getKeyspace()), quote(writeConfig.getTable()))
+                Insert insert = QueryBuilder
+                        .insertInto(quote(writeConfig.getKeyspace()), quote(writeConfig.getTable()))
                         .values(bindVars._1(), bindVars._2());
 
                 batch.add(insert);
@@ -99,13 +100,13 @@ public class CassandraUtils {
     /**
      * Provided the mapping function <i>transformer</i> that transforms a generic RDD to an RDD<Tuple2<Cells, Cells>>,
      * this generic method persists the RDD to underlying Cassandra datastore.
-     *
+     * 
      * @param rdd
      * @param writeConfig
      * @param transformer
      */
     public static <W> void doSaveToCassandra(RDD<W> rdd, final ICassandraDeepJobConfig<W> writeConfig,
-                                             Function1<W, Tuple2<Cells, Cells>> transformer) {
+            Function1<W, Tuple2<Cells, Cells>> transformer) {
 
         if (!writeConfig.getIsWriteConfig()) {
             throw new IllegalArgumentException("Provided configuration object is not suitable for writing");
@@ -114,7 +115,7 @@ public class CassandraUtils {
         Tuple2<Map<String, ByteBuffer>, Map<String, ByteBuffer>> tuple = new Tuple2<>(null, null);
 
         final RDD<Tuple2<Cells, Cells>> mappedRDD = rdd.map(transformer,
-                ClassTag$.MODULE$.<Tuple2<Cells, Cells>>apply(tuple.getClass()));
+                ClassTag$.MODULE$.<Tuple2<Cells, Cells>> apply(tuple.getClass()));
 
         ((GenericDeepJobConfig) writeConfig).createOutputTableIfNeeded(mappedRDD.first());
 
@@ -136,17 +137,20 @@ public class CassandraUtils {
                         return null;
                     }
                 }, uClassTag
-        );
+                );
 
     }
 
     /**
      * Returns an instance of the Cassandra validator that matches the provided object.
-     *
-     * @param obj the object to use to resolve the cassandra marshaller.
-     * @param <T> the generic object type.
+     * 
+     * @param obj
+     *            the object to use to resolve the cassandra marshaller.
+     * @param <T>
+     *            the generic object type.
      * @return an instance of the Cassandra validator that matches the provided object.
-     * @throws com.stratio.deep.commons.exception.DeepGenericException if no validator can be found for the specified object.
+     * @throws com.stratio.deep.commons.exception.DeepGenericException
+     *             if no validator can be found for the specified object.
      */
     public static <T> AbstractType<?> marshallerInstance(T obj) {
         AbstractType<?> abstractType = MAP_JAVA_TYPE_TO_ABSTRACT_TYPE.get(obj.getClass());
@@ -171,19 +175,22 @@ public class CassandraUtils {
     }
 
     /**
-     * Generates the update query for the provided IDeepType.
-     * The UPDATE query takes into account all the columns of the testentity, even those containing the null value.
-     * We do not generate the key part of the update query. The provided query will be concatenated with the key part
-     * by CqlRecordWriter.
-     *
-     * @param keys               the row  keys wrapped inside a Cells object.
-     * @param values             all the other row columns wrapped inside a Cells object.
-     * @param outputKeyspace     the output keyspace.
-     * @param outputColumnFamily the output column family.
+     * Generates the update query for the provided IDeepType. The UPDATE query takes into account all the columns of the
+     * testentity, even those containing the null value. We do not generate the key part of the update query. The
+     * provided query will be concatenated with the key part by CqlRecordWriter.
+     * 
+     * @param keys
+     *            the row keys wrapped inside a Cells object.
+     * @param values
+     *            all the other row columns wrapped inside a Cells object.
+     * @param outputKeyspace
+     *            the output keyspace.
+     * @param outputColumnFamily
+     *            the output column family.
      * @return the update query statement.
      */
     public static String updateQueryGenerator(Cells keys, Cells values, String outputKeyspace,
-                                              String outputColumnFamily) {
+            String outputColumnFamily) {
 
         StringBuilder sb = new StringBuilder("UPDATE ").append(outputKeyspace).append(".").append(outputColumnFamily)
                 .append(" SET ");
@@ -221,15 +228,19 @@ public class CassandraUtils {
 
     /**
      * Generates a create table cql statement from the given Cells description.
-     *
-     * @param keys               the row  keys wrapped inside a Cells object.
-     * @param values             all the other row columns wrapped inside a Cells object.
-     * @param outputKeyspace     the output keyspace.
-     * @param outputColumnFamily the output column family.
+     * 
+     * @param keys
+     *            the row keys wrapped inside a Cells object.
+     * @param values
+     *            all the other row columns wrapped inside a Cells object.
+     * @param outputKeyspace
+     *            the output keyspace.
+     * @param outputColumnFamily
+     *            the output column family.
      * @return the create table statement.
      */
     public static String createTableQueryGenerator(Cells keys, Cells values, String outputKeyspace,
-                                                   String outputColumnFamily) {
+            String outputColumnFamily) {
 
         if (keys == null || StringUtils.isEmpty(outputKeyspace)
                 || StringUtils.isEmpty(outputColumnFamily)) {
@@ -251,8 +262,8 @@ public class CassandraUtils {
                 sb.append(", ");
             }
 
-//            CellValidator cellValidator = CellValidator.cellValidator(key.getCellValue());
-            sb.append(cellName).append(" ").append(((CassandraCell)key).getCql3TypeClassName());
+            // CellValidator cellValidator = CellValidator.cellValidator(key.getCellValue());
+            sb.append(cellName).append(" ").append(((CassandraCell) key).getCql3TypeClassName());
 
             if (((CassandraCell) key).isPartitionKey()) {
                 partitionKey.add(cellName);
@@ -266,7 +277,7 @@ public class CassandraUtils {
         if (values != null) {
             for (Cell key : values) {
                 sb.append(", ");
-                sb.append(quote(key.getCellName())).append(" ").append(((CassandraCell)key).getCql3TypeClassName());
+                sb.append(quote(key.getCellName())).append(" ").append(((CassandraCell) key).getCql3TypeClassName());
             }
         }
 
@@ -314,13 +325,16 @@ public class CassandraUtils {
     }
 
     /**
-     * Convers an instance of type <T> to a tuple of ( Map<String, ByteBuffer>, List<ByteBuffer> ).
-     * The first map contains the key column names and the corresponding values.
-     * The ByteBuffer list contains the value of the columns that will be bounded to CQL query parameters.
-     *
-     * @param e   the entity object to process.
-     * @param <T> the entity object generic type.
-     * @return a pair whose first element is a Cells object containing key Cell(s) and whose second element contains all of the other Cell(s).
+     * Convers an instance of type <T> to a tuple of ( Map<String, ByteBuffer>, List<ByteBuffer> ). The first map
+     * contains the key column names and the corresponding values. The ByteBuffer list contains the value of the columns
+     * that will be bounded to CQL query parameters.
+     * 
+     * @param e
+     *            the entity object to process.
+     * @param <T>
+     *            the entity object generic type.
+     * @return a pair whose first element is a Cells object containing key Cell(s) and whose second element contains all
+     *         of the other Cell(s).
      */
     public static <T extends IDeepType> Tuple2<Cells, Cells> deepType2tuple(T e) {
 

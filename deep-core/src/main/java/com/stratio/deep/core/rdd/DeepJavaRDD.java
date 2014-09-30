@@ -24,15 +24,13 @@ import scala.reflect.ClassTag$;
  */
 public class DeepJavaRDD<T> extends JavaRDD<T> {
 
-
     public DeepJavaRDD(DeepRDD<T> rdd) {
-        super(rdd, ClassTag$.MODULE$.<T>apply(rdd.config.value().getEntityClass()));
+        super(rdd, ClassTag$.MODULE$.<T> apply(rdd.config.value().getEntityClass()));
     }
-
 
     @Override
     public ClassTag<T> classTag() {
-        return ClassTag$.MODULE$.<T>apply(((DeepRDD<T>) this.rdd()).config.value().getEntityClass());
+        return ClassTag$.MODULE$.<T> apply(((DeepRDD<T>) this.rdd()).config.value().getEntityClass());
     }
 
 }

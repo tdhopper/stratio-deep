@@ -29,7 +29,6 @@ import scala.Tuple2;
 import com.stratio.deep.commons.config.DeepJobConfig;
 import com.stratio.deep.commons.config.ExtractorConfig;
 import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
-import com.stratio.deep.commons.rdd.IExtractor;
 import com.stratio.deep.core.context.DeepSparkContext;
 import com.stratio.deep.core.entity.MessageTestEntity;
 import com.stratio.deep.mongodb.extractor.MongoEntityExtractor;
@@ -78,7 +77,7 @@ public final class WritingEntityToMongoDB {
         inputConfigEntity.putValue(ExtractorConstants.HOST, host).putValue(ExtractorConstants.DATABASE, database)
                 .putValue(ExtractorConstants.COLLECTION, inputCollection);
         inputConfigEntity
-                .setExtractorImplClass((Class<? extends IExtractor<MessageTestEntity>>) MongoEntityExtractor.class);
+                .setExtractorImplClass(MongoEntityExtractor.class);
 
         RDD<MessageTestEntity> inputRDDEntity = deepContext.createRDD(inputConfigEntity);
 
@@ -87,7 +86,7 @@ public final class WritingEntityToMongoDB {
         outputConfigEntity.putValue(ExtractorConstants.HOST, host).putValue(ExtractorConstants.DATABASE, database)
                 .putValue(ExtractorConstants.COLLECTION, outputCollection);
         outputConfigEntity
-                .setExtractorImplClass((Class<? extends IExtractor<MessageTestEntity>>) MongoEntityExtractor.class);
+                .setExtractorImplClass(MongoEntityExtractor.class);
 
         deepContext.saveRDD(inputRDDEntity, outputConfigEntity);
 

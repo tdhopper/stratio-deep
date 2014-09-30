@@ -16,17 +16,19 @@
 
 package com.stratio.deep.core.entity;
 
+import java.util.List;
+
 import com.stratio.deep.commons.annotations.DeepEntity;
 import com.stratio.deep.commons.annotations.DeepField;
 import com.stratio.deep.commons.entity.IDeepType;
-
-import java.util.List;
 
 /**
  * Created by rcrespo on 25/06/14.
  */
 @DeepEntity
 public class BookEntity implements IDeepType {
+
+    private static final long serialVersionUID = 16425739542757842L;
 
     @DeepField(fieldName = "_id")
     private String id;
@@ -44,7 +46,6 @@ public class BookEntity implements IDeepType {
     public void setId(String id) {
         this.id = id;
     }
-
 
     public List<CantoEntity> getCantoEntities() {
         return cantoEntities;

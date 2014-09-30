@@ -27,9 +27,8 @@ import java.util.Map;
 /**
  * Class containing the appropriate configuration for a MongoEntityRDD.
  * <p/>
- * Remember to call {@link #initialize()} after having configured all the
- * properties.
- *
+ * Remember to call {@link #initialize()} after having configured all the properties.
+ * 
  * @param <T>
  */
 public final class EntityDeepJobConfigMongoDB<T extends IDeepType> extends GenericDeepJobConfigMongoDB<T> {
@@ -72,9 +71,6 @@ public final class EntityDeepJobConfigMongoDB<T extends IDeepType> extends Gener
         return this;
     }
 
-
-
-
     public Map<String, String> getMapDBNameToEntityName() {
         return mapDBNameToEntityName;
     }
@@ -82,6 +78,5 @@ public final class EntityDeepJobConfigMongoDB<T extends IDeepType> extends Gener
     public void setMapDBNameToEntityName(Map<String, String> mapDBNameToEntityName) {
         this.mapDBNameToEntityName = mapDBNameToEntityName;
     }
-
 
 }

@@ -23,5 +23,4 @@ import org.apache.spark.Partition;
  */
 public interface IDeepSparkPartition extends IDeepPartition, Partition {
 
-
 }

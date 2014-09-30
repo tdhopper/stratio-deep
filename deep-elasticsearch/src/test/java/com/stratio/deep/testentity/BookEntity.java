@@ -45,7 +45,6 @@ public class BookEntity implements IDeepType {
         this.id = id;
     }
 
-
     public List<CantoEntity> getCantoEntities() {
         return cantoEntities;
     }

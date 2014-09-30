@@ -18,7 +18,7 @@ package com.stratio.deep.commons.exception;
 
 /**
  * Generic Deep exception.
- *
+ * 
  * @author Luca Rosellini <luca@stratio.com>
  */
 public class DeepGenericException extends RuntimeException {

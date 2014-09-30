@@ -18,7 +18,6 @@ package com.stratio.deep.mongodb.config;
 
 import com.stratio.deep.commons.entity.Cells;
 
-
 public class CellDeepJobConfigMongoDB extends GenericDeepJobConfigMongoDB<Cells> {
 
     private static final long serialVersionUID = -598862509865396541L;
@@ -31,15 +30,10 @@ public class CellDeepJobConfigMongoDB extends GenericDeepJobConfigMongoDB<Cells>
         dummyCells = new Cells();
     }
 
-
-
     @SuppressWarnings("unchecked")
     @Override
     public Class<Cells> getEntityClass() {
         return (Class<Cells>) dummyCells.getClass();
     }
-
-
-
 
 }

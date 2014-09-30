@@ -86,7 +86,7 @@ public final class WritingEntityToES {
         values.put(ExtractorConstants.DATABASE, database);
         values.put(ExtractorConstants.HOST, host);
 
-        config.setExtractorImplClass((Class<? extends IExtractor<BookEntity>>) ESEntityExtractor.class);
+        config.setExtractorImplClass(ESEntityExtractor.class);
         config.setEntityClass(BookEntity.class);
 
         config.setValues(values);
@@ -138,7 +138,7 @@ public final class WritingEntityToES {
 
         DeepJobConfig<WordCount> outputConfigEntity = new DeepJobConfig(new ExtractorConfig(WordCount.class));
         outputConfigEntity.putValue(ExtractorConstants.HOST, host).putValue(ExtractorConstants.DATABASE, database2);
-        outputConfigEntity.setExtractorImplClass((Class<? extends IExtractor<WordCount>>) ESEntityExtractor.class);
+        outputConfigEntity.setExtractorImplClass(ESEntityExtractor.class);
 
         deepContext.saveRDD(outputRDD.rdd(), outputConfigEntity);
 

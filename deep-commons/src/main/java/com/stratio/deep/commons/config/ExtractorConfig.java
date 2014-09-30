@@ -30,7 +30,7 @@ public class ExtractorConfig<T> implements Serializable {
 
     private Map<String, Serializable> values = new HashMap<>();
 
-    private Class<? extends IExtractor<T>> extractorImplClass;
+    private Class<? extends IExtractor> extractorImplClass;
 
     private String extractorImplClassName;
 
@@ -49,11 +49,11 @@ public class ExtractorConfig<T> implements Serializable {
         this.values = values;
     }
 
-    public Class<? extends IExtractor<T>> getExtractorImplClass() {
+    public Class<? extends IExtractor> getExtractorImplClass() {
         return extractorImplClass;
     }
 
-    public void setExtractorImplClass(Class<? extends IExtractor<T>> extractorImplClass) {
+    public void setExtractorImplClass(Class<? extends IExtractor> extractorImplClass) {
         this.extractorImplClass = extractorImplClass;
     }
 

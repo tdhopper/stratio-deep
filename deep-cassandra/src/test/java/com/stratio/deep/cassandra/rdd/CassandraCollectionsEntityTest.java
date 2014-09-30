@@ -63,7 +63,6 @@ import com.stratio.deep.commons.config.DeepJobConfig;
 import com.stratio.deep.commons.config.ExtractorConfig;
 import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
 import com.stratio.deep.commons.functions.AbstractSerializableFunction;
-import com.stratio.deep.commons.rdd.IExtractor;
 import com.stratio.deep.commons.utils.Constants;
 
 /**
@@ -236,8 +235,10 @@ public class CassandraCollectionsEntityTest extends CassandraRDDTest<Cql3Collect
         values.put(ExtractorConstants.BISECT_FACTOR, testBisectFactor);
         values.put(ExtractorConstants.CQLPORT, CassandraServer.CASSANDRA_CQL_PORT);
         rddConfig.setValues(values);
+        rddConfig.getExtractorConfiguration().setExtractorImplClassName(
+                "com.stratio.deep.cassandra.extractor.CassandraEntityExtractor");
         rddConfig.getExtractorConfiguration().setExtractorImplClass(
-                (Class<? extends IExtractor<Cql3CollectionsTestEntity>>) CassandraEntityExtractor.class);
+                CassandraEntityExtractor.class);
         return rddConfig;
 
     }
@@ -256,8 +257,8 @@ public class CassandraCollectionsEntityTest extends CassandraRDDTest<Cql3Collect
         values.put(ExtractorConstants.CQLPORT, CassandraServer.CASSANDRA_CQL_PORT);
         values.put(ExtractorConstants.CREATE_ON_WRITE, true);
         rddConfig.setValues(values);
-        rddConfig.getExtractorConfiguration().setExtractorImplClass(
-                (Class<? extends IExtractor<Cql3CollectionsTestEntity>>) CassandraEntityExtractor.class);
+        rddConfig.getExtractorConfiguration().setExtractorImplClassName(
+                "com.stratio.deep.cassandra.extractor.CassandraEntityExtractor");
         return rddConfig;
     }
 

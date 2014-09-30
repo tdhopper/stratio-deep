@@ -33,8 +33,8 @@ import org.testng.annotations.Test;
 
 import static org.testng.Assert.fail;
 
-@Test(suiteName = "cassandraRddTests", groups = {"GenericDeepJobConfigTest"},
-        dependsOnGroups = {"CassandraJavaRDDTest"})
+@Test(suiteName = "cassandraRddTests", groups = { "GenericDeepJobConfigTest" },
+        dependsOnGroups = { "CassandraJavaRDDTest" })
 public class GenericConfigFactoryTest extends AbstractDeepSparkContextTest {
     class NotAnnotatedTestEntity implements IDeepType {
         private static final long serialVersionUID = -2603126590709315326L;
@@ -69,7 +69,7 @@ public class GenericConfigFactoryTest extends AbstractDeepSparkContextTest {
 
         djc.rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT).cqlPort(CassandraServer.CASSANDRA_CQL_PORT)
                 .columnFamily(COLUMN_FAMILY).keyspace(KEYSPACE_NAME).inputColumns("not_existent_col1",
-                "not_existent_col2");
+                        "not_existent_col2");
 
         try {
             djc.initialize();
@@ -163,7 +163,6 @@ public class GenericConfigFactoryTest extends AbstractDeepSparkContextTest {
 
         }
 
-
         try {
             djc.getEntityClass();
         } catch (DeepIllegalAccessException e) {
@@ -256,7 +255,6 @@ public class GenericConfigFactoryTest extends AbstractDeepSparkContextTest {
             fail(e.getMessage());
         }
 
-
         djc.readConsistencyLevel(ConsistencyLevel.LOCAL_ONE.name());
 
         try {
@@ -300,7 +298,8 @@ public class GenericConfigFactoryTest extends AbstractDeepSparkContextTest {
     @Test
     public void testWronglyMappedField() {
 
-        ICassandraDeepJobConfig<WronglyMappedTestEntity> djc = CassandraConfigFactory.create(WronglyMappedTestEntity.class).host
+        ICassandraDeepJobConfig<WronglyMappedTestEntity> djc = CassandraConfigFactory
+                .create(WronglyMappedTestEntity.class).host
                 (Constants.DEFAULT_CASSANDRA_HOST).rpcPort(CassandraServer.CASSANDRA_THRIFT_PORT)
                 .cqlPort(CassandraServer.CASSANDRA_CQL_PORT).keyspace(KEYSPACE_NAME).columnFamily(COLUMN_FAMILY);
 
@@ -316,7 +315,8 @@ public class GenericConfigFactoryTest extends AbstractDeepSparkContextTest {
 
     @Test
     public void testValidationNotAnnotadedTestEntity() {
-        ICassandraDeepJobConfig<NotAnnotatedTestEntity> djc = CassandraConfigFactory.create(NotAnnotatedTestEntity.class)
+        ICassandraDeepJobConfig<NotAnnotatedTestEntity> djc = CassandraConfigFactory
+                .create(NotAnnotatedTestEntity.class)
                 .keyspace("a").columnFamily("cf");
         try {
             djc.initialize();

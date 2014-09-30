@@ -57,7 +57,6 @@ public class GenericConfigFactoryMongoDBTest {
     public void testCollectionValidation() {
         IMongoDeepJobConfig<MessageTestEntity> djc = MongoConfigFactory.createMongoDB(MessageTestEntity.class);
 
-
         djc.host(HOST_TEST).database(DATATABASE_TEST);
 
         try {
@@ -76,7 +75,6 @@ public class GenericConfigFactoryMongoDBTest {
     public void testHostValidation() {
         IMongoDeepJobConfig<MessageTestEntity> djc = MongoConfigFactory.createMongoDB(MessageTestEntity.class);
 
-
         djc.database(DATATABASE_TEST).collection(COLLECTION_TEST);
 
         try {
@@ -85,7 +83,6 @@ public class GenericConfigFactoryMongoDBTest {
         } catch (IllegalArgumentException iae) {
             // OK
             log.info("Correctly catched IllegalArgumentException: " + iae.getLocalizedMessage());
-
 
         }
 
@@ -113,15 +110,14 @@ public class GenericConfigFactoryMongoDBTest {
         assertEquals(djc2.getHostList().get(1), HOST_TEST_2);
         assertEquals(djc2.getHostList().get(2), HOST_TEST_3);
 
-
     }
 
     @Test
     public void testEntity() {
         IMongoDeepJobConfig<MessageTestEntity> djc = MongoConfigFactory.createMongoDB(MessageTestEntity.class);
 
-        djc.host(HOST_TEST).database(DATATABASE_TEST).collection(COLLECTION_TEST).username(USER_TEST).password(PASSWORD_TEST);
-
+        djc.host(HOST_TEST).database(DATATABASE_TEST).collection(COLLECTION_TEST).username(USER_TEST)
+                .password(PASSWORD_TEST);
 
         djc.initialize();
 
@@ -137,7 +133,6 @@ public class GenericConfigFactoryMongoDBTest {
         djcCell.initialize();
 
         assertEquals(djcCell.getEntityClass(), Cells.class);
-
 
     }
 }

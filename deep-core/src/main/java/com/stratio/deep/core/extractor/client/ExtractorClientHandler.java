@@ -14,7 +14,6 @@
  */
 package com.stratio.deep.core.extractor.client;
 
-
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
@@ -66,10 +65,9 @@ public class ExtractorClientHandler<T> extends SimpleChannelInboundHandler<Respo
 
     /*
      * (non-Javadoc)
-     *
-     * @see
-     * io.netty.channel.SimpleChannelInboundHandler#channelRead0(io.netty.channel.ChannelHandlerContext
-     * , java.lang.Object)
+     * 
+     * @see io.netty.channel.SimpleChannelInboundHandler#channelRead0(io.netty.channel.ChannelHandlerContext ,
+     * java.lang.Object)
      */
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, Response msg) throws Exception {
@@ -78,7 +76,7 @@ public class ExtractorClientHandler<T> extends SimpleChannelInboundHandler<Respo
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see com.stratio.deep.rdd.IDeepRDD#getPartitions(org.apache.spark.broadcast.Broadcast, int)
      */
     @Override
@@ -90,7 +88,7 @@ public class ExtractorClientHandler<T> extends SimpleChannelInboundHandler<Respo
 
         Response response;
         boolean interrupted = false;
-        for (; ; ) {
+        for (;;) {
             try {
                 response = answer.take();
                 break;
@@ -114,7 +112,7 @@ public class ExtractorClientHandler<T> extends SimpleChannelInboundHandler<Respo
 
         Response response;
         boolean interrupted = false;
-        for (; ; ) {
+        for (;;) {
             try {
                 response = answer.take();
                 break;
@@ -130,7 +128,6 @@ public class ExtractorClientHandler<T> extends SimpleChannelInboundHandler<Respo
         return;
     }
 
-
     @Override
     public boolean hasNext() {
         HasNextAction hasNextAction = new HasNextAction<>();
@@ -139,7 +136,7 @@ public class ExtractorClientHandler<T> extends SimpleChannelInboundHandler<Respo
 
         Response response;
         boolean interrupted = false;
-        for (; ; ) {
+        for (;;) {
             try {
                 response = answer.take();
                 break;
@@ -163,7 +160,7 @@ public class ExtractorClientHandler<T> extends SimpleChannelInboundHandler<Respo
 
         Response response;
         boolean interrupted = false;
-        for (; ; ) {
+        for (;;) {
             try {
                 response = answer.take();
                 break;
@@ -179,7 +176,6 @@ public class ExtractorClientHandler<T> extends SimpleChannelInboundHandler<Respo
         return ((NextResponse<T>) response).getData();
     }
 
-
     @Override
     public void initIterator(Partition dp, DeepJobConfig<T> config) {
         InitIteratorAction<T> initIteratorAction = new InitIteratorAction<>(dp, config);
@@ -188,7 +184,7 @@ public class ExtractorClientHandler<T> extends SimpleChannelInboundHandler<Respo
 
         Response response;
         boolean interrupted = false;
-        for (; ; ) {
+        for (;;) {
             try {
                 response = answer.take();
                 break;
@@ -211,7 +207,7 @@ public class ExtractorClientHandler<T> extends SimpleChannelInboundHandler<Respo
 
         Response response;
         boolean interrupted = false;
-        for (; ; ) {
+        for (;;) {
             try {
                 response = answer.take();
                 break;
@@ -235,31 +231,7 @@ public class ExtractorClientHandler<T> extends SimpleChannelInboundHandler<Respo
 
         Response response;
         boolean interrupted = false;
-        for (; ; ) {
-            try {
-                response = answer.take();
-                break;
-            } catch (InterruptedException ignore) {
-                interrupted = true;
-            }
-        }
-
-        if (interrupted) {
-            Thread.currentThread().interrupt();
-        }
-
-        return ;
-    }
-
-    @Override
-    public void initSave(DeepJobConfig<T> config, T first) {
-        InitSaveAction<T> initSaveAction = new InitSaveAction<>(config, first);
-
-        channel.writeAndFlush(initSaveAction);
-
-        Response response;
-        boolean interrupted = false;
-        for (; ; ) {
+        for (;;) {
             try {
                 response = answer.take();
                 break;
@@ -275,7 +247,28 @@ public class ExtractorClientHandler<T> extends SimpleChannelInboundHandler<Respo
         return;
     }
 
+    @Override
+    public void initSave(DeepJobConfig<T> config, T first) {
+        InitSaveAction<T> initSaveAction = new InitSaveAction<>(config, first);
 
+        channel.writeAndFlush(initSaveAction);
 
+        Response response;
+        boolean interrupted = false;
+        for (;;) {
+            try {
+                response = answer.take();
+                break;
+            } catch (InterruptedException ignore) {
+                interrupted = true;
+            }
+        }
+
+        if (interrupted) {
+            Thread.currentThread().interrupt();
+        }
+
+        return;
+    }
 
 }

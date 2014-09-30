@@ -37,37 +37,33 @@ public interface IESDeepJobConfig<T> extends IDeepJobConfig<T, IESDeepJobConfig<
 
     /**
      * Sets the list of available ElasticSearch hosts.
-     *
-     * @param host the list of available ElasticSearch hosts.
+     * 
+     * @param host
+     *            the list of available ElasticSearch hosts.
      * @return this object.
      */
     IESDeepJobConfig<T> host(List<String> host);
-
 
     /**
      * @return the hadoop configuration object if the concrete implementation has one, null otherwise.
      */
     Configuration getHadoopConfiguration();
 
-
-
     /**
      * Filter query
-     *
+     * 
      * @param query
      * @return this object.
      */
     IESDeepJobConfig<T> filterQuery(String query);
 
-
     /**
      * Sorting
-     *
+     * 
      * @param sort
      * @return this object.
      */
     IESDeepJobConfig<T> sort(String sort);
-
 
     /**
      * @param inputKey
@@ -79,6 +75,5 @@ public interface IESDeepJobConfig<T> extends IDeepJobConfig<T, IESDeepJobConfig<
      * @return Hosts list
      */
     List<String> getHostList();
-
 
 }

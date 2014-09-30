@@ -42,19 +42,17 @@ import static java.util.Collections.unmodifiableCollection;
 /**
  * Defines a serializable CellValidator. <br/>
  * <p/>
- * This object wraps the complexity of obtaining the Cassandra's AbstractType
- * associated to a {@link com.stratio.deep.commons.entity.Cell}.
+ * This object wraps the complexity of obtaining the Cassandra's AbstractType associated to a
+ * {@link com.stratio.deep.commons.entity.Cell}.
  * <p/>
- * In the case of collection types, a simple cassandra marshaller qualified name
- * is not enough to fully generate an AbstractType, we also need the type(s) the
- * collection holds.
+ * In the case of collection types, a simple cassandra marshaller qualified name is not enough to fully generate an
+ * AbstractType, we also need the type(s) the collection holds.
  */
 public class CellValidator {
     private static final String DEFAULT_VALIDATOR_CLASSNAME = "org.apache.cassandra.db.marshal.UTF8Type";
 
-
     public static final Map<Class, CQL3Type.Native> MAP_JAVA_TYPE_TO_CQL_TYPE =
-            ImmutableMap.<Class, CQL3Type.Native>builder()
+            ImmutableMap.<Class, CQL3Type.Native> builder()
                     .put(String.class, CQL3Type.Native.TEXT)
                     .put(Integer.class, CQL3Type.Native.INT)
                     .put(Boolean.class, CQL3Type.Native.BOOLEAN)
@@ -69,26 +67,26 @@ public class CellValidator {
                     .put(BigInteger.class, CQL3Type.Native.VARINT)
                     .put(UUID.class, CQL3Type.Native.UUID)
                     .build();
-//
-//    public static final Map<CQL3Type.Native, Class> CQL_TYPE_TO_MAP_JAVA_TYPE =
-//            ImmutableMap.<CQL3Type.Native, Class>builder()
-//                    .put(CQL3Type.Native.TEXT, String.class)
-//                    .put(CQL3Type.Native.INT, Integer.class)
-//                    .put(CQL3Type.Native.BOOLEAN, Boolean.class)
-//                    .put(CQL3Type.Native.TIMESTAMP, Date.class)
-//                    .put(CQL3Type.Native.DECIMAL, BigDecimal.class)
-//                    .put(CQL3Type.Native.BIGINT, Long.class)
-//                    .put(CQL3Type.Native.DOUBLE, Double.class)
-//                    .put(CQL3Type.Native.FLOAT, Float.class)
-//                    .put(CQL3Type.Native.INET, InetAddress.class)
-//                    .put(CQL3Type.Native.INET, Inet4Address.class)
-//                    .put(CQL3Type.Native.INET, Inet6Address.class)
-//                    .put(CQL3Type.Native.VARINT, BigInteger.class)
-//                    .put(CQL3Type.Native.UUID, UUID.class)
-//                    .build();
+    //
+    // public static final Map<CQL3Type.Native, Class> CQL_TYPE_TO_MAP_JAVA_TYPE =
+    // ImmutableMap.<CQL3Type.Native, Class>builder()
+    // .put(CQL3Type.Native.TEXT, String.class)
+    // .put(CQL3Type.Native.INT, Integer.class)
+    // .put(CQL3Type.Native.BOOLEAN, Boolean.class)
+    // .put(CQL3Type.Native.TIMESTAMP, Date.class)
+    // .put(CQL3Type.Native.DECIMAL, BigDecimal.class)
+    // .put(CQL3Type.Native.BIGINT, Long.class)
+    // .put(CQL3Type.Native.DOUBLE, Double.class)
+    // .put(CQL3Type.Native.FLOAT, Float.class)
+    // .put(CQL3Type.Native.INET, InetAddress.class)
+    // .put(CQL3Type.Native.INET, Inet4Address.class)
+    // .put(CQL3Type.Native.INET, Inet6Address.class)
+    // .put(CQL3Type.Native.VARINT, BigInteger.class)
+    // .put(CQL3Type.Native.UUID, UUID.class)
+    // .build();
 
     private static final Map<String, DataType.Name> MAP_JAVA_TYPE_TO_DATA_TYPE_NAME =
-            ImmutableMap.<String, DataType.Name>builder()
+            ImmutableMap.<String, DataType.Name> builder()
                     .put(UTF8Type.class.getCanonicalName(), DataType.Name.TEXT)
                     .put(Int32Type.class.getCanonicalName(), DataType.Name.INT)
                     .put(BooleanType.class.getCanonicalName(), DataType.Name.BOOLEAN)
@@ -126,8 +124,9 @@ public class CellValidator {
          * <li>SET: when the provided validator is SetType.class</li>
          * </ul>
          * </p>
-         *
-         * @param type the marshaller Class object.
+         * 
+         * @param type
+         *            the marshaller Class object.
          * @return the Kind associated to the provided marhaller Class object.
          */
         public static Kind validatorClassToKind(Class<? extends AbstractType> type) {
@@ -149,20 +148,23 @@ public class CellValidator {
         /**
          * Returns the Kind associated to the provided object instance.
          * <p/>
-         * <p>To be more specific, returns:
+         * <p>
+         * To be more specific, returns:
          * <ul>
-         * <li>{@link CellValidator.Kind#SET}: when the provided instance object is an
-         * instance of {@link java.util.Set}</li>
-         * <li>{@link CellValidator.Kind#LIST}: when the provided instance object is an
-         * instance of {@link java.util.List}</li>
-         * <li>{@link CellValidator.Kind#MAP}: when the provided instance object is an
-         * instance of {@link java.util.Map}</li>
+         * <li>{@link CellValidator.Kind#SET}: when the provided instance object is an instance of {@link java.util.Set}
+         * </li>
+         * <li>{@link CellValidator.Kind#LIST}: when the provided instance object is an instance of
+         * {@link java.util.List}</li>
+         * <li>{@link CellValidator.Kind#MAP}: when the provided instance object is an instance of {@link java.util.Map}
+         * </li>
          * <li>{@link CellValidator.Kind#NOT_A_COLLECTION}: otherwise.</li>
          * </ul>
          * </p>
-         *
-         * @param object an object instance.
-         * @param <T>    the generic type of the provided object instance.
+         * 
+         * @param object
+         *            an object instance.
+         * @param <T>
+         *            the generic type of the provided object instance.
          * @return the Kind associated to the provided object.
          */
         public static <T> Kind objectToKind(T object) {
@@ -193,9 +195,8 @@ public class CellValidator {
     private String validatorClassName = DEFAULT_VALIDATOR_CLASSNAME;
 
     /**
-     * Only applies to collection types (validatorKind != Kind.NOT_A_COLLECTION), contains the list of
-     * types the collection holds. At most, this collection will contain two elements, in the case
-     * of validatorKind == Kind.MAP.
+     * Only applies to collection types (validatorKind != Kind.NOT_A_COLLECTION), contains the list of types the
+     * collection holds. At most, this collection will contain two elements, in the case of validatorKind == Kind.MAP.
      */
     private Collection<String> validatorTypes;
 
@@ -210,8 +211,9 @@ public class CellValidator {
 
     /**
      * Factory method that builds a CellValidator from an IDeepType field.
-     *
-     * @param field the IDeepType field.
+     * 
+     * @param field
+     *            the IDeepType field.
      * @return a new CellValidator associated to the provided object.
      */
     public static CellValidator cellValidator(Field field) {
@@ -220,8 +222,9 @@ public class CellValidator {
 
     /**
      * Factory method that builds a CellValidator from a DataType object.
-     *
-     * @param type the data type coming from the driver.
+     * 
+     * @param type
+     *            the data type coming from the driver.
      * @return a new CellValidator associated to the provided object.
      */
     public static CellValidator cellValidator(DataType type) {
@@ -229,11 +232,13 @@ public class CellValidator {
     }
 
     /**
-     * Generates a CellValidator for a generic instance of an object.
-     * We need the actual instance in order to differentiate between an UUID and a TimeUUID.
-     *
-     * @param obj an instance to use to build the new CellValidator.
-     * @param <T> the generic type of the provided object instance.
+     * Generates a CellValidator for a generic instance of an object. We need the actual instance in order to
+     * differentiate between an UUID and a TimeUUID.
+     * 
+     * @param obj
+     *            an instance to use to build the new CellValidator.
+     * @param <T>
+     *            the generic type of the provided object instance.
      * @return a new CellValidator associated to the provided object.
      */
     public static <T> CellValidator cellValidator(T obj) {
@@ -253,7 +258,8 @@ public class CellValidator {
     /**
      * private constructor.
      */
-    private CellValidator(String validatorClassName, Kind validatorKind, Collection<String> validatorTypes, DataType.Name cqlTypeName) {
+    private CellValidator(String validatorClassName, Kind validatorKind, Collection<String> validatorTypes,
+            DataType.Name cqlTypeName) {
         this.validatorClassName = validatorClassName != null ? validatorClassName : DEFAULT_VALIDATOR_CLASSNAME;
         this.validatorKind = validatorKind;
         this.validatorTypes = validatorTypes;
@@ -282,21 +288,22 @@ public class CellValidator {
         cqlTypeName = MAP_JAVA_TYPE_TO_DATA_TYPE_NAME.get(this.validatorClassName);
 
         switch (this.validatorKind) {
-            case SET:
-            case LIST:
-                this.validatorTypes = asList(getCollectionInnerType(types[0]));
-                break;
-            case MAP:
-                this.validatorTypes = asList(getCollectionInnerType(types[0]), getCollectionInnerType(types[1]));
-                break;
-            default:
+        case SET:
+        case LIST:
+            this.validatorTypes = asList(getCollectionInnerType(types[0]));
+            break;
+        case MAP:
+            this.validatorTypes = asList(getCollectionInnerType(types[0]), getCollectionInnerType(types[1]));
+            break;
+        default:
         }
     }
 
     /**
      * private constructor.
-     *
-     * @param type a {@link com.datastax.driver.core.DataType} coming from the underlying Java driver.
+     * 
+     * @param type
+     *            a {@link com.datastax.driver.core.DataType} coming from the underlying Java driver.
      */
     private CellValidator(DataType type) {
         if (type == null) {
@@ -316,30 +323,29 @@ public class CellValidator {
             }
 
             switch (type.getName()) {
-                case SET:
-                    validatorKind = Kind.SET;
-                    validatorClassName = SetType.class.getName();
-                    break;
-                case LIST:
-                    validatorKind = Kind.LIST;
-                    validatorClassName = ListType.class.getName();
-                    break;
-                case MAP:
-                    validatorKind = Kind.MAP;
-                    validatorClassName = MapType.class.getName();
-                    break;
-                default:
-                    throw new DeepGenericException("Cannot determine collection type for " + type.getName());
+            case SET:
+                validatorKind = Kind.SET;
+                validatorClassName = SetType.class.getName();
+                break;
+            case LIST:
+                validatorKind = Kind.LIST;
+                validatorClassName = ListType.class.getName();
+                break;
+            case MAP:
+                validatorKind = Kind.MAP;
+                validatorClassName = MapType.class.getName();
+                break;
+            default:
+                throw new DeepGenericException("Cannot determine collection type for " + type.getName());
             }
 
             validatorTypes = unmodifiableCollection(validatorTypes);
         }
     }
 
-
     /**
      * Generates the cassandra marshaller ({@link org.apache.cassandra.db.marshal.AbstractType}) for this CellValidator.
-     *
+     * 
      * @return an instance of the cassandra marshaller for this CellValidator.
      */
     public AbstractType<?> getAbstractType() {
@@ -357,21 +363,21 @@ public class CellValidator {
                 Iterator<String> types = validatorTypes.iterator();
 
                 switch (validatorKind) {
-                    case SET:
-                        CQL3Type cql3Type = CQL3Type.Native.valueOf(types.next().toUpperCase());
-                        abstractType = SetType.getInstance(cql3Type.getType());
-                        break;
-                    case LIST:
-                        cql3Type = CQL3Type.Native.valueOf(types.next().toUpperCase());
-                        abstractType = ListType.getInstance(cql3Type.getType());
-                        break;
-                    case MAP:
-                        cql3Type = CQL3Type.Native.valueOf(types.next().toUpperCase());
-                        CQL3Type cql3Type2 = CQL3Type.Native.valueOf(types.next().toUpperCase());
-                        abstractType = MapType.getInstance(cql3Type.getType(), cql3Type2.getType());
-                        break;
-                    default:
-                        throw new DeepGenericException("Cannot determine collection kind for " + validatorKind);
+                case SET:
+                    CQL3Type cql3Type = CQL3Type.Native.valueOf(types.next().toUpperCase());
+                    abstractType = SetType.getInstance(cql3Type.getType());
+                    break;
+                case LIST:
+                    cql3Type = CQL3Type.Native.valueOf(types.next().toUpperCase());
+                    abstractType = ListType.getInstance(cql3Type.getType());
+                    break;
+                case MAP:
+                    cql3Type = CQL3Type.Native.valueOf(types.next().toUpperCase());
+                    CQL3Type cql3Type2 = CQL3Type.Native.valueOf(types.next().toUpperCase());
+                    abstractType = MapType.getInstance(cql3Type.getType(), cql3Type2.getType());
+                    break;
+                default:
+                    throw new DeepGenericException("Cannot determine collection kind for " + validatorKind);
 
                 }
             }
@@ -385,7 +391,7 @@ public class CellValidator {
 
     /**
      * Getter for validatorClassName.
-     *
+     * 
      * @return the cassandra marshaller class name.
      */
     public String getValidatorClassName() {
@@ -394,7 +400,7 @@ public class CellValidator {
 
     /**
      * Getter for validatorTypes.
-     *
+     * 
      * @return a collection of validator type names.
      */
     public Collection<String> getValidatorTypes() {
@@ -403,7 +409,7 @@ public class CellValidator {
 
     /**
      * Getter for validatorKind.
-     *
+     * 
      * @return the Kind associated to this CellValidator.
      */
     public Kind validatorKind() {
@@ -461,7 +467,6 @@ public class CellValidator {
                 ", abstractType=" + abstractType +
                 '}';
     }
-
 
     /**
      * @return the original CQL3 type name (if known, null otherwise)

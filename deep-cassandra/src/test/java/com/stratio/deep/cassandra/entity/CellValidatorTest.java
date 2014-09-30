@@ -93,7 +93,7 @@ public class CellValidatorTest {
             assertNull(cellValidator((DataType) null));
             fail();
         } catch (Exception e) {
-            //ok
+            // ok
         }
 
         DataType type = DataType.list(DataType.timeuuid());
@@ -119,7 +119,7 @@ public class CellValidatorTest {
         assertEquals(cv.getAbstractType(), ListType.getInstance(TimeUUIDType.instance));
     }
 
-    public void testBlobDataType(){
+    public void testBlobDataType() {
         CellValidator cv = cellValidator(DataType.blob());
         assertNotNull(cv);
         assertEquals(cv.getValidatorClassName(), BytesType.class.getName());
@@ -176,7 +176,6 @@ public class CellValidatorTest {
         assertEquals(cv.getAbstractType(), UUIDType.instance);
         assertNull(cv.getValidatorTypes());
         assertEquals(cv.validatorKind(), Kind.NOT_A_COLLECTION);
-
 
         UUID testTimeUUID = UUID.fromString("A5C78940-9260-11E3-BAA8-0800200C9A66");
         cv = cellValidator(testTimeUUID);
@@ -283,6 +282,4 @@ public class CellValidatorTest {
         assertEquals(Kind.objectToKind(new WeakHashMap<>()), Kind.MAP);
     }
 
-
 }
-

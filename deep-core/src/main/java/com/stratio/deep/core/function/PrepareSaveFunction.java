@@ -32,34 +32,32 @@ import com.stratio.deep.commons.rdd.IExtractor;
  * Created by rcrespo on 28/08/14.
  */
 public class PrepareSaveFunction<T> extends AbstractFunction1<Iterator<T>, BoxedUnit> implements
-    Serializable {
+        Serializable {
 
-  private final DeepJobConfig<T> deepJobConfig;
+    private final DeepJobConfig<T> deepJobConfig;
 
-  private final T first;
+    private final T first;
 
-
-
-  public PrepareSaveFunction(DeepJobConfig<T> deepJobConfig, T first) {
-    this.first = first;
-    this.deepJobConfig = deepJobConfig;
-  }
-
+    public PrepareSaveFunction(DeepJobConfig<T> deepJobConfig, T first) {
+        this.first = first;
+        this.deepJobConfig = deepJobConfig;
+    }
 
     @Override
     public BoxedUnit apply(Iterator<T> v1) {
         IExtractor<T> extractor;
-        try{
+        try {
             extractor = getExtractorInstance(deepJobConfig.getExtractorConfiguration());
-        }catch (DeepExtractorinitializationException e){
+        } catch (DeepExtractorinitializationException e) {
             extractor = getExtractorClient();
         }
 
         extractor.initSave(deepJobConfig, first);
-        while(v1.hasNext()){
+        while (v1.hasNext()) {
             extractor.saveRDD(v1.next());
         }
-        deepJobConfig.putValue(SPARK_PARTITION_ID, String.valueOf(Integer.parseInt(deepJobConfig.getValues().get(SPARK_PARTITION_ID).toString())+1)) ;
+        deepJobConfig.putValue(SPARK_PARTITION_ID,
+                String.valueOf(Integer.parseInt(deepJobConfig.getValues().get(SPARK_PARTITION_ID).toString()) + 1));
         extractor.close();
         return null;
     }

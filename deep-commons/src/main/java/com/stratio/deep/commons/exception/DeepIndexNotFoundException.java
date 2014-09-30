@@ -17,8 +17,7 @@
 package com.stratio.deep.commons.exception;
 
 /**
- * Unchecked exception thrown when trying to define a default filter over
- * a not existent secondary index in Cassandra.
+ * Unchecked exception thrown when trying to define a default filter over a not existent secondary index in Cassandra.
  */
 public class DeepIndexNotFoundException extends RuntimeException {
 

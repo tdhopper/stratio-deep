@@ -69,7 +69,7 @@ public class AbstractDeepExamplesTest {
                     "  content text," +
                     "  truncated boolean" +
                     ");", TWEETS_COLUMN_FAMILY
-    );
+            );
 
     private static final String createCrawlerCF = String.format(
             "CREATE TABLE %s.\"%s\" (\n" +
@@ -90,7 +90,7 @@ public class AbstractDeepExamplesTest {
                     " url text,\n" +
                     " PRIMARY KEY (key)\n" +
                     ");", CRAWLER_KEYSPACE_NAME, CRAWLER_COLUMN_FAMILY
-    );
+            );
 
     @BeforeSuite
     protected void initContextAndServer() throws ConfigurationException, IOException, InterruptedException {
@@ -107,7 +107,7 @@ public class AbstractDeepExamplesTest {
         String useKeyspace = "USE " + KEYSPACE_NAME + ";";
 
         String[] startupCommands =
-                new String[]{createKeyspace, createCrawlerKeyspace, useKeyspace, createTweetCF, createCrawlerCF};
+                new String[] { createKeyspace, createCrawlerKeyspace, useKeyspace, createTweetCF, createCrawlerCF };
 
         cassandraServer = new CassandraServer();
         cassandraServer.setStartupCommands(startupCommands);
@@ -118,7 +118,6 @@ public class AbstractDeepExamplesTest {
 
         session = cluster.connect();
 
-
         try {
 
             session.execute(createKeyspace);
@@ -126,7 +125,8 @@ public class AbstractDeepExamplesTest {
             session.execute(useKeyspace);
             session.execute(createTweetCF);
             session.execute(createCrawlerCF);
-        } catch (Exception ex){}
+        } catch (Exception ex) {
+        }
 
         dataInsertCql();
 
@@ -155,8 +155,8 @@ public class AbstractDeepExamplesTest {
         List<Insert> inserts = new ArrayList<>();
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        String[] names = new String[]{"tweet_id", "tweet_date", "author", "hashtags", "favorite_count", "content",
-                "truncated"};
+        String[] names = new String[] { "tweet_id", "tweet_date", "author", "hashtags", "favorite_count", "content",
+                "truncated" };
         try (BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(
                 new File(tweetsTestData.toURI()))))) {
 
@@ -193,14 +193,14 @@ public class AbstractDeepExamplesTest {
             logger.error("Error", e);
         }
 
-        names = new String[]{
+        names = new String[] {
                 "key", "\"___class\"", "charset", "content", "\"domainName\"",
                 "\"downloadTime\"", "\"enqueuedForTransforming\"", "etag", "\"firstDownloadTime\"",
-                "\"lastModified\"", "\"responseCode\"", "\"responseTime\"", "\"timeTransformed\"", "title", "url"};
+                "\"lastModified\"", "\"responseCode\"", "\"responseTime\"", "\"timeTransformed\"", "title", "url" };
 
         try (CSVReader reader = new CSVReader(new BufferedReader(new InputStreamReader(new GZIPInputStream(new
                 FileInputStream(
-                new File(crawlerTestData.toURI()))))))) {
+                        new File(crawlerTestData.toURI()))))))) {
 
             String[] fields;
 
@@ -235,7 +235,6 @@ public class AbstractDeepExamplesTest {
                 }
             }
 
-
             Batch batch = QueryBuilder.batch(inserts.toArray(new Insert[0]));
             session.execute(batch);
         } catch (Exception e) {
@@ -256,7 +255,6 @@ public class AbstractDeepExamplesTest {
 
         ResultSet rs = session.execute(command);
         assertEquals(rs.one().getLong(0), 4892);
-
 
         command = "select count(*) from " + CRAWLER_KEYSPACE_NAME + "." + quote(CRAWLER_COLUMN_FAMILY) + ";";
 

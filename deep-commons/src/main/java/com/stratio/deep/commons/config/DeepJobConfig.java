@@ -349,11 +349,11 @@ public class DeepJobConfig<T> implements Serializable {
         return this;
     }
 
-    public Class<? extends IExtractor<T>> getExtractorImplClass() {
+    public Class<? extends IExtractor> getExtractorImplClass() {
         return this.getExtractorConfiguration().getExtractorImplClass();
     }
 
-    public void setExtractorImplClass(Class<? extends IExtractor<T>> extractorImplClass) {
+    public void setExtractorImplClass(Class<? extends IExtractor> extractorImplClass) {
         this.getExtractorConfiguration().setExtractorImplClass(extractorImplClass);
     }
 

@@ -16,7 +16,6 @@ public class InitIteratorAction<T> extends Action {
 
     private DeepJobConfig<T> config;
 
-
     private Partition partition;
 
     public InitIteratorAction() {
@@ -28,7 +27,6 @@ public class InitIteratorAction<T> extends Action {
         this.config = config;
         this.partition = partition;
     }
-
 
     public DeepJobConfig<T> getConfig() {
         return config;

@@ -20,8 +20,8 @@ import com.stratio.deep.commons.annotations.DeepField;
 import com.stratio.deep.commons.entity.IDeepType;
 
 /**
- * Abstract Test Entity class, used to test the system works correctly with domain entities that inherit from
- * a base class.<br/>
+ * Abstract Test Entity class, used to test the system works correctly with domain entities that inherit from a base
+ * class.<br/>
  * Note that in order to have all of the fields of the entity correctly serialized, the base class must be serializable.
  */
 public abstract class BaseTestEntity implements IDeepType {

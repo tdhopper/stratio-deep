@@ -26,11 +26,10 @@ import static org.apache.commons.lang.StringUtils.defaultIfEmpty;
 /**
  * Common properties used by the examples.
  * <p/>
- * Author: Emmanuelle Raffenne
- * Date..: 26-feb-2014
+ * Author: Emmanuelle Raffenne Date..: 26-feb-2014
  */
 public class ContextProperties {
-    static final String OPT_INT           = "int";
+    static final String OPT_INT = "int";
 
     private static final Logger LOG = Logger.getLogger(ContextProperties.class);
     /**
@@ -53,46 +52,45 @@ public class ContextProperties {
      */
     private String mongoHost;
 
-
     /**
      * Public constructor.
      */
     public ContextProperties(String[] args) {
         Options options = new Options();
 
-        options.addOption("m","master", true, "The spark's master endpoint");
-        options.addOption("h","sparkHome", true, "The spark's home, eg. /opt/spark");
-        options.addOption("H","mongoHost", true, "Mongo endpoint");
+        options.addOption("m", "master", true, "The spark's master endpoint");
+        options.addOption("h", "sparkHome", true, "The spark's home, eg. /opt/spark");
+        options.addOption("H", "mongoHost", true, "Mongo endpoint");
 
-        options.addOption(OptionBuilder.hasArg().withType(Integer.class).withLongOpt("mongoCqlPort").withArgName("mongo_cql_port").withDescription("mongo's cql port, defaults to 9042").create());
+        options.addOption(OptionBuilder.hasArg().withType(Integer.class).withLongOpt("mongoCqlPort")
+                .withArgName("mongo_cql_port").withDescription("mongo's cql port, defaults to 9042").create());
         options.addOption(OptionBuilder.hasArg().withType(Integer.class).withLongOpt("mongoThriftPort")
                 .withArgName("mongo_thrift_port").withDescription("mongo's thrift port, " +
                         "defaults to 9160").create());
         options.addOption(OptionBuilder.hasArg().withValueSeparator(',').withLongOpt("jars")
                 .withArgName("jars_to_add").withDescription("comma separated list of jars to add").create());
-        Option help = new Option( "help", "print this message" );
-        //options.addOption("j","jars", true, "comma separated list of jars to add");
+        Option help = new Option("help", "print this message");
+        // options.addOption("j","jars", true, "comma separated list of jars to add");
         options.addOption(help);
         CommandLineParser parser = new PosixParser();
         HelpFormatter formatter = new HelpFormatter();
 
         try {
-            CommandLine line = parser.parse( options, args );
+            CommandLine line = parser.parse(options, args);
 
-            if (line.hasOption("help")){
-                formatter.printHelp( "", options );
+            if (line.hasOption("help")) {
+                formatter.printHelp("", options);
 
                 throw new DeepGenericException("Help command issued");
             }
 
-            jar = (line.hasOption("jars") ? line.getOptionValues("jars") : new String[]{});
-            cluster = line.getOptionValue ("master", defaultIfEmpty(System.getProperty("spark.master"), "local"));
-            sparkHome = line.getOptionValue ("sparkHome", defaultIfEmpty(System.getProperty("spark.home"), ""));
-            mongoHost = line.getOptionValue ("mongoHost", Constants.DEFAULT_MONGO_HOST);
-
+            jar = (line.hasOption("jars") ? line.getOptionValues("jars") : new String[] {});
+            cluster = line.getOptionValue("master", defaultIfEmpty(System.getProperty("spark.master"), "local"));
+            sparkHome = line.getOptionValue("sparkHome", defaultIfEmpty(System.getProperty("spark.home"), ""));
+            mongoHost = line.getOptionValue("mongoHost", Constants.DEFAULT_MONGO_HOST);
 
         } catch (ParseException e) {
-            formatter.printHelp( "", options );
+            formatter.printHelp("", options);
             LOG.error("Unexpected exception: ", e);
         }
     }

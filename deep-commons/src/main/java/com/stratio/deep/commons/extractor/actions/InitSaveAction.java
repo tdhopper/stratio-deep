@@ -39,9 +39,8 @@ public class InitSaveAction<T> extends Action {
     public InitSaveAction(DeepJobConfig<T> config, T first) {
         super(ActionType.INIT_SAVE);
         this.config = config;
-        this.first=first;
+        this.first = first;
     }
-
 
     public DeepJobConfig<T> getConfig() {
         return config;

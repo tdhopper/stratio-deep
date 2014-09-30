@@ -32,7 +32,7 @@ public class ESConfigFactory {
 
     /**
      * Creates a new cell-based ElasticSearch job configuration object.
-     *
+     * 
      * @return a new cell-based ElasticSearch job configuration object.
      */
     public static IESDeepJobConfig<Cells> createES() {
@@ -41,9 +41,11 @@ public class ESConfigFactory {
 
     /**
      * Creates a new entity-based ElasticSearch job configuration object.
-     *
-     * @param entityClass the class instance of the entity class that will be used to map db objects to Java objects.
-     * @param <T>         the generic type of the entity object implementing IDeepType.
+     * 
+     * @param entityClass
+     *            the class instance of the entity class that will be used to map db objects to Java objects.
+     * @param <T>
+     *            the generic type of the entity object implementing IDeepType.
      * @return a new entity-based ElasticSearch job configuration object.
      */
     public static <T extends IDeepType> IESDeepJobConfig<T> createES(Class<T> entityClass) {

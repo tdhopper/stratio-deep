@@ -43,18 +43,18 @@ import com.stratio.deep.commons.exception.DeepIOException;
 import com.stratio.deep.commons.rdd.IExtractor;
 
 /**
- * Utility class providing useful methods to manipulate the conversion
- * between ByteBuffers maps coming from the underlying Cassandra API to
- * instances of a concrete javabean.
- *
+ * Utility class providing useful methods to manipulate the conversion between ByteBuffers maps coming from the
+ * underlying Cassandra API to instances of a concrete javabean.
+ * 
  * @author Luca Rosellini <luca@strat.io>
  */
 public final class Utils {
 
     /**
      * Creates a new instance of the given class.
-     *
-     * @param clazz the class object for which a new instance should be created.
+     * 
+     * @param clazz
+     *            the class object for which a new instance should be created.
      * @return the new instance of class clazz.
      */
     public static <T extends IDeepType> T newTypeInstance(Class<T> clazz) {
@@ -67,8 +67,9 @@ public final class Utils {
 
     /**
      * Creates a new instance of the given class name.
-     *
-     * @param className the class object for which a new instance should be created.
+     * 
+     * @param className
+     *            the class object for which a new instance should be created.
      * @return the new instance of class clazz.
      */
     @SuppressWarnings("unchecked")
@@ -126,8 +127,9 @@ public final class Utils {
 
     /**
      * Generates the part of the query where clause that will hit the Cassandra's secondary indexes.
-     *
-     * @param additionalFilters the map of filters names and values.
+     * 
+     * @param additionalFilters
+     *            the map of filters names and values.
      * @return the query subpart corresponding to the provided additional filters.
      */
     public static String additionalFilterGenerator(Map<String, Serializable> additionalFilters) {
@@ -154,11 +156,11 @@ public final class Utils {
         return sb.toString();
     }
 
-
     /**
      * Returns a CQL batch query wrapping the given statements.
-     *
-     * @param statements the list of statements to use to generate the batch statement.
+     * 
+     * @param statements
+     *            the list of statements to use to generate the batch statement.
      * @return the batch statement.
      */
     public static String batchQueryGenerator(List<String> statements) {
@@ -175,9 +177,12 @@ public final class Utils {
 
     /**
      * Splits columns names and values as required by Datastax java driver to generate an Insert query.
-     *
-     * @param tuple an object containing the key Cell(s) as the first element and all the other columns as the second element.
-     * @return an object containing an array of column names as the first element and an array of column values as the second element.
+     * 
+     * @param tuple
+     *            an object containing the key Cell(s) as the first element and all the other columns as the second
+     *            element.
+     * @return an object containing an array of column names as the first element and an array of column values as the
+     *         second element.
      */
     public static Tuple2<String[], Object[]> prepareTuple4CqlDriver(Tuple2<Cells, Cells> tuple) {
         Cells keys = tuple._1();
@@ -204,14 +209,16 @@ public final class Utils {
     }
 
     /**
-     * Resolves the setter name for the property whose name is 'propertyName' whose type is 'valueType'
-     * in the entity bean whose class is 'entityClass'.
-     * If we don't find a setter following Java's naming conventions, before throwing an exception we try to
-     * resolve the setter following Scala's naming conventions.
-     *
-     * @param propertyName the field name of the property whose setter we want to resolve.
-     * @param entityClass  the bean class object in which we want to search for the setter.
-     * @param valueType    the class type of the object that we want to pass to the setter.
+     * Resolves the setter name for the property whose name is 'propertyName' whose type is 'valueType' in the entity
+     * bean whose class is 'entityClass'. If we don't find a setter following Java's naming conventions, before throwing
+     * an exception we try to resolve the setter following Scala's naming conventions.
+     * 
+     * @param propertyName
+     *            the field name of the property whose setter we want to resolve.
+     * @param entityClass
+     *            the bean class object in which we want to search for the setter.
+     * @param valueType
+     *            the class type of the object that we want to pass to the setter.
      * @return the resolved setter.
      */
     @SuppressWarnings("unchecked")
@@ -235,15 +242,15 @@ public final class Utils {
         return setter;
     }
 
-
     /**
-     * Resolves the getter name for the property whose name is 'propertyName' whose type is 'valueType'
-     * in the entity bean whose class is 'entityClass'.
-     * If we don't find a setter following Java's naming conventions, before throwing an exception we try to
-     * resolve the setter following Scala's naming conventions.
-     *
-     * @param propertyName the field name of the property whose getter we want to resolve.
-     * @param entityClass  the bean class object in which we want to search for the getter.
+     * Resolves the getter name for the property whose name is 'propertyName' whose type is 'valueType' in the entity
+     * bean whose class is 'entityClass'. If we don't find a setter following Java's naming conventions, before throwing
+     * an exception we try to resolve the setter following Scala's naming conventions.
+     * 
+     * @param propertyName
+     *            the field name of the property whose getter we want to resolve.
+     * @param entityClass
+     *            the bean class object in which we want to search for the getter.
      * @return the resolved getter.
      */
     @SuppressWarnings("unchecked")
@@ -266,11 +273,11 @@ public final class Utils {
         return getter;
     }
 
-
     /**
      * Returns the inet address for the specified location.
-     *
-     * @param location the address as String
+     * 
+     * @param location
+     *            the address as String
      * @return the InetAddress object associated to the provided address.
      */
     public static InetAddress inetAddressFromLocation(String location) {
@@ -322,28 +329,25 @@ public final class Utils {
         return hostConnection.toString();
     }
 
-    public static <T>IExtractor<T> getExtractorInstance(ExtractorConfig<T> config){
+    public static <T> IExtractor<T> getExtractorInstance(ExtractorConfig<T> config) {
 
         try {
             Class<T> rdd = (Class<T>) config.getExtractorImplClass();
-            if(rdd==null){
+            if (rdd == null) {
                 rdd = (Class<T>) Class.forName(config.getExtractorImplClassName());
             }
             Constructor<T> c;
-            if (config.getEntityClass().isAssignableFrom(Cells.class)){
+            if (config.getEntityClass().isAssignableFrom(Cells.class)) {
                 c = rdd.getConstructor();
                 return (IExtractor<T>) c.newInstance();
-            }else{
+            } else {
                 c = rdd.getConstructor(Class.class);
                 return (IExtractor<T>) c.newInstance(config.getEntityClass());
             }
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | IllegalArgumentException
                 | InvocationTargetException | NoSuchMethodException | SecurityException e) {
-           throw new DeepExtractorinitializationException(e.getMessage());
+            throw new DeepExtractorinitializationException(e.getMessage());
         }
     }
-
-
-
 
 }

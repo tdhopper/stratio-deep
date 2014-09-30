@@ -16,7 +16,6 @@
 
 package com.stratio.deep.cassandra.cql;
 
-
 import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.List;
@@ -123,7 +122,7 @@ public class RangeUtilsTest {
             "-8935141660703064064", "-8971170457722028032", "-900719925474099200", "-9007199254740992000",
             "-9043228051759955968", "-9079256848778919936", "-9115285645797883904", "-9151314442816847872",
             "-9187343239835811840", "-936748722493063168", "-972777519512027136"
-    );
+            );
 
     private final Set<String> remoteTokens2 = Sets.newHashSet(
             "-9223372036854775808", "1008806316530991103", "1044835113549955071", "108086391056891903",
@@ -190,12 +189,12 @@ public class RangeUtilsTest {
             "8899112863684100095", "8935141660703064063", "8971170457722028031", "900719925474099199",
             "9007199254740991999", "9043228051759955967", "9079256848778919935", "9115285645797883903",
             "9151314442816847871", "9187343239835811839", "936748722493063167", "972777519512027135"
-    );
+            );
 
-	private final Set<String> localTokens3 = Sets.newHashSet("-6148914691236517206");
+    private final Set<String> localTokens3 = Sets.newHashSet("-6148914691236517206");
 
-	private final Set<String> remoteTokens3 = Sets.newHashSet("-9223372036854775808",
-					"-3074457345618258604", "-2", "3074457345618258600", "6148914691236517202");
+    private final Set<String> remoteTokens3 = Sets.newHashSet("-9223372036854775808",
+            "-3074457345618258604", "-2", "3074457345618258600", "6148914691236517202");
 
     @Mock
     private Session mockSession1;
@@ -209,12 +208,11 @@ public class RangeUtilsTest {
     @Mock
     private ResultSet mockLocalTokensResultSet2;
 
-	@Mock
-	private Session mockSession3;
+    @Mock
+    private Session mockSession3;
 
-	@Mock
-	private ResultSet mockLocalTokensResultSet3;
-
+    @Mock
+    private ResultSet mockLocalTokensResultSet3;
 
     @BeforeMethod
     protected void setUp() throws Exception {
@@ -259,24 +257,24 @@ public class RangeUtilsTest {
         when(mockLocalTokensResultSet2.all()).thenReturn(rows2);
         when(mockSession2.execute(any(String.class))).thenReturn(mockLocalTokensResultSet2);
 
-	    /* mock example 3 */
-	    List<Row> rows3 = new ArrayList<>();
-	    Row localTokensRow3 = mock(Row.class);
-	    when(localTokensRow3.getInet(any(String.class))).thenThrow(IllegalArgumentException.class);
-	    Set<String> shuffledLocalTokens3 = Sets.newHashSet(Ordering.arbitrary().sortedCopy(localTokens3));
-	    when(localTokensRow3.getSet("tokens", String.class)).thenReturn(shuffledLocalTokens3);
-	    rows3.add(localTokensRow3);
+        /* mock example 3 */
+        List<Row> rows3 = new ArrayList<>();
+        Row localTokensRow3 = mock(Row.class);
+        when(localTokensRow3.getInet(any(String.class))).thenThrow(IllegalArgumentException.class);
+        Set<String> shuffledLocalTokens3 = Sets.newHashSet(Ordering.arbitrary().sortedCopy(localTokens3));
+        when(localTokensRow3.getSet("tokens", String.class)).thenReturn(shuffledLocalTokens3);
+        rows3.add(localTokensRow3);
 
-	    Row remoteTokensRow3 = mock(Row.class);
-	    when(remoteTokensRow3.getInet("peer")).thenReturn(mockInet);
+        Row remoteTokensRow3 = mock(Row.class);
+        when(remoteTokensRow3.getInet("peer")).thenReturn(mockInet);
 
-	    Set<String> shuffledRemoteTokens3 = Sets.newHashSet(Ordering.arbitrary().sortedCopy(remoteTokens3));
-	    when(remoteTokensRow3.getSet("tokens", String.class)).thenReturn(shuffledRemoteTokens3);
-	    rows3.add(remoteTokensRow3);
+        Set<String> shuffledRemoteTokens3 = Sets.newHashSet(Ordering.arbitrary().sortedCopy(remoteTokens3));
+        when(remoteTokensRow3.getSet("tokens", String.class)).thenReturn(shuffledRemoteTokens3);
+        rows3.add(remoteTokensRow3);
 
-	    when(mockLocalTokensResultSet3.all()).thenReturn(rows3);
-	    when(mockSession3.getLoggedKeyspace()).thenReturn("fake-keyspace");
-	    when(mockSession3.execute(any(String.class))).thenReturn(mockLocalTokensResultSet3);
+        when(mockLocalTokensResultSet3.all()).thenReturn(rows3);
+        when(mockSession3.getLoggedKeyspace()).thenReturn("fake-keyspace");
+        when(mockSession3.execute(any(String.class))).thenReturn(mockLocalTokensResultSet3);
     }
 
     @Test

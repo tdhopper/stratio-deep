@@ -38,15 +38,14 @@ public class DomainEntity implements IDeepType {
 
     public String getDomain() {
 
-
         return domain;
     }
 
-    public DomainEntity(){
+    public DomainEntity() {
 
     }
 
-    public DomainEntity(String domain, Integer numPages){
+    public DomainEntity(String domain, Integer numPages) {
         this.domain = domain;
         this.numPages = numPages;
     }

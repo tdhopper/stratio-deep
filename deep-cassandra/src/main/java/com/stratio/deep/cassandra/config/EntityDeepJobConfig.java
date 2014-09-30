@@ -35,9 +35,8 @@ import java.util.*;
 /**
  * Class containing the appropiate configuration for a CassandraEntityRDD.
  * <p/>
- * Remember to call {@link #initialize()} after having configured all the
- * properties.
- *
+ * Remember to call {@link #initialize()} after having configured all the properties.
+ * 
  * @author Luca Rosellini <luca@strat.io>
  */
 public final class EntityDeepJobConfig<T extends IDeepType> extends GenericDeepJobConfig<T> {
@@ -71,25 +70,26 @@ public final class EntityDeepJobConfig<T extends IDeepType> extends GenericDeepJ
         return this;
     }
 
-
     public Configuration getHadoopConfiguration() {
         return null;
     }
 
-
     /**
      * Public constructor. Constructs a job object with the specified entity class.
-     *
-     * @param entityClass   IDeepType entity Class object
-//     * @param isWriteConfig boolean specifing if the constructed object is suitable for writes.
+     * 
+     * @param entityClass
+     *            IDeepType entity Class object // * @param isWriteConfig boolean specifing if the constructed object is
+     *            suitable for writes.
      */
     public EntityDeepJobConfig(Class<T> entityClass) {
         super();
         this.entityClass = entityClass;
-//        this.isWriteConfig = isWriteConfig;
+        // this.isWriteConfig = isWriteConfig;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see IDeepJobConfig#getEntityClass()
      */
     @Override
@@ -98,9 +98,11 @@ public final class EntityDeepJobConfig<T extends IDeepType> extends GenericDeepJ
         return entityClass;
     }
 
-    /* (non-Javadoc)
-       * @see IDeepJobConfig#validate()
-       */
+    /*
+     * (non-Javadoc)
+     * 
+     * @see IDeepJobConfig#validate()
+     */
     @Override
     public void validate() {
 
@@ -119,8 +121,10 @@ public final class EntityDeepJobConfig<T extends IDeepType> extends GenericDeepJ
 
         Map<String, Cell> colDefs = super.columnDefinitions();
 
-        /* colDefs is null if table does not exist. I.E. this configuration will be used as an output configuration
-         object, and the output table is dynamically created */
+        /*
+         * colDefs is null if table does not exist. I.E. this configuration will be used as an output configuration
+         * object, and the output table is dynamically created
+         */
         if (colDefs == null) {
             return;
         }
@@ -139,16 +143,17 @@ public final class EntityDeepJobConfig<T extends IDeepType> extends GenericDeepJ
     }
 
     /**
-     * Given an instance of the generic object mapped to this configurtion object,
-     * sets the instance property whose name is the name specified by dbName.
-     * Since the provided dbName is the name of the field in the database, we first try
-     * to resolve the property name using the fieldName property of the DeepField annotation.
-     * If we don't find any property whose DeepField.fieldName.equals(dbName) we fallback to the
-     * name of the Java property.
-     *
-     * @param instance instance object.
-     * @param dbName   name of the field as known by the data store.
-     * @param value    value to set in the property field of the provided instance object.
+     * Given an instance of the generic object mapped to this configurtion object, sets the instance property whose name
+     * is the name specified by dbName. Since the provided dbName is the name of the field in the database, we first try
+     * to resolve the property name using the fieldName property of the DeepField annotation. If we don't find any
+     * property whose DeepField.fieldName.equals(dbName) we fallback to the name of the Java property.
+     * 
+     * @param instance
+     *            instance object.
+     * @param dbName
+     *            name of the field as known by the data store.
+     * @param value
+     *            value to set in the property field of the provided instance object.
      */
     public void setInstancePropertyFromDbName(T instance, String dbName, Object value) {
         Map<String, Cell> cfs = columnDefinitions();
@@ -173,16 +178,15 @@ public final class EntityDeepJobConfig<T extends IDeepType> extends GenericDeepJ
     @SuppressWarnings("unchecked")
     private Object packageCollectionValue(CassandraCell metadataCell, Object value) {
         switch (metadataCell.getCellValidator().validatorKind()) {
-            case SET:
-                return new LinkedHashSet((Collection) value);
-            case LIST:
-                return new LinkedList((Collection) value);
-            case MAP:
-                return new LinkedHashMap((Map) value);
-            default:
-                return value;
+        case SET:
+            return new LinkedHashSet((Collection) value);
+        case LIST:
+            return new LinkedList((Collection) value);
+        case MAP:
+            return new LinkedHashMap((Map) value);
+        default:
+            return value;
         }
     }
-
 
 }

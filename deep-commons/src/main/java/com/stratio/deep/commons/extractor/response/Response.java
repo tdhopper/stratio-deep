@@ -7,7 +7,6 @@ import com.stratio.deep.commons.extractor.actions.ActionType;
 
 import java.io.Serializable;
 
-
 /**
  * @author Óscar Puertas
  */

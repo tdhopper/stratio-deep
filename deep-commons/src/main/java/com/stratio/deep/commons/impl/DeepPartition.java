@@ -39,18 +39,20 @@ public class DeepPartition implements IDeepPartition {
     private final int idx;
 
     /**
-     * Cassandra's split object, maintains information of
-     * the start and end token of the cassandra split mapped
-     * by this partition and its list of replicas.
+     * Cassandra's split object, maintains information of the start and end token of the cassandra split mapped by this
+     * partition and its list of replicas.
      */
     private final DeepTokenRange splitWrapper;
 
     /**
      * Public constructor.
-     *
-     * @param rddId the rdd id.
-     * @param idx   the index of the new partition (relative to the provided rdd id).
-     * @param range the deep token range to wrap.
+     * 
+     * @param rddId
+     *            the rdd id.
+     * @param idx
+     *            the index of the new partition (relative to the provided rdd id).
+     * @param range
+     *            the deep token range to wrap.
      */
     public DeepPartition(int rddId, int idx, DeepTokenRange range) {
 
@@ -87,7 +89,7 @@ public class DeepPartition implements IDeepPartition {
 
     /**
      * Returns the index of the current partition.
-     *
+     * 
      * @return the index of the current parition.
      */
     @Override
@@ -97,7 +99,7 @@ public class DeepPartition implements IDeepPartition {
 
     /**
      * Returns the Cassandra split
-     *
+     * 
      * @return the wrapped token range.
      */
     public DeepTokenRange splitWrapper() {

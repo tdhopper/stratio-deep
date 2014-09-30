@@ -62,7 +62,7 @@ public class CassandraServer {
     private static void cleanup() throws IOException {
 
         // clean up commitlog
-        String[] directoryNames = {DatabaseDescriptor.getCommitLogLocation(),};
+        String[] directoryNames = { DatabaseDescriptor.getCommitLogLocation(), };
         for (String dirName : directoryNames) {
             File dir = new File(dirName);
             if (!dir.exists()) {
@@ -94,7 +94,7 @@ public class CassandraServer {
 
     /**
      * Copies a resource from within the jar to a directory.
-     *
+     * 
      * @param resource
      * @param directory
      * @throws IOException
@@ -116,7 +116,7 @@ public class CassandraServer {
 
     /**
      * Creates a directory
-     *
+     * 
      * @param dir
      * @throws IOException
      */
@@ -183,7 +183,7 @@ public class CassandraServer {
 
     /**
      * Set embedded cassandra up and spawn it in a new thread.
-     *
+     * 
      * @throws TTransportException
      * @throws IOException
      * @throws InterruptedException
@@ -200,7 +200,7 @@ public class CassandraServer {
         String yamlPath = dirPath + File.separatorChar + "cassandra.yaml";
         org.apache.commons.io.FileUtils.writeStringToFile(new File(yamlPath), yaml);
 
-//        make a tmp dir and copy cassandra.yaml and log4j.properties to it
+        // make a tmp dir and copy cassandra.yaml and log4j.properties to it
         try {
             copy("/log4j.xml", dir.getAbsolutePath());
         } catch (Exception e1) {

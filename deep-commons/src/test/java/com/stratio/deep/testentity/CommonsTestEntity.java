@@ -85,7 +85,7 @@ public class CommonsTestEntity extends CommonsBaseTestEntity {
     }
 
     public CommonsTestEntity(String id, String domain, String url, Integer responseTime, Integer responseCode,
-                             String notMappedField) {
+            String notMappedField) {
         super(id, domain);
         this.url = url;
         this.responseTime = responseTime;
@@ -137,7 +137,8 @@ public class CommonsTestEntity extends CommonsBaseTestEntity {
     @Override
     public String toString() {
         return "TestEntity [" + (getId() != null ? "id=" + getId() + ", " : "")
-                + (getDomain() != null ? "domain=" + getDomain() + ", " : "") + (url != null ? "url=" + url + ", " : "")
+                + (getDomain() != null ? "domain=" + getDomain() + ", " : "")
+                + (url != null ? "url=" + url + ", " : "")
                 + (responseTime != null ? "responseTime=" + responseTime + ", " : "")
                 + (responseCode != null ? "responseCode=" + responseCode + ", " : "")
                 + (downloadTime != null ? "downloadTime=" + downloadTime + ", " : "")

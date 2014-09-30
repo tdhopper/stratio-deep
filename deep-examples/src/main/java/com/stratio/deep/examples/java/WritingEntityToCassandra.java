@@ -87,7 +87,7 @@ public final class WritingEntityToCassandra {
         // --- INPUT RDD
         DeepJobConfig<DomainEntity> inputConfig = new DeepJobConfig<>(new ExtractorConfig(DomainEntity.class));
 
-        inputConfig.setExtractorImplClass((Class<? extends IExtractor<DomainEntity>>) CassandraEntityExtractor.class);
+        inputConfig.setExtractorImplClass(CassandraEntityExtractor.class);
         // inputConfig.setEntityClass(TweetEntity.class);
 
         Map<String, Serializable> values = new HashMap<>();

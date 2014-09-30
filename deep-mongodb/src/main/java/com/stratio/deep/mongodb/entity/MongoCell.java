@@ -27,7 +27,6 @@ public class MongoCell extends Cell {
         super(cellName, cellValue);
     }
 
-
     public Boolean isKey() {
         return cellName.equals(UtilMongoDB.MONGO_DEFAULT_ID);
     }
@@ -47,6 +46,6 @@ public class MongoCell extends Cell {
 
         MongoCell cell = (MongoCell) o;
 
-        return this.cellName.equals(cell.cellName)&&this.cellValue.equals(cell.cellValue);
+        return this.cellName.equals(cell.cellName) && this.cellValue.equals(cell.cellValue);
     }
 }

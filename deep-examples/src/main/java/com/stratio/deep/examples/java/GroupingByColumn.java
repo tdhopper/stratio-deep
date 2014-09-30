@@ -35,7 +35,6 @@ import com.stratio.deep.commons.config.DeepJobConfig;
 import com.stratio.deep.commons.config.ExtractorConfig;
 import com.stratio.deep.commons.extractor.server.ExtractorServer;
 import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
-import com.stratio.deep.commons.rdd.IExtractor;
 import com.stratio.deep.core.context.DeepSparkContext;
 import com.stratio.deep.testentity.TweetEntity;
 import com.stratio.deep.utils.ContextProperties;
@@ -89,7 +88,7 @@ public final class GroupingByColumn {
         DeepJobConfig<TweetEntity> config = new DeepJobConfig<>(new ExtractorConfig(TweetEntity.class));
 
         config.getExtractorConfiguration().setExtractorImplClass(
-                (Class<? extends IExtractor<TweetEntity>>) CassandraEntityExtractor.class);
+                CassandraEntityExtractor.class);
         config.setEntityClass(TweetEntity.class);
 
         Map<String, Serializable> values = new HashMap<>();

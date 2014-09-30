@@ -27,9 +27,8 @@ import java.util.Map;
 /**
  * Class containing the appropriate configuration for a ESRDD.
  * <p/>
- * Remember to call {@link #initialize()} after having configured all the
- * properties.
- *
+ * Remember to call {@link #initialize()} after having configured all the properties.
+ * 
  * @param <T>
  */
 public final class EntityDeepJobConfigES<T extends IDeepType> extends GenericDeepJobConfigES<T> {
@@ -71,9 +70,6 @@ public final class EntityDeepJobConfigES<T extends IDeepType> extends GenericDee
 
         return this;
     }
-
-
-
 
     public Map<String, String> getMapDBNameToEntityName() {
         return mapDBNameToEntityName;

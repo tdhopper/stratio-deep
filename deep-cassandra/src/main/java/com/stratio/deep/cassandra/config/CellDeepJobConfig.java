@@ -21,7 +21,7 @@ import org.apache.hadoop.conf.Configuration;
 
 /**
  * Cell-based configuration object.
- *
+ * 
  * @author Luca Rosellini <luca@stratio.com>
  */
 public final class CellDeepJobConfig extends GenericDeepJobConfig<Cells> {
@@ -30,7 +30,7 @@ public final class CellDeepJobConfig extends GenericDeepJobConfig<Cells> {
     private Cells dummyCells;
 
     public CellDeepJobConfig() {
-//        this.isWriteConfig = isWriteConfig;
+        // this.isWriteConfig = isWriteConfig;
     }
 
     {
@@ -43,14 +43,8 @@ public final class CellDeepJobConfig extends GenericDeepJobConfig<Cells> {
         return (Class<Cells>) dummyCells.getClass();
     }
 
-
-
     public Configuration getHadoopConfiguration() {
         return null;
     }
-
-
-
-
 
 }

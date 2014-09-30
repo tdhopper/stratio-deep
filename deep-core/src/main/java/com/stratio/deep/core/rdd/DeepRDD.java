@@ -15,7 +15,6 @@
  */
 package com.stratio.deep.core.rdd;
 
-
 import static com.stratio.deep.commons.utils.Constants.SPARK_RDD_ID;
 
 import com.stratio.deep.commons.config.ExtractorConfig;
@@ -39,7 +38,6 @@ import static com.stratio.deep.commons.utils.Utils.getExtractorInstance;
 import static com.stratio.deep.core.util.ExtractorClientUtil.getExtractorClient;
 import static scala.collection.JavaConversions.asScalaIterator;
 
-
 /**
  * Created by rcrespo on 11/08/14.
  */
@@ -56,30 +54,28 @@ public class DeepRDD<T> extends RDD<T> implements Serializable {
     }
 
     public DeepRDD(SparkContext sc, DeepJobConfig<T> config) {
-        super(sc, scala.collection.Seq$.MODULE$.empty(), ClassTag$.MODULE$.<T>apply(config
+        super(sc, scala.collection.Seq$.MODULE$.empty(), ClassTag$.MODULE$.<T> apply(config
                 .getEntityClass()));
         config.putValue(SPARK_RDD_ID, String.valueOf(id()));
         this.config =
                 sc.broadcast(config, ClassTag$.MODULE$
-                        .<DeepJobConfig<T>>apply(config.getClass()));
-
+                        .<DeepJobConfig<T>> apply(config.getClass()));
 
         initExtractorClient();
 
     }
 
     public DeepRDD(SparkContext sc, Class entityClass) {
-        super(sc, scala.collection.Seq$.MODULE$.empty(), ClassTag$.MODULE$.<T>apply(entityClass));
+        super(sc, scala.collection.Seq$.MODULE$.empty(), ClassTag$.MODULE$.<T> apply(entityClass));
     }
 
     @Override
     public Iterator<T> compute(Partition split, TaskContext context) {
 
         this.
-        initExtractorClient();
+                initExtractorClient();
 
         context.addOnCompleteCallback(new OnComputedRDDCallback(extractorClient));
-
 
         extractorClient.initIterator(split, config.getValue());
         java.util.Iterator<T> iterator = new java.util.Iterator<T>() {
@@ -111,15 +107,14 @@ public class DeepRDD<T> extends RDD<T> implements Serializable {
     }
 
     /**
-     * It tries to get an Extractor Instance,
-     * if there is any problem try to instance an extractorClient
+     * It tries to get an Extractor Instance, if there is any problem try to instance an extractorClient
      */
     private void initExtractorClient() {
-        try{
+        try {
             if (extractorClient == null) {
                 extractorClient = getExtractorInstance(config.getValue().getExtractorConfiguration());
             }
-        }catch (DeepExtractorinitializationException e){
+        } catch (DeepExtractorinitializationException e) {
             extractorClient = getExtractorClient();
         }
     }

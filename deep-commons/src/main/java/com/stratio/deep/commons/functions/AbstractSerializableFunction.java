@@ -22,7 +22,7 @@ import java.io.Serializable;
 
 /**
  * Abstract base type to create serializable functions of tipe 1.
- *
+ * 
  * @author Luca Rosellini <luca@stratio.com>
  */
 public abstract class AbstractSerializableFunction<T, U> extends AbstractFunction1<T, U> implements Serializable {

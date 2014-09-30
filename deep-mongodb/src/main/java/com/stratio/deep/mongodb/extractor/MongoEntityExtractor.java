@@ -29,7 +29,7 @@ import java.lang.reflect.InvocationTargetException;
 
 /**
  * EntityRDD to interact with mongoDB
- *
+ * 
  * @param <T>
  */
 public final class MongoEntityExtractor<T> extends MongoExtractor<T> {
@@ -37,9 +37,7 @@ public final class MongoEntityExtractor<T> extends MongoExtractor<T> {
     private static final Logger LOG = LoggerFactory.getLogger(MongoEntityExtractor.class);
     private static final long serialVersionUID = -3208994171892747470L;
 
-
-
-    public MongoEntityExtractor(Class<T> t){
+    public MongoEntityExtractor(Class<T> t) {
         super();
         this.deepJobConfig = new EntityDeepJobConfigMongoDB(t);
     }
@@ -48,8 +46,7 @@ public final class MongoEntityExtractor<T> extends MongoExtractor<T> {
      * {@inheritDoc}
      */
     @Override
-    public T transformElement(Tuple2<Object, BSONObject> tuple, IDeepJobConfig<T, ? extends IDeepJobConfig> config ) {
-
+    public T transformElement(Tuple2<Object, BSONObject> tuple, IDeepJobConfig<T, ? extends IDeepJobConfig> config) {
 
         try {
             return UtilMongoDB.getObjectFromBson(config.getEntityClass(), tuple._2());

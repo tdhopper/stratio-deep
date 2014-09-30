@@ -8,7 +8,7 @@ import java.util.List;
 /**
  * Created by rcrespo on 5/08/14.
  */
-public class TweetES implements IDeepType{
+public class TweetES implements IDeepType {
 
     @DeepField
     private String user;
@@ -22,7 +22,6 @@ public class TweetES implements IDeepType{
     private DocumentTest subDocumento;
     @DeepField
     private Long numerico;
-
 
     public String getUser() {
         return user;
@@ -85,5 +84,3 @@ public class TweetES implements IDeepType{
         return sb.toString();
     }
 }
-
-

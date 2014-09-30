@@ -54,7 +54,6 @@ import com.stratio.deep.commons.config.DeepJobConfig;
 import com.stratio.deep.commons.config.ExtractorConfig;
 import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
 import com.stratio.deep.commons.functions.AbstractSerializableFunction;
-import com.stratio.deep.commons.rdd.IExtractor;
 import com.stratio.deep.commons.utils.Constants;
 import com.stratio.deep.commons.utils.Pair;
 
@@ -201,7 +200,7 @@ public class CassandraEntityRDDTest extends CassandraRDDTest<TestEntity> {
         values.put(ExtractorConstants.FILTER_FIELD, Pair.create("response_time", 371));
         rddConfig.setValues(values);
         rddConfig.getExtractorConfiguration().setExtractorImplClass(
-                (Class<? extends IExtractor<TestEntity>>) CassandraEntityExtractor.class);
+                CassandraEntityExtractor.class);
 
         RDD<TestEntity> otherRDD = context.createRDD(rddConfig);
 
@@ -230,7 +229,7 @@ public class CassandraEntityRDDTest extends CassandraRDDTest<TestEntity> {
         values.put(ExtractorConstants.CQLPORT, CassandraServer.CASSANDRA_CQL_PORT);
         rddConfig.setValues(values);
         rddConfig.getExtractorConfiguration().setExtractorImplClass(
-                (Class<? extends IExtractor<TestEntity>>) CassandraEntityExtractor.class);
+                CassandraEntityExtractor.class);
         return rddConfig;
     }
 
@@ -250,7 +249,7 @@ public class CassandraEntityRDDTest extends CassandraRDDTest<TestEntity> {
 
         rddConfig.setValues(values);
         rddConfig.getExtractorConfiguration().setExtractorImplClass(
-                (Class<? extends IExtractor<TestEntity>>) CassandraEntityExtractor.class);
+                CassandraEntityExtractor.class);
 
         return rddConfig;
 
@@ -273,7 +272,7 @@ public class CassandraEntityRDDTest extends CassandraRDDTest<TestEntity> {
 
         rddConfig.setValues(values);
         rddConfig.getExtractorConfiguration().setExtractorImplClass(
-                (Class<? extends IExtractor<TestEntity>>) CassandraEntityExtractor.class);
+                CassandraEntityExtractor.class);
 
         RDD<TestEntity> tmpRdd = context.createRDD(rddConfig);
 

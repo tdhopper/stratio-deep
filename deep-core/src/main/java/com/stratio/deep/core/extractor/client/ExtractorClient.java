@@ -14,7 +14,6 @@
  */
 package com.stratio.deep.core.extractor.client;
 
-
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.EventLoopGroup;
@@ -33,8 +32,7 @@ import com.stratio.deep.commons.exception.DeepExtractorinitializationException;
 import com.stratio.deep.commons.rdd.IExtractor;
 
 /**
- * Sends a list of continent/city pairs to a {@link } to get the local times of the
- * specified cities.
+ * Sends a list of continent/city pairs to a {@link } to get the local times of the specified cities.
  */
 public class ExtractorClient<T> implements IExtractor<T> {
 
@@ -81,7 +79,6 @@ public class ExtractorClient<T> implements IExtractor<T> {
         group.shutdownGracefully();
     }
 
-
     @Override
     public boolean hasNext() {
         return handler.hasNext();
@@ -91,7 +88,6 @@ public class ExtractorClient<T> implements IExtractor<T> {
     public T next() {
         return handler.next();
     }
-
 
     @Override
     public void initIterator(Partition dp, DeepJobConfig<T> config) {
@@ -113,8 +109,6 @@ public class ExtractorClient<T> implements IExtractor<T> {
         handler.initSave(config, first);
     }
 
-
-
     @Override
     public void close() {
         handler.close();
@@ -123,13 +117,12 @@ public class ExtractorClient<T> implements IExtractor<T> {
 
     /*
      * (non-Javadoc)
-     *
+     * 
      * @see com.stratio.deep.rdd.IDeepRDD#getPartitions(IDeepJobConfig, int)
      */
     @Override
     public Partition[] getPartitions(DeepJobConfig<T> config) {
         return this.handler.getPartitions(config);
     }
-
 
 }

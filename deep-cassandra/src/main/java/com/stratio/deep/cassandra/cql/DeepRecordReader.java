@@ -49,11 +49,11 @@ import static com.stratio.deep.cassandra.cql.CassandraClientProvider.trySessionF
 import static com.stratio.deep.commons.utils.Utils.additionalFilterGenerator;
 
 /**
- * Implements a cassandra record reader with pagination capabilities.
- * Does not rely on Cassandra's Hadoop CqlPagingRecordReader.
+ * Implements a cassandra record reader with pagination capabilities. Does not rely on Cassandra's Hadoop
+ * CqlPagingRecordReader.
  * <p/>
  * Pagination is outsourced to Datastax Java Driver.
- *
+ * 
  * @author Luca Rosellini <luca@strat.io>
  */
 public class DeepRecordReader implements IDeepRecordReader {
@@ -86,9 +86,11 @@ public class DeepRecordReader implements IDeepRecordReader {
 
     /**
      * public constructor. Takes a list of filters to pass to the underlying data stores.
-     *
-     * @param config the deep configuration object.
-     * @param split  the token range on which the new reader will be based.
+     * 
+     * @param config
+     *            the deep configuration object.
+     * @param split
+     *            the token range on which the new reader will be based.
      */
     public DeepRecordReader(IDeepJobConfig config, DeepTokenRange split) {
         this.config = (ICassandraDeepJobConfig) config;
@@ -99,7 +101,9 @@ public class DeepRecordReader implements IDeepRecordReader {
 
     /**
      * Initialized this object.
-     * <p>Creates a new client and row iterator.</p>
+     * <p>
+     * Creates a new client and row iterator.
+     * </p>
      */
     private void initialize() {
         cfName = config.getTable();
@@ -123,7 +127,7 @@ public class DeepRecordReader implements IDeepRecordReader {
 
     /**
      * Creates a new connection. Reuses a cached connection if possible.
-     *
+     * 
      * @return the new session
      */
     private Session createConnection() {
@@ -148,7 +152,6 @@ public class DeepRecordReader implements IDeepRecordReader {
         throw new DeepIOException(lastException);
     }
 
-
     /**
      * Closes this input reader object.
      */
@@ -158,7 +161,7 @@ public class DeepRecordReader implements IDeepRecordReader {
 
     /**
      * Creates a new empty LinkedHashMap.
-     *
+     * 
      * @return the map of associations between row column names and their values.
      */
     public Map<String, ByteBuffer> createEmptyMap() {
@@ -170,8 +173,8 @@ public class DeepRecordReader implements IDeepRecordReader {
      */
     class RowIterator extends AbstractIterator<Pair<Map<String, ByteBuffer>, Map<String, ByteBuffer>>> {
         private Iterator<Row> rows;
-        private String partitionKeyString;       // keys in <key1>, <key2>, <key3> string format
-        private String partitionKeyMarkers;      // question marks in ? , ? , ? format which matches the number of keys
+        private String partitionKeyString; // keys in <key1>, <key2>, <key3> string format
+        private String partitionKeyMarkers; // question marks in ? , ? , ? format which matches the number of keys
 
         /**
          * Default constructor.
@@ -465,9 +468,9 @@ public class DeepRecordReader implements IDeepRecordReader {
     }
 
     /**
-     * Returns a boolean indicating if the underlying rowIterator has a new element or not.
-     * DOES NOT advance the iterator to the next element.
-     *
+     * Returns a boolean indicating if the underlying rowIterator has a new element or not. DOES NOT advance the
+     * iterator to the next element.
+     * 
      * @return a boolean indicating if the underlying rowIterator has a new element or not.
      */
     public boolean hasNext() {
@@ -476,7 +479,7 @@ public class DeepRecordReader implements IDeepRecordReader {
 
     /**
      * Returns the next element in the underlying rowIterator.
-     *
+     * 
      * @return the next element in the underlying rowIterator.
      */
     public Pair<Map<String, ByteBuffer>, Map<String, ByteBuffer>> next() {
@@ -486,33 +489,33 @@ public class DeepRecordReader implements IDeepRecordReader {
         return rowIterator.next();
     }
 
-
-//
-//
-//    @Override
-//    public void initialize(InputSplit inputSplit, TaskAttemptContext taskAttemptContext) throws IOException, InterruptedException {
-//
-//    }
-//
-//    @Override
-//    public boolean nextKeyValue() throws IOException, InterruptedException {
-//        return false;
-//    }
-//
-//    @Override
-//    public Object getCurrentKey() throws IOException, InterruptedException {
-//        return null;
-//    }
-//
-//    @Override
-//    public Object getCurrentValue() throws IOException, InterruptedException {
-//        return null;
-//    }
-//
-//    @Override
-//    public float getProgress() throws IOException, InterruptedException {
-//        return 0;
-//    }
-//
+    //
+    //
+    // @Override
+    // public void initialize(InputSplit inputSplit, TaskAttemptContext taskAttemptContext) throws IOException,
+    // InterruptedException {
+    //
+    // }
+    //
+    // @Override
+    // public boolean nextKeyValue() throws IOException, InterruptedException {
+    // return false;
+    // }
+    //
+    // @Override
+    // public Object getCurrentKey() throws IOException, InterruptedException {
+    // return null;
+    // }
+    //
+    // @Override
+    // public Object getCurrentValue() throws IOException, InterruptedException {
+    // return null;
+    // }
+    //
+    // @Override
+    // public float getProgress() throws IOException, InterruptedException {
+    // return 0;
+    // }
+    //
 
 }

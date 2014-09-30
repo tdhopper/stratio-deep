@@ -18,7 +18,7 @@ package com.stratio.deep.commons.exception;
 
 /**
  * Unchecked variant of {@link NoSuchFieldException}.
- *
+ * 
  * @author Luca Rosellini <luca@stratio.com>
  */
 public class DeepNoSuchFieldException extends RuntimeException {

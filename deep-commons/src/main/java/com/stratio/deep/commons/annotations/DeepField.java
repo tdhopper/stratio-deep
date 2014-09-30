@@ -32,8 +32,8 @@ import java.lang.annotation.Target;
 public @interface DeepField {
 
     /**
-     * used to specify an alternative database name for the current property.
-     * If omitted the property name will be used to resolve the database column name.
+     * used to specify an alternative database name for the current property. If omitted the property name will be used
+     * to resolve the database column name.
      */
     String fieldName() default "";
 

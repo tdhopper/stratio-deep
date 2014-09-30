@@ -20,10 +20,8 @@ import com.google.common.base.Objects;
 
 import java.io.Serializable;
 
-
 /**
- * Common utility class wrapping a pair of objects.
- * Instances of Pair are immutable.
+ * Common utility class wrapping a pair of objects. Instances of Pair are immutable.
  */
 public class Pair<L, R> implements Serializable {
     /**
@@ -38,9 +36,11 @@ public class Pair<L, R> implements Serializable {
 
     /**
      * private constructor.
-     *
-     * @param left  left element
-     * @param right right element
+     * 
+     * @param left
+     *            left element
+     * @param right
+     *            right element
      */
     private Pair(L left, R right) {
         this.left = left;
@@ -49,11 +49,15 @@ public class Pair<L, R> implements Serializable {
 
     /**
      * Creates a new immutable pair of objects.
-     *
-     * @param left  the left element.
-     * @param right the right element.
-     * @param <L>   the type of the left element.
-     * @param <R>   the type of the right element.
+     * 
+     * @param left
+     *            the left element.
+     * @param right
+     *            the right element.
+     * @param <L>
+     *            the type of the left element.
+     * @param <R>
+     *            the type of the right element.
      * @return a new pair.
      */
     public static <L, R> Pair<L, R> create(L left, R right) {

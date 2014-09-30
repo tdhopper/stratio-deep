@@ -37,12 +37,10 @@ public class UtilsTest {
     private static final String OUTPUT_KEYSPACE_NAME = "out_test_keyspace";
     private static final String OUTPUT_COLUMN_FAMILY = "out_test_page";
 
-
     class NotInstantiable implements IDeepType {
 
         private static final long serialVersionUID = -3311345712290429412L;
     }
-
 
     @Test
     public void testFilterDeepFields() {
@@ -72,7 +70,6 @@ public class UtilsTest {
     @Test
     public void testAdditionalFilters() {
         assertEquals(additionalFilterGenerator(null), "");
-
 
         Map<String, Serializable> map = new TreeMap<>();
         assertEquals(additionalFilterGenerator(map), "");
@@ -124,7 +121,6 @@ public class UtilsTest {
 
         Utils.newTypeInstance(CommonsTestEntity.class);
     }
-
 
     @Test
     public void testSingleQuote() {

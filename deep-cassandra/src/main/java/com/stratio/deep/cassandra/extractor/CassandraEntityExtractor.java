@@ -39,7 +39,7 @@ import com.stratio.deep.commons.utils.Utils;
  * 
  * @author Luca Rosellini <luca@strat.io>
  */
-public final class CassandraEntityExtractor<T extends IDeepType> extends CassandraExtractor<T> {
+public class CassandraEntityExtractor<T extends IDeepType> extends CassandraExtractor<T> {
 
     private static final long serialVersionUID = -3208994171892747470L;
 

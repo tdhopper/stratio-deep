@@ -24,8 +24,8 @@ import java.net.UnknownHostException;
 import java.util.Comparator;
 
 /**
- * Given a list of names of machines, this comparator tries as much as he can
- * to put the hostname of the local machine on the first position of the list.
+ * Given a list of names of machines, this comparator tries as much as he can to put the hostname of the local machine
+ * on the first position of the list.
  */
 public class DeepPartitionLocationComparator implements Comparator<String> {
     private final InetAddress hostname;
@@ -43,8 +43,9 @@ public class DeepPartitionLocationComparator implements Comparator<String> {
 
     /**
      * Constucts a comparator using as the name of the local machine the hostname provided.
-     *
-     * @param hostname the host name of the current machine.
+     * 
+     * @param hostname
+     *            the host name of the current machine.
      */
     public DeepPartitionLocationComparator(String hostname) {
         try {

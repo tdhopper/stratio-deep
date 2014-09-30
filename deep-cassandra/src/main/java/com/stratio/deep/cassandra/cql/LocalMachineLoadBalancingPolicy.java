@@ -64,11 +64,12 @@ public class LocalMachineLoadBalancingPolicy extends RoundRobinPolicy {
     /**
      * Return the HostDistance for the provided host.
      * <p/>
-     * This policy consider all nodes as local. This is generally the right
-     * thing to do in a single datacenter deployment. If you use multiple
-     * datacenter, see {@link com.datastax.driver.core.policies.DCAwareRoundRobinPolicy} instead.
-     *
-     * @param host the host of which to return the distance of.
+     * This policy consider all nodes as local. This is generally the right thing to do in a single datacenter
+     * deployment. If you use multiple datacenter, see {@link com.datastax.driver.core.policies.DCAwareRoundRobinPolicy}
+     * instead.
+     * 
+     * @param host
+     *            the host of which to return the distance of.
      * @return the HostDistance to {@code host}.
      */
     @Override
@@ -79,15 +80,15 @@ public class LocalMachineLoadBalancingPolicy extends RoundRobinPolicy {
     /**
      * Returns the hosts to use for a new query.
      * <p/>
-     * The returned plan will try each known host of the cluster. Upon each
-     * call to this method, the {@code i}th host of the plans returned will cycle
-     * over all the hosts of the cluster in a round-robin fashion.
-     *
-     * @param loggedKeyspace the keyspace currently logged in on for this
-     *                       query.
-     * @param statement      the query for which to build the plan.
-     * @return a new query plan, i.e. an iterator indicating which host to
-     * try first for querying, which one to use as failover, etc...
+     * The returned plan will try each known host of the cluster. Upon each call to this method, the {@code i}th host of
+     * the plans returned will cycle over all the hosts of the cluster in a round-robin fashion.
+     * 
+     * @param loggedKeyspace
+     *            the keyspace currently logged in on for this query.
+     * @param statement
+     *            the query for which to build the plan.
+     * @return a new query plan, i.e. an iterator indicating which host to try first for querying, which one to use as
+     *         failover, etc...
      */
     @Override
     public Iterator<Host> newQueryPlan(String loggedKeyspace, Statement statement) {
@@ -144,8 +145,9 @@ public class LocalMachineLoadBalancingPolicy extends RoundRobinPolicy {
 
     /**
      * Adds the given new host only if the list of known hosts is empty.
-     *
-     * @param host the host to add.
+     * 
+     * @param host
+     *            the host to add.
      */
     @Override
     public void onAdd(Host host) {

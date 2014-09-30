@@ -24,7 +24,7 @@ import java.io.Serializable;
 
 /**
  * Factory class for deep configuration objects.
- *
+ * 
  * @author Luca Rosellini <luca@stratio.com>
  */
 public final class CassandraConfigFactory implements Serializable {
@@ -41,7 +41,7 @@ public final class CassandraConfigFactory implements Serializable {
 
     /**
      * Creates a new cell-based job configuration object.
-     *
+     * 
      * @return a new cell-based job configuration object.
      */
     public static ICassandraDeepJobConfig<Cells> create() {
@@ -50,7 +50,7 @@ public final class CassandraConfigFactory implements Serializable {
 
     /**
      * Creates a new cell-based write suitable job configuration object.
-     *
+     * 
      * @return a new cell-based write suitable job configuration object.
      */
     public static ICassandraDeepJobConfig<Cells> createWriteConfig() {
@@ -59,9 +59,11 @@ public final class CassandraConfigFactory implements Serializable {
 
     /**
      * Creates an entity-based configuration object.
-     *
-     * @param entityClass the class instance of the entity class that will be used to map db objects to Java objects.
-     * @param <T>         the generic type of the entity object implementing IDeepType.
+     * 
+     * @param entityClass
+     *            the class instance of the entity class that will be used to map db objects to Java objects.
+     * @param <T>
+     *            the generic type of the entity object implementing IDeepType.
      * @return a new an entity-based configuration object.
      */
     public static <T extends IDeepType> ICassandraDeepJobConfig<T> create(Class<T> entityClass) {
@@ -70,12 +72,11 @@ public final class CassandraConfigFactory implements Serializable {
 
     /**
      * Creates an entity-based write configuration object.
-     *
+     * 
      * @return an entity-based write configuration object.
      */
     public static <T extends IDeepType> ICassandraDeepJobConfig<T> createWriteConfig(Class<T> entityClass) {
         return new EntityDeepJobConfig<>(entityClass);
     }
-
 
 }

@@ -1,6 +1,5 @@
 package com.stratio.deep.extractor;
 
-
 import com.google.common.io.Resources;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
@@ -25,9 +24,8 @@ import static org.testng.Assert.assertEquals;
 /**
  * Created by rcrespo on 16/07/14.
  */
-@Test(suiteName = "mongoRddTests", groups = {"MongoJavaRDDTest"})
+@Test(suiteName = "mongoRddTests", groups = { "MongoJavaRDDTest" })
 public class MongoJavaRDDTest {
-
 
     public static MongodExecutable mongodExecutable = null;
     public static MongoClient mongo = null;
@@ -57,13 +55,11 @@ public class MongoJavaRDDTest {
 
     public static final String DATA_SET_URL = "http://docs.openstratio.org/resources/datasets/divineComedy.json";
 
-
     private static MongodProcess mongod;
 
     @BeforeSuite
     public static void init() throws IOException {
         Command command = Command.MongoD;
-
 
         new File(DB_FOLDER_NAME).mkdirs();
 
@@ -80,7 +76,6 @@ public class MongoJavaRDDTest {
                         .build())
                 .build();
 
-
         IRuntimeConfig runtimeConfig = new RuntimeConfigBuilder()
                 .defaults(command)
                 .artifactStore(new ArtifactStoreBuilder()
@@ -94,15 +89,13 @@ public class MongoJavaRDDTest {
 
         mongodExecutable = null;
 
-
         mongodExecutable = runtime.prepare(mongodConfig);
 
         mongod = mongodExecutable.start();
 
-//TODO : Uncomment when drone.io is ready
-//        Files.forceDelete(new File(System.getProperty("user.home") +
-//                File.separator + ".embedmongo"));
-
+        // TODO : Uncomment when drone.io is ready
+        // Files.forceDelete(new File(System.getProperty("user.home") +
+        // File.separator + ".embedmongo"));
 
         mongo = new MongoClient(HOST, PORT);
         DB db = mongo.getDB(DATABASE);
@@ -112,19 +105,18 @@ public class MongoJavaRDDTest {
         map.put("message", MESSAGE_TEST);
         col.save(new BasicDBObject(map));
 
-
         dataSetImport();
 
     }
 
     @Test
     public void testRDD() {
-        assertEquals(true,true);
+        assertEquals(true, true);
     }
 
     /**
      * Imports dataset
-     *
+     * 
      * @throws java.io.IOException
      */
     private static void dataSetImport() throws IOException {
@@ -141,20 +133,19 @@ public class MongoJavaRDDTest {
                 .jsonArray(true)
                 .importFile(url.getFile())
                 .build();
-        MongoImportExecutable mongoImportExecutable = MongoImportStarter.getDefaultInstance().prepare(mongoImportConfig);
+        MongoImportExecutable mongoImportExecutable = MongoImportStarter.getDefaultInstance()
+                .prepare(mongoImportConfig);
         mongoImportExecutable.start();
-
 
     }
 
-
     @AfterSuite
     public static void cleanup() {
-        try{
+        try {
             if (mongodExecutable != null) {
                 mongodExecutable.stop();
             }
-        }finally{
+        } finally {
             Files.forceDelete(new File(DB_FOLDER_NAME));
         }
 

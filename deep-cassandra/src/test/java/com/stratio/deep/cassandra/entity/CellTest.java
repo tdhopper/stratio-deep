@@ -72,7 +72,8 @@ public class CellTest {
         assertTrue(c2.marshallerClassName().equals(ListType.class.getCanonicalName()));
         assertEquals(c2.getValueType(), List.class);
 
-        CassandraCell c3 = (CassandraCell) CassandraCell.create(te, CommonsTestEntity.class.getDeclaredField("uuid2id"));
+        CassandraCell c3 = (CassandraCell) CassandraCell
+                .create(te, CommonsTestEntity.class.getDeclaredField("uuid2id"));
 
         assertNotNull(c3);
         assertEquals(c3.getCellName(), "uuid2id");

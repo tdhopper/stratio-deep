@@ -39,6 +39,4 @@ public class CellDeepJobConfigES extends GenericDeepJobConfigES<Cells> {
         return (Class<Cells>) dummyCells.getClass();
     }
 
-
-
 }

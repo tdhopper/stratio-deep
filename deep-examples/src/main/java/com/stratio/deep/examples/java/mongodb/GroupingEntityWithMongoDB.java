@@ -33,7 +33,6 @@ import scala.Tuple2;
 import com.stratio.deep.commons.config.DeepJobConfig;
 import com.stratio.deep.commons.config.ExtractorConfig;
 import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
-import com.stratio.deep.commons.rdd.IExtractor;
 import com.stratio.deep.core.context.DeepSparkContext;
 import com.stratio.deep.core.entity.BookEntity;
 import com.stratio.deep.core.entity.CantoEntity;
@@ -70,7 +69,7 @@ public final class GroupingEntityWithMongoDB {
         DeepJobConfig<BookEntity> inputConfigEntity = new DeepJobConfig<>(new ExtractorConfig(BookEntity.class));
         inputConfigEntity.putValue(ExtractorConstants.HOST, host).putValue(ExtractorConstants.DATABASE, database)
                 .putValue(ExtractorConstants.COLLECTION, inputCollection);
-        inputConfigEntity.setExtractorImplClass((Class<? extends IExtractor<BookEntity>>) MongoEntityExtractor.class);
+        inputConfigEntity.setExtractorImplClass(MongoEntityExtractor.class);
 
         RDD<BookEntity> inputRDDEntity = deepContext.createRDD(inputConfigEntity);
         JavaRDD<String> words = inputRDDEntity.toJavaRDD().flatMap(new FlatMapFunction<BookEntity, String>() {
@@ -109,7 +108,7 @@ public final class GroupingEntityWithMongoDB {
         DeepJobConfig<WordCount> outputConfigEntity = new DeepJobConfig<>(new ExtractorConfig(WordCount.class));
         outputConfigEntity.putValue(ExtractorConstants.HOST, host).putValue(ExtractorConstants.DATABASE, database)
                 .putValue(ExtractorConstants.COLLECTION, outputCollection);
-        outputConfigEntity.setExtractorImplClass((Class<? extends IExtractor<WordCount>>) MongoEntityExtractor.class);
+        outputConfigEntity.setExtractorImplClass(MongoEntityExtractor.class);
 
         deepContext.saveRDD(outputRDD.rdd(), outputConfigEntity);
 

@@ -20,7 +20,7 @@ import java.io.IOException;
 
 /**
  * Unchecked variant of {@link IOException}.
- *
+ * 
  * @author Luca Rosellini <luca@stratio.com>
  */
 public class DeepIOException extends RuntimeException {

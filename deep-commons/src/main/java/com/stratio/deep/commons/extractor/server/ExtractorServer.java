@@ -32,8 +32,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 /**
- * Receives a list of continent/city pairs from a {@link } to
- * get the local times of the specified cities.
+ * Receives a list of continent/city pairs from a {@link } to get the local times of the specified cities.
  */
 public final class ExtractorServer {
 
@@ -75,12 +74,12 @@ public final class ExtractorServer {
         b.bind(PORT).sync().channel().closeFuture().sync();
     }
 
-    public static void close(){
+    public static void close() {
         bossGroup.shutdownGracefully();
         workerGroup.shutdownGracefully();
     }
 
-    public static void initExtractorServer (){
+    public static void initExtractorServer() {
         ExecutorService es = Executors.newFixedThreadPool(1);
         final Future future = es.submit(new Callable() {
             public Object call() throws Exception {
@@ -90,7 +89,7 @@ public final class ExtractorServer {
         });
     }
 
-    public static void stopExtractorServer (){
+    public static void stopExtractorServer() {
         close();
     }
 }

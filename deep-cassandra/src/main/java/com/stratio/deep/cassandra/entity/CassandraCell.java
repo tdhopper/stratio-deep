@@ -14,33 +14,32 @@ import java.nio.ByteBuffer;
 
 import static com.stratio.deep.commons.utils.AnnotationUtils.*;
 
-
 /**
  * Created by rcrespo on 23/06/14.
  */
 public class CassandraCell extends Cell {
 
     /**
-     * flag that tells if this cell is part of the partition key.
-     * Defaults to FALSE.
+     * flag that tells if this cell is part of the partition key. Defaults to FALSE.
      */
     private Boolean isPartitionKey = Boolean.FALSE;
 
     /**
-     * flag that tells if this cell is part of the clustering key.
-     * Defaults to FALSE.
+     * flag that tells if this cell is part of the clustering key. Defaults to FALSE.
      */
     private Boolean isClusterKey = Boolean.FALSE;
 
     private transient CellValidator cellValidator;
 
-
     private String cql3TypeClassName;
+
     /**
      * Factory method, creates a new CassandraCell from its value and metadata information<br/>
-     *
-     * @param metadata  the cell object carrying the metadata for this new CassandraCell
-     * @param cellValue the cell value, provided as a ByteBuffer.
+     * 
+     * @param metadata
+     *            the cell object carrying the metadata for this new CassandraCell
+     * @param cellValue
+     *            the cell value, provided as a ByteBuffer.
      * @return an instance of a Cell object for the provided parameters.
      */
     public static Cell create(Cell metadata, Object cellValue) {
@@ -49,9 +48,11 @@ public class CassandraCell extends Cell {
 
     /**
      * Factory method, creates a new CassandraCell from its value and metadata information<br/>
-     *
-     * @param metadata  the cell object carrying the metadata for this new CassandraCell
-     * @param cellValue the cell value, provided as a ByteBuffer.
+     * 
+     * @param metadata
+     *            the cell object carrying the metadata for this new CassandraCell
+     * @param cellValue
+     *            the cell value, provided as a ByteBuffer.
      * @return an instance of a Cell object for the provided parameters.
      */
     public static Cell create(Cell metadata, ByteBuffer cellValue) {
@@ -59,11 +60,13 @@ public class CassandraCell extends Cell {
     }
 
     /**
-     * Factory method, builds a new CassandraCell (isPartitionKey = false and isClusterKey = false).
-     * The validator will be automatically calculated using the value object type.
-     *
-     * @param cellName  the cell name
-     * @param cellValue the cell value, provided as a ByteBuffer.
+     * Factory method, builds a new CassandraCell (isPartitionKey = false and isClusterKey = false). The validator will
+     * be automatically calculated using the value object type.
+     * 
+     * @param cellName
+     *            the cell name
+     * @param cellValue
+     *            the cell value, provided as a ByteBuffer.
      * @return an instance of a Cell object for the provided parameters.
      */
     public static Cell create(String cellName, Object cellValue) {
@@ -73,8 +76,9 @@ public class CassandraCell extends Cell {
     /**
      * Factory method, builds a new CassandraCell (isPartitionKey = false and isClusterKey = false) with value = null.
      * The validator will be automatically calculated using the value object type.
-     *
-     * @param cellName the cell name
+     * 
+     * @param cellName
+     *            the cell name
      * @return an instance of a Cell object for the provided parameters.
      */
     public static Cell create(String cellName) {
@@ -83,38 +87,49 @@ public class CassandraCell extends Cell {
 
     /**
      * Factory method, creates a new CassandraCell.<br/>
-     *
-     * @param cellName       the cell name
-     * @param cellValue      the cell value, provided as a ByteBuffer.
-     * @param isPartitionKey true if this cell is part of the cassandra's partition key.
-     * @param isClusterKey   true if this cell is part of the cassandra's clustering key.
+     * 
+     * @param cellName
+     *            the cell name
+     * @param cellValue
+     *            the cell value, provided as a ByteBuffer.
+     * @param isPartitionKey
+     *            true if this cell is part of the cassandra's partition key.
+     * @param isClusterKey
+     *            true if this cell is part of the cassandra's clustering key.
      * @return an instance of a Cell object for the provided parameters.
      */
     public static Cell create(String cellName, Object cellValue, Boolean isPartitionKey,
-                              Boolean isClusterKey) {
+            Boolean isClusterKey) {
         return new CassandraCell(cellName, cellValue, isPartitionKey, isClusterKey);
     }
 
     /**
      * Factory method, creates a new metadata Cell, i.e. a Cell without value.
-     *
-     * @param cellName       the cell name
-     * @param cellType       the cell value type.
-     * @param isPartitionKey true if this cell is part of the cassandra's partition key.
-     * @param isClusterKey   true if this cell is part of the cassandra's clustering key.
+     * 
+     * @param cellName
+     *            the cell name
+     * @param cellType
+     *            the cell value type.
+     * @param isPartitionKey
+     *            true if this cell is part of the cassandra's partition key.
+     * @param isClusterKey
+     *            true if this cell is part of the cassandra's clustering key.
      * @return an instance of a Cell object for the provided parameters.
      */
     public static Cell create(String cellName, DataType cellType, Boolean isPartitionKey,
-                              Boolean isClusterKey) {
+            Boolean isClusterKey) {
         return new CassandraCell(cellName, cellType, isPartitionKey, isClusterKey);
     }
 
     /**
      * Constructs a Cell from a {@link com.stratio.deep.commons.annotations.DeepField} property.
-     *
-     * @param e     instance of the testentity whose field is going to generate a Cell.
-     * @param field field that will generate the Cell.
-     * @param <E>   a subclass of IDeepType.
+     * 
+     * @param e
+     *            instance of the testentity whose field is going to generate a Cell.
+     * @param field
+     *            field that will generate the Cell.
+     * @param <E>
+     *            a subclass of IDeepType.
      * @return an instance of a Cell object for the provided parameters.
      */
     public static <E extends IDeepType> Cell create(E e, Field field) {
@@ -123,10 +138,11 @@ public class CassandraCell extends Cell {
 
     /**
      * Calculates the Cassandra validator type given the value class type.<br/>
-     * There's a shortcoming in the case of an UUID. At this level we are not able
-     * to distinguish between an UUID or a TimeUUID because twe don't have the UUID value.
-     *
-     * @param obj the value class type.
+     * There's a shortcoming in the case of an UUID. At this level we are not able to distinguish between an UUID or a
+     * TimeUUID because twe don't have the UUID value.
+     * 
+     * @param obj
+     *            the value class type.
      * @return the CellValidator object associated to this cell.
      */
     public static CellValidator getValueType(DataType obj) {
@@ -135,8 +151,9 @@ public class CassandraCell extends Cell {
 
     /**
      * Calculates the Cassandra marshaller given the cell value.
-     *
-     * @param obj the cell value.
+     * 
+     * @param obj
+     *            the cell value.
      * @return the CellValidator object associated to this cell.
      */
     public static CellValidator getValueType(Object obj) {
@@ -155,7 +172,7 @@ public class CassandraCell extends Cell {
         this.isClusterKey = isClusterKey;
         this.isPartitionKey = isPartitionKey;
         this.cellValidator = getValueType(cellValue);
-        this.cql3TypeClassName = cellValidator!=null?cellValidator.getAbstractType().asCQL3Type().toString():null;
+        this.cql3TypeClassName = cellValidator != null ? cellValidator.getAbstractType().asCQL3Type().toString() : null;
 
     }
 
@@ -217,7 +234,6 @@ public class CassandraCell extends Cell {
 
     }
 
-
     public CellValidator getCellValidator() {
         return cellValidator;
     }
@@ -231,8 +247,9 @@ public class CassandraCell extends Cell {
      * <li>isPartitionKey</li>
      * <li>validator</li>
      * </ol>
-     *
-     * @param o the object instance we want to compare to this object.
+     * 
+     * @param o
+     *            the object instance we want to compare to this object.
      * @return either true or false if this Cell is equal to the one supplied as an argument.
      */
     @SuppressWarnings("rawtypes")
@@ -249,17 +266,19 @@ public class CassandraCell extends Cell {
 
         boolean isCellEqual = cellEquals(cell);
         boolean isKey = keyEquals(cell);
-//        boolean isCellValidatorEqual = cellValidatorEquals(cell);
+        // boolean isCellValidatorEqual = cellValidatorEquals(cell);
         boolean iscql3TypeClassNameEquals = cql3TypeClassNameEquals(cell);
         return isCellEqual && isKey && iscql3TypeClassNameEquals;
     }
 
     private boolean cellEquals(CassandraCell cell) {
-        return cql3TypeClassName != null ? cql3TypeClassName.equals(cell.cql3TypeClassName) : cell.cql3TypeClassName == null;
+        return cql3TypeClassName != null ? cql3TypeClassName.equals(cell.cql3TypeClassName)
+                : cell.cql3TypeClassName == null;
     }
 
     private boolean cql3TypeClassNameEquals(CassandraCell cell) {
-        return cellName.equals(cell.cellName) && cellValue != null ? cellValue.equals(cell.cellValue) : cell.cellValue == null;
+        return cellName.equals(cell.cellName) && cellValue != null ? cellValue.equals(cell.cellValue)
+                : cell.cellValue == null;
     }
 
     private boolean keyEquals(CassandraCell cell) {
@@ -270,7 +289,6 @@ public class CassandraCell extends Cell {
         return cellValidator != null ? cellValidator.equals(cell.cellValidator) : cell.cellValidator == null;
     }
 
-
     public Class getValueType() {
         Class valueType = MAP_ABSTRACT_TYPE_CLASSNAME_TO_JAVA_TYPE.get(cellValidator.getValidatorClassName());
         if (valueType == null) {
@@ -280,7 +298,6 @@ public class CassandraCell extends Cell {
 
         return valueType;
     }
-
 
     @Override
     @SuppressWarnings("unchecked")
@@ -307,21 +324,17 @@ public class CassandraCell extends Cell {
         return result;
     }
 
-
     public Boolean isClusterKey() {
         return isClusterKey;
     }
-
 
     public Boolean isPartitionKey() {
         return isPartitionKey;
     }
 
-
     public Boolean isKey() {
         return isClusterKey || isPartitionKey;
     }
-
 
     public AbstractType marshaller() {
         if (cellValidator != null) {
@@ -330,7 +343,6 @@ public class CassandraCell extends Cell {
             return null;
         }
     }
-
 
     public String marshallerClassName() {
         if (cellValidator != null) {

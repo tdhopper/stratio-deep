@@ -26,7 +26,6 @@ public class ESCell extends Cell {
         super(cellName, cellValue);
     }
 
-
     public Boolean isKey() {
         return false;
     }

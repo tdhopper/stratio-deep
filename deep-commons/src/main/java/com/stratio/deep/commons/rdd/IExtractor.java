@@ -12,7 +12,6 @@ import com.stratio.deep.commons.config.ExtractorConfig;
  */
 public interface IExtractor<T> extends Serializable {
 
-
     Partition[] getPartitions(DeepJobConfig<T> config);
 
     boolean hasNext();
@@ -22,7 +21,6 @@ public interface IExtractor<T> extends Serializable {
     void close();
 
     void initIterator(Partition dp, DeepJobConfig<T> config);
-
 
     IExtractor<T> getExtractorInstance(DeepJobConfig<T> config);
 

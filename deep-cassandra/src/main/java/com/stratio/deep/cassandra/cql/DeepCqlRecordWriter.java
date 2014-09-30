@@ -71,7 +71,7 @@ public class DeepCqlRecordWriter implements AutoCloseable {
 
     /**
      * Con
-     *
+     * 
      * @param writeConfig
      */
     public DeepCqlRecordWriter(ICassandraDeepJobConfig writeConfig) {
@@ -191,10 +191,13 @@ public class DeepCqlRecordWriter implements AutoCloseable {
 
     /**
      * Fetches row metadata for the given column family.
-     *
-     * @param sessionWithHost the connection to the DB.
-     * @param keyspace        the keyspace name
-     * @param cfName          the column family
+     * 
+     * @param sessionWithHost
+     *            the connection to the DB.
+     * @param keyspace
+     *            the keyspace name
+     * @param cfName
+     *            the column family
      * @return the Row object
      */
     private static Row getRowMetadata(Pair<Session, String> sessionWithHost, String keyspace, String cfName) {
@@ -208,11 +211,13 @@ public class DeepCqlRecordWriter implements AutoCloseable {
     }
 
     /**
-     * Adds the provided row to a batch. If the batch size reaches the threshold configured in IDeepJobConfig.getBatchSize
-     * the batch will be sent to the data store.
-     *
-     * @param keys   the Cells object containing the row keys.
-     * @param values the Cells object containing all the other row  columns.
+     * Adds the provided row to a batch. If the batch size reaches the threshold configured in
+     * IDeepJobConfig.getBatchSize the batch will be sent to the data store.
+     * 
+     * @param keys
+     *            the Cells object containing the row keys.
+     * @param values
+     *            the Cells object containing all the other row columns.
      */
     public void write(Cells keys, Cells values) {
         /* generate SQL */
@@ -240,8 +245,8 @@ public class DeepCqlRecordWriter implements AutoCloseable {
     }
 
     /**
-     * A client that runs in a threadpool and connects to the list of endpoints for a particular
-     * range. Bound variables for keys in that range are sent to this client via a queue.
+     * A client that runs in a threadpool and connects to the list of endpoints for a particular range. Bound variables
+     * for keys in that range are sent to this client via a queue.
      */
     private class RangeClient extends Thread implements Closeable {
 
@@ -253,9 +258,11 @@ public class DeepCqlRecordWriter implements AutoCloseable {
 
         /**
          * Returns true if adding the current element triggers the batch execution.
-         *
-         * @param stmt   the query to add to the batch.
-         * @param values the list of binding values.
+         * 
+         * @param stmt
+         *            the query to add to the batch.
+         * @param values
+         *            the list of binding values.
          * @return a boolean indicating if the batch has been triggered or not.
          */
         public synchronized boolean put(String stmt, List<Object> values) {

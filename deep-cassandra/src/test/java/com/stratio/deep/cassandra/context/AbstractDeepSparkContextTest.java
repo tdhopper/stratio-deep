@@ -62,29 +62,31 @@ public abstract class AbstractDeepSparkContextTest {
     protected static final int entityTestDataSize = 19;
     protected static final int cql3TestDataSize = 20;
 
-    protected String createCF = "CREATE TABLE " + quote(KEYSPACE_NAME) + "." + quote(COLUMN_FAMILY) + " (id text PRIMARY " +
+    protected String createCF = "CREATE TABLE " + quote(KEYSPACE_NAME) + "." + quote(COLUMN_FAMILY)
+            + " (id text PRIMARY " +
             "KEY, " + "url text, "
             + "domain_name text, " + "response_code int, " + "charset text," + "response_time int,"
             + "download_time bigint," + "first_download_time bigint," + "title text, lucene text ) ;";
 
     /*
-    protected String createLuceneIndex =
-            "CREATE CUSTOM INDEX page_lucene ON " + KEYSPACE_NAME + "." + quote(COLUMN_FAMILY) + " (lucene) USING " +
-                    "'org.apache.cassandra.db.index.stratio.RowIndex' " +
-                    "WITH OPTIONS = {'refresh_seconds':'1', 'schema':'{default_analyzer:\"org.apache.lucene.analysis" +
-                    ".standard.StandardAnalyzer\", " +
-                    "fields:{ charset:{type:\"string\"}, url:{type:\"string\"}, domain_name:{type:\"string\"}, " +
-                    "response_code:{type:\"integer\"}, id:{type:\"string\"}, response_time:{type:\"integer\"} } }'};";
-    */
+     * protected String createLuceneIndex = "CREATE CUSTOM INDEX page_lucene ON " + KEYSPACE_NAME + "." +
+     * quote(COLUMN_FAMILY) + " (lucene) USING " + "'org.apache.cassandra.db.index.stratio.RowIndex' " +
+     * "WITH OPTIONS = {'refresh_seconds':'1', 'schema':'{default_analyzer:\"org.apache.lucene.analysis" +
+     * ".standard.StandardAnalyzer\", " +
+     * "fields:{ charset:{type:\"string\"}, url:{type:\"string\"}, domain_name:{type:\"string\"}, " +
+     * "response_code:{type:\"integer\"}, id:{type:\"string\"}, response_time:{type:\"integer\"} } }'};";
+     */
 
-    protected String createCFIndex = "create index idx_" + COLUMN_FAMILY + "_resp_time on " + quote(KEYSPACE_NAME) + "." +
+    protected String createCFIndex = "create index idx_" + COLUMN_FAMILY + "_resp_time on " + quote(KEYSPACE_NAME)
+            + "." +
             quote(COLUMN_FAMILY) + " (response_time);";
 
     protected String createCql3CF = "create table " + quote(KEYSPACE_NAME) + "." + CQL3_COLUMN_FAMILY
             + "(name varchar, password varchar, color varchar, gender varchar, food varchar, "
             + " animal varchar, lucene varchar,age int,PRIMARY KEY ((name, gender), age, animal)); ";
 
-    protected String createCql3CFIndex = "create index idx_" + CQL3_COLUMN_FAMILY + "_food on " + quote(KEYSPACE_NAME) + "."
+    protected String createCql3CFIndex = "create index idx_" + CQL3_COLUMN_FAMILY + "_food on " + quote(KEYSPACE_NAME)
+            + "."
             + CQL3_COLUMN_FAMILY + "(food);";
 
     protected String createCql3CollectionsCF =
@@ -217,7 +219,7 @@ public abstract class AbstractDeepSparkContextTest {
 
     @BeforeSuite
     protected void initContextAndServer() throws ConfigurationException, IOException, InterruptedException {
-        if (context==null && cassandraServer==null) {
+        if (context == null && cassandraServer == null) {
 
             logger.info("instantiating context");
             context = new DeepSparkContext("local", "deepSparkContextTest");
@@ -234,14 +236,14 @@ public abstract class AbstractDeepSparkContextTest {
 
             String initialDataset = buildTestDataInsertBatch();
 
-            String[] startupCommands = new String[]{createKeyspace, createOutputKeyspace, useKeyspace, createCF,
-                    createCFIndex, /*createLuceneIndex,*/
-                    createCql3CF, createCql3CFIndex, createCql3CollectionsCF, initialDataset, useOutputKeyspace};
+            String[] startupCommands = new String[] { createKeyspace, createOutputKeyspace, useKeyspace, createCF,
+                    createCFIndex, /* createLuceneIndex, */
+                    createCql3CF, createCql3CFIndex, createCql3CollectionsCF, initialDataset, useOutputKeyspace };
 
             cassandraServer = new CassandraServer();
             cassandraServer.setStartupCommands(startupCommands);
             cassandraServer.start();
-           checkTestData();
+            checkTestData();
         }
     }
 

@@ -16,9 +16,7 @@ public class MongoCellTest {
     @Test
     public void createTest() {
 
-
         Cell cell1 = MongoCell.create("cellName1", "testStringObject");
-
 
         assertEquals(cell1.getCellName(), "cellName1");
 
@@ -29,11 +27,9 @@ public class MongoCellTest {
     @Test
     public void isKeyTest() {
 
-
         Cell cell2 = MongoCell.create("_id", "_idObject");
 
-
-        //assertTrue(cell2.isKey());
+        // assertTrue(cell2.isKey());
 
     }
 

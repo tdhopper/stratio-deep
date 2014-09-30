@@ -44,7 +44,6 @@ import com.mongodb.DBObject;
 import com.stratio.deep.commons.config.DeepJobConfig;
 import com.stratio.deep.commons.config.ExtractorConfig;
 import com.stratio.deep.commons.extractor.utils.ExtractorConstants;
-import com.stratio.deep.commons.rdd.IExtractor;
 import com.stratio.deep.core.context.DeepSparkContext;
 import com.stratio.deep.core.entity.BookEntity;
 import com.stratio.deep.core.entity.CantoEntity;
@@ -72,10 +71,10 @@ public class MongoEntityExtractorTest extends ExtractorTest {
 
         DeepSparkContext context = new DeepSparkContext("local", "deepSparkContextTest");
 
-        DeepJobConfig<BookEntity> inputConfigEntity = new DeepJobConfig<>(new ExtractorConfig(BookEntity.class));
+        DeepJobConfig<BookEntity> inputConfigEntity = new DeepJobConfig<>(new ExtractorConfig<>(BookEntity.class));
         inputConfigEntity.putValue(ExtractorConstants.HOST, hostConcat).putValue(ExtractorConstants.DATABASE, "book")
                 .putValue(ExtractorConstants.COLLECTION, "input");
-        inputConfigEntity.setExtractorImplClass((Class<? extends IExtractor<BookEntity>>) MongoEntityExtractor.class);
+        inputConfigEntity.setExtractorImplClass(MongoEntityExtractor.class);
 
         RDD<BookEntity> inputRDDEntity = context.createRDD(inputConfigEntity);
 
@@ -140,7 +139,7 @@ public class MongoEntityExtractorTest extends ExtractorTest {
         DeepJobConfig<WordCount> outputConfigEntity = new DeepJobConfig<>(new ExtractorConfig<>(WordCount.class));
         outputConfigEntity.putValue(ExtractorConstants.HOST, hostConcat).putValue(ExtractorConstants.DATABASE, "book")
                 .putValue(ExtractorConstants.COLLECTION, "output");
-        outputConfigEntity.setExtractorImplClass((Class<? extends IExtractor<WordCount>>) MongoEntityExtractor.class);
+        outputConfigEntity.setExtractorImplClass(MongoEntityExtractor.class);
 
         context.saveRDD(outputRDD.rdd(), outputConfigEntity);
 

@@ -15,9 +15,9 @@ import static org.testng.Assert.assertTrue;
 @Test
 public class MongoConfigFactoryTest {
 
-
     @Test(expectedExceptions = InvocationTargetException.class)
-    public void testConstructorIsPrivate() throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
+    public void testConstructorIsPrivate() throws NoSuchMethodException, IllegalAccessException,
+            InvocationTargetException, InstantiationException {
         Constructor<MongoConfigFactory> constructor = MongoConfigFactory.class.getDeclaredConstructor();
         assertTrue(Modifier.isPrivate(constructor.getModifiers()));
         constructor.setAccessible(true);

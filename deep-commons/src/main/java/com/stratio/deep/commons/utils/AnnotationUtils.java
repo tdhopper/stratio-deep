@@ -42,11 +42,10 @@ import java.util.*;
  */
 public final class AnnotationUtils {
     /**
-     * Static map of associations between Class objects and the equivalent
-     * Cassandra marshaller.
+     * Static map of associations between Class objects and the equivalent Cassandra marshaller.
      */
     public static final Map<Class, AbstractType<?>> MAP_JAVA_TYPE_TO_ABSTRACT_TYPE =
-            ImmutableMap.<Class, AbstractType<?>>builder()
+            ImmutableMap.<Class, AbstractType<?>> builder()
                     .put(String.class, UTF8Type.instance)
                     .put(Integer.class, Int32Type.instance)
                     .put(Boolean.class, BooleanType.instance)
@@ -64,11 +63,11 @@ public final class AnnotationUtils {
                     .build();
 
     /**
-     * Static map of associations between a cassandra marshaller fully qualified class name and the corresponding
-     * Java class.
+     * Static map of associations between a cassandra marshaller fully qualified class name and the corresponding Java
+     * class.
      */
     public static final Map<String, Class> MAP_ABSTRACT_TYPE_CLASSNAME_TO_JAVA_TYPE =
-            ImmutableMap.<String, Class>builder()
+            ImmutableMap.<String, Class> builder()
                     .put(UTF8Type.class.getCanonicalName(), String.class)
                     .put(Int32Type.class.getCanonicalName(), Integer.class)
                     .put(BooleanType.class.getCanonicalName(), Boolean.class)
@@ -92,7 +91,7 @@ public final class AnnotationUtils {
      * Static map of associations between cassandra marshaller Class objects and their instance.
      */
     public static final Map<Class<?>, AbstractType<?>> MAP_ABSTRACT_TYPE_CLASS_TO_ABSTRACT_TYPE =
-            ImmutableMap.<Class<?>, AbstractType<?>>builder()
+            ImmutableMap.<Class<?>, AbstractType<?>> builder()
                     .put(UTF8Type.class, UTF8Type.instance)
                     .put(Int32Type.class, Int32Type.instance)
                     .put(BooleanType.class, BooleanType.instance)
@@ -110,11 +109,11 @@ public final class AnnotationUtils {
                     .build();
 
     /**
-     * Returns the field name as known by the datastore. If the provided field object DeepField annotation
-     * specifies the fieldName property, the value of this property will be returned, otherwise the java field name
-     * will be returned.
-     *
-     * @param field the Field object associated to the property for which we want to resolve the name.
+     * Returns the field name as known by the datastore. If the provided field object DeepField annotation specifies the
+     * fieldName property, the value of this property will be returned, otherwise the java field name will be returned.
+     * 
+     * @param field
+     *            the Field object associated to the property for which we want to resolve the name.
      * @return the field name.
      */
     public static String deepFieldName(Field field) {
@@ -128,10 +127,11 @@ public final class AnnotationUtils {
     }
 
     /**
-     * Utility method that filters out all the fields _not_ annotated
-     * with the {@link com.stratio.deep.commons.annotations.DeepField} annotation.
-     *
-     * @param clazz the Class object for which we want to resolve deep fields.
+     * Utility method that filters out all the fields _not_ annotated with the
+     * {@link com.stratio.deep.commons.annotations.DeepField} annotation.
+     * 
+     * @param clazz
+     *            the Class object for which we want to resolve deep fields.
      * @return an array of deep Field(s).
      */
     public static Field[] filterDeepFields(Class clazz) {
@@ -146,12 +146,13 @@ public final class AnnotationUtils {
     }
 
     /**
-     * Return a pair of Field[] whose left element is
-     * the array of keys fields.
-     * The right element contains the array of all other non-key fields.
-     *
-     * @param clazz the Class object
-     * @return a pair object whose first element contains key fields, and whose second element contains all other columns.
+     * Return a pair of Field[] whose left element is the array of keys fields. The right element contains the array of
+     * all other non-key fields.
+     * 
+     * @param clazz
+     *            the Class object
+     * @return a pair object whose first element contains key fields, and whose second element contains all other
+     *         columns.
      */
     public static Pair<Field[], Field[]> filterKeyFields(Class clazz) {
         Field[] filtered = filterDeepFields(clazz);
@@ -171,8 +172,9 @@ public final class AnnotationUtils {
 
     /**
      * Returns true is given field is part of the table key.
-     *
-     * @param field the Field object we want to process.
+     * 
+     * @param field
+     *            the Field object we want to process.
      * @return true if the field is part of the cluster key or the partition key, false otherwise.
      */
     public static boolean isKey(DeepField field) {
@@ -181,9 +183,11 @@ public final class AnnotationUtils {
 
     /**
      * Returns the value of the fields <i>deepField</i> in the instance <i>entity</i> of type T.
-     *
-     * @param entity    the entity to process.
-     * @param deepField the Field to process belonging to <i>entity</i>
+     * 
+     * @param entity
+     *            the entity to process.
+     * @param deepField
+     *            the Field to process belonging to <i>entity</i>
      * @return the property value.
      */
     public static Serializable getBeanFieldValue(IDeepType entity, Field deepField) {
@@ -198,8 +202,9 @@ public final class AnnotationUtils {
 
     /**
      * Returns the list of generic types associated to the provided field (if any).
-     *
-     * @param field the field instance to process.
+     * 
+     * @param field
+     *            the field instance to process.
      * @return the list of generic types associated to the provided field (if any).
      */
     public static Class[] getGenericTypes(Field field) {
@@ -216,7 +221,7 @@ public final class AnnotationUtils {
             return res;
 
         } catch (ClassCastException e) {
-            return new Class<?>[]{(Class<?>) field.getGenericType()};
+            return new Class<?>[] { (Class<?>) field.getGenericType() };
         }
     }
 
