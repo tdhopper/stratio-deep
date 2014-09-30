@@ -2,7 +2,7 @@ package com.stratio.deep.config;
 
 import com.stratio.deep.commons.entity.Cells;
 import com.stratio.deep.mongodb.config.CellDeepJobConfigMongoDB;
-import com.stratio.deep.mongodb.config.GenericDeepJobConfigMongoDB;
+import com.stratio.deep.mongodb.config.DeepJobConfigMongoDB;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertEquals;
@@ -17,7 +17,7 @@ public class CellDeepJobConfigMongoDBTest {
     @Test
     public void createTest() {
 
-        GenericDeepJobConfigMongoDB<Cells> cellDeepJobConfigMongoDB = new CellDeepJobConfigMongoDB();
+        DeepJobConfigMongoDB<Cells> cellDeepJobConfigMongoDB = new CellDeepJobConfigMongoDB();
 
         assertNotNull(cellDeepJobConfigMongoDB);
 

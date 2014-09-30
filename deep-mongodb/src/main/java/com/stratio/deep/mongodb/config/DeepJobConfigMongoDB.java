@@ -55,7 +55,8 @@ import com.stratio.deep.commons.entity.Cell;
 /**
  * @param <T>
  */
-public abstract class GenericDeepJobConfigMongoDB<T> implements IMongoDeepJobConfig<T> {
+public class DeepJobConfigMongoDB<T> extends DeepJobConfig<T> implements IMongoDeepJobConfig<T> {
+
     private static final long serialVersionUID = -7179376653643603038L;
 
     /**
@@ -147,8 +148,9 @@ public abstract class GenericDeepJobConfigMongoDB<T> implements IMongoDeepJobCon
     /**
      * Default constructor
      */
-    public GenericDeepJobConfigMongoDB() {
-
+    public DeepJobConfigMongoDB(Class<T> entityClass) {
+        super();
+        this.entityClass = entityClass;
     }
 
     /**
@@ -164,7 +166,7 @@ public abstract class GenericDeepJobConfigMongoDB<T> implements IMongoDeepJobCon
      */
     // TODO : cheking
     @Override
-    public IMongoDeepJobConfig<T> pageSize(int pageSize) {
+    public DeepJobConfigMongoDB<T> pageSize(int pageSize) {
         return this;
     }
 
@@ -290,14 +292,6 @@ public abstract class GenericDeepJobConfigMongoDB<T> implements IMongoDeepJobCon
         return this;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public IMongoDeepJobConfig<T> username(String username) {
-        this.username = username;
-        return this;
-    }
 
     /**
      * {@inheritDoc}
@@ -371,14 +365,6 @@ public abstract class GenericDeepJobConfigMongoDB<T> implements IMongoDeepJobCon
         return 0;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public IMongoDeepJobConfig<T> password(String password) {
-        this.password = password;
-        return this;
-    }
 
     /**
      * {@inheritDoc}
@@ -404,7 +390,7 @@ public abstract class GenericDeepJobConfigMongoDB<T> implements IMongoDeepJobCon
      * {@inheritDoc}
      */
     @Override
-    public GenericDeepJobConfigMongoDB<T> initialize() {
+    public DeepJobConfigMongoDB<T> initialize() {
         validate();
         configHadoop = new Configuration();
         StringBuilder connection = new StringBuilder();
