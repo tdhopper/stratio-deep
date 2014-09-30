@@ -38,7 +38,7 @@ import com.stratio.deep.commons.utils.Utils;
 /**
  * @param <T>
  */
-public abstract class GenericDeepJobConfigES<T> implements IESDeepJobConfig<T> {
+public abstract class DeepJobConfigES<T> extends DeepJobConfig<T> implements IESDeepJobConfig<T> {
     private static final long serialVersionUID = -7179376653643603038L;
 
     /**
@@ -95,8 +95,8 @@ public abstract class GenericDeepJobConfigES<T> implements IESDeepJobConfig<T> {
     /**
      * Default constructor
      */
-    public GenericDeepJobConfigES() {
-
+    public DeepJobConfigES(Class<T> entityClass) {
+        super(entityClass);
     }
 
     public IESDeepJobConfig<T> customConfiguration(Map<String, Object> customConfiguration) {
@@ -152,7 +152,7 @@ public abstract class GenericDeepJobConfigES<T> implements IESDeepJobConfig<T> {
      * {@inheritDoc}
      */
     @Override
-    public GenericDeepJobConfigES<T> initialize() {
+    public DeepJobConfigES<T> initialize() {
         validate();
         configHadoop = new JobConf();
         configHadoop.setInputFormat(EsInputFormat.class);

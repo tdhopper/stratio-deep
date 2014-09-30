@@ -16,10 +16,11 @@
 
 package com.stratio.deep.mongodb.extractor;
 
-import com.stratio.deep.mongodb.config.CellDeepJobConfigMongoDB;
-import com.stratio.deep.commons.config.IDeepJobConfig;
+
+import com.stratio.deep.commons.config.DeepJobConfig;
 import com.stratio.deep.commons.entity.Cells;
 import com.stratio.deep.commons.exception.DeepTransformException;
+import com.stratio.deep.mongodb.config.DeepJobConfigMongoDB;
 import com.stratio.deep.mongodb.utils.UtilMongoDB;
 import org.bson.BSONObject;
 import org.slf4j.Logger;
@@ -38,16 +39,13 @@ public final class MongoCellExtractor extends MongoExtractor<Cells> {
 
     public MongoCellExtractor() {
         super();
-        this.deepJobConfig = new CellDeepJobConfigMongoDB();
+        this.deepJobConfig = new DeepJobConfigMongoDB(Cells.class);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Cells transformElement(Tuple2<Object, BSONObject> tuple,
-            IDeepJobConfig<Cells, ? extends IDeepJobConfig> config) {
 
+    @Override
+    public <W extends DeepJobConfig<Cells>> Cells transformElement(Tuple2<Object, BSONObject> tuple,
+            W deepJobConfig) {
         try {
             return UtilMongoDB.getCellFromBson(tuple._2());
         } catch (Exception e) {

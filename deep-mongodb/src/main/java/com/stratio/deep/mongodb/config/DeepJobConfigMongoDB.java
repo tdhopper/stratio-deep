@@ -55,7 +55,8 @@ import com.stratio.deep.commons.entity.Cell;
 /**
  * @param <T>
  */
-public abstract class GenericDeepJobConfigMongoDB<T> implements IMongoDeepJobConfig<T> {
+public class DeepJobConfigMongoDB<T> extends DeepJobConfig<T> implements IMongoDeepJobConfig<T> {
+
     private static final long serialVersionUID = -7179376653643603038L;
 
     /**
@@ -67,17 +68,6 @@ public abstract class GenericDeepJobConfigMongoDB<T> implements IMongoDeepJobCon
      * A list of mongodb host to connect
      */
     private final List<String> hostList = new ArrayList<>();
-
-    /**
-     * MongoDB username
-     */
-    private String username;
-
-    /**
-     * MongoDB password
-     */
-
-    private String password;
 
     /**
      * Indicates the replica set's name
@@ -100,17 +90,6 @@ public abstract class GenericDeepJobConfigMongoDB<T> implements IMongoDeepJobCon
      */
     private String readPreference;
 
-    /**
-     * Entity class to map BSONObject
-     */
-    protected Class<T> entityClass;
-
-    /**
-     * VIP, this MUST be transient!
-     */
-    private transient Map<String, Cell> columnDefinitionMap;
-
-    private String[] inputColumns;
 
     /**
      * OPTIONAL filter query
@@ -127,7 +106,6 @@ public abstract class GenericDeepJobConfigMongoDB<T> implements IMongoDeepJobCon
      */
     private String sort;
 
-    private final Class<? extends InputFormat<?, ?>> inputFormat = MongoInputFormat.class;
 
     /**
      * Shard key
@@ -142,13 +120,13 @@ public abstract class GenericDeepJobConfigMongoDB<T> implements IMongoDeepJobCon
 
     private Integer splitSize = 8;
 
-    private Map<String, Object> customConfiguration;
+    private Map<String, Serializable> customConfiguration;
 
     /**
      * Default constructor
      */
-    public GenericDeepJobConfigMongoDB() {
-
+    public DeepJobConfigMongoDB(Class<T> entityClass) {
+        super(entityClass);
     }
 
     /**
@@ -164,7 +142,7 @@ public abstract class GenericDeepJobConfigMongoDB<T> implements IMongoDeepJobCon
      */
     // TODO : cheking
     @Override
-    public IMongoDeepJobConfig<T> pageSize(int pageSize) {
+    public DeepJobConfigMongoDB<T> pageSize(int pageSize) {
         return this;
     }
 
@@ -217,7 +195,7 @@ public abstract class GenericDeepJobConfigMongoDB<T> implements IMongoDeepJobCon
      * {@inheritDoc}
      */
     @Override
-    public IMongoDeepJobConfig<T> host(String host) {
+    public DeepJobConfigMongoDB<T> host(String host) {
         this.hostList.add(host);
         return this;
     }
@@ -226,12 +204,12 @@ public abstract class GenericDeepJobConfigMongoDB<T> implements IMongoDeepJobCon
      * {@inheritDoc}
      */
     @Override
-    public IMongoDeepJobConfig<T> host(List<String> host) {
+    public DeepJobConfigMongoDB<T> host(List<String> host) {
         this.hostList.addAll(host);
         return this;
     }
 
-    public IMongoDeepJobConfig<T> host(String[] hosts) {
+    public DeepJobConfigMongoDB<T> host(String[] hosts) {
         this.hostList.addAll(Arrays.asList(hosts));
         return this;
     }
@@ -240,7 +218,7 @@ public abstract class GenericDeepJobConfigMongoDB<T> implements IMongoDeepJobCon
      * {@inheritDoc}
      */
     @Override
-    public IMongoDeepJobConfig<T> filterQuery(String query) {
+    public DeepJobConfigMongoDB<T> filterQuery(String query) {
         this.query = query;
         return this;
     }
@@ -290,14 +268,6 @@ public abstract class GenericDeepJobConfigMongoDB<T> implements IMongoDeepJobCon
         return this;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public IMongoDeepJobConfig<T> username(String username) {
-        this.username = username;
-        return this;
-    }
 
     /**
      * {@inheritDoc}
@@ -371,14 +341,6 @@ public abstract class GenericDeepJobConfigMongoDB<T> implements IMongoDeepJobCon
         return 0;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public IMongoDeepJobConfig<T> password(String password) {
-        this.password = password;
-        return this;
-    }
 
     /**
      * {@inheritDoc}
@@ -404,7 +366,7 @@ public abstract class GenericDeepJobConfigMongoDB<T> implements IMongoDeepJobCon
      * {@inheritDoc}
      */
     @Override
-    public GenericDeepJobConfigMongoDB<T> initialize() {
+    public DeepJobConfigMongoDB<T> initialize() {
         validate();
         configHadoop = new Configuration();
         StringBuilder connection = new StringBuilder();
@@ -478,10 +440,10 @@ public abstract class GenericDeepJobConfigMongoDB<T> implements IMongoDeepJobCon
         }
 
         if (customConfiguration != null) {
-            Set<Map.Entry<String, Object>> set = customConfiguration.entrySet();
-            Iterator<Map.Entry<String, Object>> iterator = set.iterator();
+            Set<Map.Entry<String, Serializable>> set = customConfiguration.entrySet();
+            Iterator<Map.Entry<String, Serializable>> iterator = set.iterator();
             while (iterator.hasNext()) {
-                Map.Entry<String, Object> entry = iterator.next();
+                Map.Entry<String, Serializable> entry = iterator.next();
                 configHadoop.set(entry.getKey(), entry.getValue().toString());
             }
         }
@@ -508,7 +470,7 @@ public abstract class GenericDeepJobConfigMongoDB<T> implements IMongoDeepJobCon
      * {@inheritDoc}
      */
     @Override
-    public IMongoDeepJobConfig<T> inputColumns(String... columns) {
+    public DeepJobConfigMongoDB<T> inputColumns(String... columns) {
         BSONObject bsonFields = fields != null ? fields : new BasicBSONObject();
         boolean isIdPresent = false;
         for (String column : columns) {
@@ -536,7 +498,7 @@ public abstract class GenericDeepJobConfigMongoDB<T> implements IMongoDeepJobCon
         return configHadoop;
     }
 
-    @Override
+//    @Override
     public IMongoDeepJobConfig<T> initialize(DeepJobConfig extractorConfig) {
         Map<String, Serializable> values = extractorConfig.getValues();
 

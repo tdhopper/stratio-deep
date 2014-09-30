@@ -17,7 +17,6 @@
 package com.stratio.deep.mongodb.config;
 
 import com.mongodb.QueryBuilder;
-import com.stratio.deep.commons.config.IDeepJobConfig;
 import org.apache.hadoop.conf.Configuration;
 import org.bson.BSONObject;
 
@@ -26,7 +25,7 @@ import java.util.List;
 /**
  * Defines the public methods that each Stratio Deep MongoDB configuration object should implement.
  */
-public interface IMongoDeepJobConfig<T> extends IDeepJobConfig<T, IMongoDeepJobConfig<T>> {
+public interface IMongoDeepJobConfig<T> {
     /**
      * The MongoDB's collection name
      */
@@ -45,6 +44,16 @@ public interface IMongoDeepJobConfig<T> extends IDeepJobConfig<T, IMongoDeepJobC
      * @return this object.
      */
     IMongoDeepJobConfig<T> host(List<String> host);
+
+
+    /**
+     * Sets Mongo hosts.
+     *
+     * @param host
+     *            mongo hosts.
+     * @return this object.
+     */
+    IMongoDeepJobConfig<T> host(String host);
 
     /**
      * The replica set identifier.
@@ -162,4 +171,6 @@ public interface IMongoDeepJobConfig<T> extends IDeepJobConfig<T, IMongoDeepJobC
      * @return this object.
      */
     IMongoDeepJobConfig<T> ignoreIdField();
+
+    IMongoDeepJobConfig<T> initialize();
 }

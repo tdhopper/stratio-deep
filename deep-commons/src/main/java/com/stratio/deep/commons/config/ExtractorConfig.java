@@ -28,19 +28,19 @@ public class ExtractorConfig<T> implements Serializable {
 
     private static final long serialVersionUID = -741177816966076337L;
 
-    private String host;
+    protected String host;
 
-    private Integer port;
+    protected Integer port;
 
-    private String username;
+    protected String username;
 
-    private String password;
+    protected String password;
 
-    private Map<String, Serializable> values = new HashMap<>();
+    protected Map<String, Serializable> values = new HashMap<>();
 
-    private Class<? extends IExtractor> extractorImplClass;
+    protected Class<? extends IExtractor> extractorImplClass;
 
-    private String extractorImplClassName;
+    protected String extractorImplClassName;
 
     protected Class<T> entityClass;
 
@@ -175,10 +175,10 @@ public class ExtractorConfig<T> implements Serializable {
 
     /**
      * Returns the cell value casted to the specified class.
-     * 
+     *
      * @param clazz
      *            the expected class
-     * @param <T>
+     * @param <S>
      *            the return type
      * @return the cell value casted to the specified class
      */
